@@ -1,0 +1,11 @@
+{
+  "name" : "palisade",
+  "blocks" : [
+    { "x" : 0, "y" : 0, "z" : 0, "typename" : "planks", "height" : 2, "depth" : 10 },
+    { "x" : 0, "y" : 2, "z" : 0, "typename" : "planks", "height" : 2 },
+    { "x" : 0, "y" : 2, "z" : 2, "typename" : "planks", "height" : 2 },
+    { "x" : 0, "y" : 2, "z" : 4, "typename" : "planks", "height" : 2 },
+    { "x" : 0, "y" : 2, "z" : 6, "typename" : "planks", "height" : 2 },
+    { "x" : 0, "y" : 2, "z" : 8, "typename" : "planks", "height" : 2 }
+    ]
+}

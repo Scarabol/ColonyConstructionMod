@@ -1,0 +1,10 @@
+{
+  "name" : "stairs",
+  "blocks" : [
+    { "x" : 0, "y" : 0, "z" : 0, "typename" : "stonebricks", "height" : 1 },
+    { "x" : 0, "y" : 0, "z" : 1, "typename" : "stonebricks", "height" : 2 },
+    { "x" : 0, "y" : 0, "z" : 2, "typename" : "stonebricks", "height" : 3 },
+    { "x" : 0, "y" : 0, "z" : 3, "typename" : "stonebricks", "height" : 4 },
+    { "x" : 0, "y" : 0, "z" : 4, "typename" : "stonebricks", "height" : 5 }
+    ]
+}
