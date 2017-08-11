@@ -1,0 +1,10 @@
+{
+  "mods.scarabol.construction.buildtool" : "Hammer",
+  "mods.scarabol.blueprints.gate" : "Blaupause Torhaus",
+  "mods.scarabol.blueprints.wall" : "Blaupause Mauer",
+  "mods.scarabol.blueprints.house" : "Blaupause Haus",
+  "mods.scarabol.blueprints.housesmall" : "Blaupause Haus (klein)",
+  "mods.scarabol.blueprints.stairs" : "Blaupause Treppe",
+  "mods.scarabol.blueprints.palisade" : "Blaupause Palisadenwall",
+  "mods.scarabol.blueprints.palisadegate" : "Blaupause Palisadentor"
+}

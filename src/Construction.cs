@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Pipliz;
 using Pipliz.Chatting;
 using Pipliz.JSON;
@@ -20,6 +20,7 @@ namespace ScarabolMods
     public static void OnAssemblyLoaded(string path)
     {
       ModDirectory = Path.GetDirectoryName(path);
+      ModLocalizationHelper.localize(Path.Combine(Path.GetDirectoryName(path), "assets/localization/"), false);
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterStartup, "scarabol.construction.registercallbacks")]
@@ -32,10 +33,10 @@ namespace ScarabolMods
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.construction.addrawtypes")]
     public static void AfterAddingBaseTypes()
     {
-      ItemTypes.AddRawType("buildhammer",
+      ItemTypes.AddRawType("mods.scarabol.construction.buildtool",
         new JSONNode(NodeType.Object)
           .SetAs<int>("npcLimit", 1)
-          .SetAs("icon", Path.Combine(ModDirectory, "assets/icons/buildhammer.png"))
+          .SetAs("icon", Path.Combine(ModDirectory, "assets/icons/buildtool.png"))
           .SetAs<bool>("isPlaceable", false)
       );
     }
@@ -44,12 +45,12 @@ namespace ScarabolMods
     [ModLoader.ModCallbackProvidesFor("pipliz.apiprovider.registerrecipes")]
     public static void AfterItemTypesDefined()
     {
-      Recipe buildhammerRecipe = new Recipe(new JSONNode()
-        .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "buildhammer")))
+      Recipe buildtoolRecipe = new Recipe(new JSONNode()
+        .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "mods.scarabol.construction.buildtool")))
         .SetAs("requires", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "ironingot")).AddToArray(new JSONNode().SetAs("type", "planks")))
       );
-      RecipePlayer.AllRecipes.Add(buildhammerRecipe);
-      RecipeManager.AddRecipes("pipliz.crafter", new List<Recipe>() { buildhammerRecipe });
+      RecipePlayer.AllRecipes.Add(buildtoolRecipe);
+      RecipeManager.AddRecipes("pipliz.crafter", new List<Recipe>() { buildtoolRecipe });
     }
   }
 
@@ -66,7 +67,7 @@ namespace ScarabolMods
 
     public override bool NeedsItems { get { return shouldTakeItems; } }
 
-    public override InventoryItem RecruitementItem { get { return new InventoryItem(ItemTypes.IndexLookup.GetIndex("buildhammer"), 1); } }
+    public override InventoryItem RecruitementItem { get { return new InventoryItem(ItemTypes.IndexLookup.GetIndex("mods.scarabol.construction.buildtool"), 1); } }
 
     public override JSONNode GetJSON()
     {

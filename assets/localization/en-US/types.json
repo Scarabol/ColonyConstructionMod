@@ -1,0 +1,10 @@
+{
+  "mods.scarabol.construction.buildtool" : "hammer",
+  "mods.scarabol.blueprints.gate" : "blueprint gate",
+  "mods.scarabol.blueprints.wall" : "blueprint wall",
+  "mods.scarabol.blueprints.house" : "blueprint house",
+  "mods.scarabol.blueprints.housesmall" : "blueprint house (small)",
+  "mods.scarabol.blueprints.stairs" : "blueprint stairs",
+  "mods.scarabol.blueprints.palisade" : "blueprint palisade",
+  "mods.scarabol.blueprints.palisadegate" : "blueprint palisade gate"
+}

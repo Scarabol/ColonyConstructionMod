@@ -123,7 +123,7 @@ namespace ScarabolMods
                   }
                 }
               }
-              BlueprintsManager.blueprints.Add("blueprint"+name, blocks);
+              BlueprintsManager.blueprints.Add(name, blocks);
             } catch (Exception exception) {
               Pipliz.Log.Write(string.Format("Exception loading from {0}; {1}", relPathFilename, exception.Message));
             }
