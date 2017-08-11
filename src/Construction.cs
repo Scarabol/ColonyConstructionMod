@@ -168,7 +168,8 @@ namespace ScarabolMods
       }
       shouldTakeItems = false;
       state.JobIsDone = true;
-      foreach (BlueprintBlock block in todoblocks) {
+      for (int i = todoblocks.Count - 1; i >= 0; i--) {
+        BlueprintBlock block = todoblocks[i];
         ushort type = ItemTypes.IndexLookup.GetIndex(block.typename);
         if (usedNPC.Colony.UsedStockpile.Remove(type, 1)) {
           state.Inventory.Add(type, 1);
@@ -186,7 +187,7 @@ namespace ScarabolMods
       if (state.Inventory.IsEmpty) {
         shouldTakeItems = true;
         state.JobIsDone = false;
-        state.SetIndicator(NPCIndicatorType.MissingItem, 6f, ItemTypes.IndexLookup.GetIndex(todoblocks[0].typename));
+        state.SetIndicator(NPCIndicatorType.MissingItem, 6f, ItemTypes.IndexLookup.GetIndex(todoblocks[todoblocks.Count-1].typename));
       }
     }
 
