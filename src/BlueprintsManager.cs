@@ -9,11 +9,20 @@ namespace ScarabolMods
   [ModLoader.ModManager]
   public static class BlueprintsManagerModEntries
   {
+    public static string RelativeTexturesPath;
+
+    [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.blueprints.assemblyload")]
+    public static void OnAssemblyLoaded(string path)
+    {
+      // TODO this is realy hacky (maybe better in future ModAPI)
+      RelativeTexturesPath = new Uri(Path.GetFullPath("gamedata/textures/materials/blocks/albedo/dummyfile")).MakeRelativeUri(new Uri(Path.Combine(Path.GetDirectoryName(path), "assets/textures/"))).OriginalString;
+    }
+
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.blueprints.addrawtypes")]
     public static void AfterAddingBaseTypes()
     {
       ItemTypesServer.AddTextureMapping("blueprintstop", new JSONNode()
-        .SetAs("albedo", "blueprintsTop")
+        .SetAs("albedo", Path.Combine(RelativeTexturesPath, "albedo/blueprintsTop"))
         .SetAs("normal", "neutral")
         .SetAs("emissive", "neutral")
         .SetAs("height", "neutral")
