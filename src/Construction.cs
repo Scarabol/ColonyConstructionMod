@@ -180,18 +180,23 @@ namespace ScarabolMods
       state.JobIsDone = true;
       for (int i = todoblocks.Count - 1; i >= 0; i--) {
         BlueprintBlock block = todoblocks[i];
-        ushort type = ItemTypes.IndexLookup.GetIndex(block.typename);
-        if (usedNPC.Colony.UsedStockpile.Remove(type, 1)) {
-          state.Inventory.Add(type, 1);
-          if (state.Inventory.UsedCapacity >= state.Inventory.Capacity) { // workaround for capacity issue
-            //Chat.SendToAll("oh boy too heavy");
-            if (state.Inventory.TryGetOneItem(type)) {
-              //Chat.SendToAll(string.Format("put one back and now have cap {0} of {1}", state.Inventory.UsedCapacity, state.Inventory.Capacity));
-              usedNPC.Colony.UsedStockpile.Add(type, 1);
+        ushort typeindex;
+        if (ItemTypes.IndexLookup.TryGetIndex(block.typename, out typeindex)) {
+          if (usedNPC.Colony.UsedStockpile.Remove(typeindex, 1)) {
+            state.Inventory.Add(typeindex, 1);
+            if (state.Inventory.UsedCapacity >= state.Inventory.Capacity) { // workaround for capacity issue
+              //Chat.SendToAll("oh boy too heavy");
+              if (state.Inventory.TryGetOneItem(typeindex)) {
+                //Chat.SendToAll(string.Format("put one back and now have cap {0} of {1}", state.Inventory.UsedCapacity, state.Inventory.Capacity));
+                usedNPC.Colony.UsedStockpile.Add(typeindex, 1);
+              }
+              //Chat.SendToAll(string.Format("cap now {0} of {1}", state.Inventory.UsedCapacity, state.Inventory.Capacity));
+              return;
             }
-            //Chat.SendToAll(string.Format("cap now {0} of {1}", state.Inventory.UsedCapacity, state.Inventory.Capacity));
-            return;
           }
+        } else {
+          Chat.Send(usedNPC.Colony.Owner, string.Format("Bob here from site at {0}, the item type '{1}' does not exist. Ignoring it...", position, block.typename));
+          todoblocks.RemoveAt(i);
         }
       }
       if (state.Inventory.IsEmpty) {
