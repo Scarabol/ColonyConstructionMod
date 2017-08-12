@@ -91,9 +91,10 @@ namespace ScarabolMods
               }
               string filename = Path.GetFileName(filepath);
               if (blueprintName == null || blueprintName.Length < 1) {
-                blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", "").ToLower();
+                blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", ".").ToLower();
                 Pipliz.Log.Write(string.Format("No name defined in '{0}', using '{1}' extracted from filename", filename, blueprintName));
               }
+              blueprintName = "mods.scarabol.blueprints."+blueprintName;
               List<BlueprintBlock> blocks = new List<BlueprintBlock>();
               Pipliz.Log.Write(string.Format("Reading blueprint named '{0}' from '{1}'", blueprintName, filename));
               JSONNode jsonBlocks;
