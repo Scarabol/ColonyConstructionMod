@@ -85,8 +85,10 @@ namespace ScarabolMods
           JSONNode json;
           if (Pipliz.JSON.JSON.Deserialize(filepath, out json, false)) {
             if (json != null) {
-              string blueprintName;
-              json.TryGetAs<string>("name", out blueprintName);
+              string blueprintName = null;
+              if (json.NodeType == NodeType.Object) {
+                json.TryGetAs<string>("name", out blueprintName);
+              }
               string filename = Path.GetFileName(filepath);
               if (blueprintName == null || blueprintName.Length < 1) {
                 blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", "").ToLower();
@@ -95,8 +97,9 @@ namespace ScarabolMods
               List<BlueprintBlock> blocks = new List<BlueprintBlock>();
               Pipliz.Log.Write(string.Format("Reading blueprint named '{0}' from '{1}'", blueprintName, filename));
               JSONNode jsonBlocks;
-              json.TryGetAs<JSONNode>("blocks", out jsonBlocks);
-              if (jsonBlocks == null) {
+              if (json.NodeType == NodeType.Object) {
+                json.TryGetAs<JSONNode>("blocks", out jsonBlocks);
+              } else {
                 jsonBlocks = json; // fallback everything is an array
                 Pipliz.Log.Write(string.Format("No blocks key defined in '{0}' using full content as array", filename));
               }
