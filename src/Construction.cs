@@ -15,19 +15,21 @@ namespace ScarabolMods
   public static class ConstructionModEntries
   {
     public static string ModDirectory;
+    private static string AssetsDirectory;
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.construction.assemblyload")]
     public static void OnAssemblyLoaded(string path)
     {
       ModDirectory = Path.GetDirectoryName(path);
-      ModLocalizationHelper.localize(Path.Combine(Path.GetDirectoryName(path), "assets/localization/"), false);
+      AssetsDirectory = Path.Combine(ModDirectory, "assets");
+      ModLocalizationHelper.localize(Path.Combine(AssetsDirectory, "localization"), false);
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterStartup, "scarabol.construction.registercallbacks")]
     public static void AfterStartup()
     {
       Pipliz.Log.Write("Loaded Construction Mod 1.2 by Scarabol");
-      BlueprintsManager.LoadBlueprints("gamedata/mods/Scarabol/Construction/blueprints/");
+      BlueprintsManager.LoadBlueprints(Path.Combine(ModDirectory, "blueprints"));
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterDefiningNPCTypes, "scarabol.construction.registerjobs")]
@@ -45,7 +47,7 @@ namespace ScarabolMods
       ItemTypes.AddRawType("mods.scarabol.construction.buildtool",
         new JSONNode(NodeType.Object)
           .SetAs<int>("npcLimit", 1)
-          .SetAs("icon", Path.Combine(ModDirectory, "assets/icons/buildtool.png"))
+          .SetAs("icon", Path.Combine(Path.Combine(AssetsDirectory, "icons"), "buildtool.png"))
           .SetAs<bool>("isPlaceable", false)
       );
     }
