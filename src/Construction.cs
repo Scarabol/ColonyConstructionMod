@@ -30,6 +30,15 @@ namespace ScarabolMods
       BlueprintsManager.LoadBlueprints("gamedata/mods/Scarabol/Construction/blueprints/");
     }
 
+    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterDefiningNPCTypes, "scarabol.construction.registerjobs")]
+    [ModLoader.ModCallbackProvidesFor("pipliz.apiprovider.jobs.resolvetypes")]
+    public static void AfterDefiningNPCTypes()
+    {
+      foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
+        BlockJobManagerTracker.Register<ConstructionJob>(blueprintTypename);
+      }
+    }
+
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.construction.addrawtypes")]
     public static void AfterAddingBaseTypes()
     {
@@ -87,9 +96,9 @@ namespace ScarabolMods
       blockInventory = new NPCInventory(10000000f);
       InitializeJob(player, position, 0);
       fullname = ItemTypes.IndexLookup.GetName(type);
-      string name = fullname.Substring(0, fullname.Length-2);
+      string blueprintTypename = fullname.Substring(0, fullname.Length-2);
       List<BlueprintBlock> blocks;
-      BlueprintsManager.blueprints.TryGetValue(name, out blocks);
+      BlueprintsManager.blueprints.TryGetValue(blueprintTypename, out blocks);
       todoblocks = new List<BlueprintBlock>(blocks);
       todoblocks.Reverse();
       return this;

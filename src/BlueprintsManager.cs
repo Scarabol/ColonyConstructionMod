@@ -21,39 +21,40 @@ namespace ScarabolMods
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.blueprints.addrawtypes")]
     public static void AfterAddingBaseTypes()
     {
+      Pipliz.Log.Write(string.Format("Blueprints relative texture path is {0}", RelativeTexturesPath));
       ItemTypesServer.AddTextureMapping("blueprintstop", new JSONNode()
         .SetAs("albedo", Path.Combine(RelativeTexturesPath, "albedo/blueprintsTop"))
         .SetAs("normal", "neutral")
         .SetAs("emissive", "neutral")
         .SetAs("height", "neutral")
       );
-      foreach (string key in BlueprintsManager.blueprints.Keys) {
-        ItemTypes.AddRawType(key,
+      foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
+        ItemTypes.AddRawType(blueprintTypename,
           new JSONNode(NodeType.Object)
             .SetAs("sideall", "planks")
             .SetAs("sidey+", "blueprintstop")
             .SetAs("isRotatable", "true")
-            .SetAs("rotatablex+", key+"x+")
-            .SetAs("rotatablex-", key+"x-")
-            .SetAs("rotatablez+", key+"z+")
-            .SetAs("rotatablez-", key+"z-")
+            .SetAs("rotatablex+", blueprintTypename+"x+")
+            .SetAs("rotatablex-", blueprintTypename+"x-")
+            .SetAs("rotatablez+", blueprintTypename+"z+")
+            .SetAs("rotatablez-", blueprintTypename+"z-")
             .SetAs("npcLimit", "0")
         );
-        ItemTypes.AddRawType(key+"x+",
+        ItemTypes.AddRawType(blueprintTypename+"x+",
           new JSONNode(NodeType.Object)
-            .SetAs("parentType", key)
+            .SetAs("parentType", blueprintTypename)
         );
-        ItemTypes.AddRawType(key+"x-",
+        ItemTypes.AddRawType(blueprintTypename+"x-",
           new JSONNode(NodeType.Object)
-            .SetAs("parentType", key)
+            .SetAs("parentType", blueprintTypename)
         );
-        ItemTypes.AddRawType(key+"z+",
+        ItemTypes.AddRawType(blueprintTypename+"z+",
           new JSONNode(NodeType.Object)
-            .SetAs("parentType", key)
+            .SetAs("parentType", blueprintTypename)
         );
-        ItemTypes.AddRawType(key+"z-",
+        ItemTypes.AddRawType(blueprintTypename+"z-",
           new JSONNode(NodeType.Object)
-            .SetAs("parentType", key)
+            .SetAs("parentType", blueprintTypename)
         );
       }
     }
@@ -62,20 +63,11 @@ namespace ScarabolMods
     [ModLoader.ModCallbackProvidesFor("pipliz.apiprovider.registerrecipes")]
     public static void AfterItemTypesDefined()
     {
-      foreach (string key in BlueprintsManager.blueprints.Keys) {
+      foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
         RecipePlayer.AllRecipes.Add(new Recipe(new JSONNode()
-          .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", key)))
+          .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", blueprintTypename)))
           .SetAs("requires", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "planks")))
         ));
-      }
-    }
-
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterDefiningNPCTypes, "scarabol.blueprints.registerjobs")]
-    [ModLoader.ModCallbackProvidesFor("pipliz.apiprovider.jobs.resolvetypes")]
-    public static void AfterDefiningNPCTypes()
-    {
-      foreach (string key in BlueprintsManager.blueprints.Keys) {
-        BlockJobManagerTracker.Register<ConstructionJob>(key);
       }
     }
   }
@@ -84,28 +76,29 @@ namespace ScarabolMods
   {
     public static Dictionary<string, List<BlueprintBlock>> blueprints = new Dictionary<string, List<BlueprintBlock>>();
 
-    public static void LoadBlueprints(string blueprintsDirectory)
+    public static void LoadBlueprints(string blueprintsPath)
     {
-      string[] files = Directory.GetFiles(blueprintsDirectory, "**.json", SearchOption.AllDirectories);
-      foreach (string relPathFilename in files) {
-        JSONNode json;
-        if (Pipliz.JSON.JSON.Deserialize(relPathFilename, out json, false)) {
-          if (json != null) {
-            try {
-              string name;
-              json.TryGetAs<string>("name", out name);
-              if (name == null || name.Length < 1) {
-                string filename  = Path.GetFileNameWithoutExtension(relPathFilename);
-                name = filename.Replace(" ", "").ToLower();
-                Pipliz.Log.Write(string.Format("No name defined using part {0} as fallback from relPathFilename {1}", name, filename));
+      Pipliz.Log.Write(string.Format("Loading blueprints from {0}", blueprintsPath));
+      string[] files = Directory.GetFiles(blueprintsPath, "**.json", SearchOption.AllDirectories);
+      foreach (string filepath in files) {
+        try {
+          JSONNode json;
+          if (Pipliz.JSON.JSON.Deserialize(filepath, out json, false)) {
+            if (json != null) {
+              string blueprintName;
+              json.TryGetAs<string>("name", out blueprintName);
+              string filename = Path.GetFileName(filepath);
+              if (blueprintName == null || blueprintName.Length < 1) {
+                blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", "").ToLower();
+                Pipliz.Log.Write(string.Format("No name defined in '{0}', using '{1}' extracted from filename", filename, blueprintName));
               }
               List<BlueprintBlock> blocks = new List<BlueprintBlock>();
-              Pipliz.Log.Write(string.Format("Reading blueprint named {0} from {1}", name, relPathFilename));
+              Pipliz.Log.Write(string.Format("Reading blueprint named '{0}' from '{1}'", blueprintName, filename));
               JSONNode jsonBlocks;
               json.TryGetAs<JSONNode>("blocks", out jsonBlocks);
               if (jsonBlocks == null) {
                 jsonBlocks = json; // fallback everything is an array
-                Pipliz.Log.Write(string.Format("No blocks defined using full content as array"));
+                Pipliz.Log.Write(string.Format("No blocks key defined in '{0}' using full content as array", filename));
               }
               foreach (JSONNode node in jsonBlocks.LoopArray()) {
                 int startx = getJSONInt(node, "startx", "x", 0, false);
@@ -132,11 +125,12 @@ namespace ScarabolMods
                   }
                 }
               }
-              BlueprintsManager.blueprints.Add(name, blocks);
-            } catch (Exception exception) {
-              Pipliz.Log.Write(string.Format("Exception loading from {0}; {1}", relPathFilename, exception.Message));
+              BlueprintsManager.blueprints.Add(blueprintName, blocks);
+              Pipliz.Log.Write(string.Format("Added blueprint '{0}' with {1} blocks", blueprintName, blocks.Count));
             }
           }
+        } catch (Exception exception) {
+          Pipliz.Log.Write(string.Format("Exception loading from {0}; {1}", filepath, exception.Message));
         }
       }
     }
