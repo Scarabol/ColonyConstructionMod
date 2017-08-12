@@ -28,7 +28,7 @@ namespace ScarabolMods
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterStartup, "scarabol.construction.registercallbacks")]
     public static void AfterStartup()
     {
-      Pipliz.Log.Write("Loaded Construction Mod 1.2 by Scarabol");
+      Pipliz.Log.Write("Loaded Construction Mod 1.3 by Scarabol");
       BlueprintsManager.LoadBlueprints(Path.Combine(ModDirectory, "blueprints"));
     }
 
