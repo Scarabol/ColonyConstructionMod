@@ -97,12 +97,24 @@ namespace ScarabolMods
               blueprintName = "mods.scarabol.blueprints."+blueprintName;
               List<BlueprintBlock> blocks = new List<BlueprintBlock>();
               Pipliz.Log.Write(string.Format("Reading blueprint named '{0}' from '{1}'", blueprintName, filename));
+              int offx = 0;
+              int offy = 0;
+              int offz = 0;
               JSONNode jsonBlocks;
               if (json.NodeType == NodeType.Object) {
                 json.TryGetAs<JSONNode>("blocks", out jsonBlocks);
               } else {
                 jsonBlocks = json; // fallback everything is an array
-                Pipliz.Log.Write(string.Format("No blocks key defined in '{0}' using full content as array", filename));
+                Pipliz.Log.Write(string.Format("No object defined in '{0}', using full content as array", filename));
+                foreach (JSONNode node in jsonBlocks.LoopArray()) {
+                  int x = getJSONInt(node, "startx", "x", 0, false);
+                  if (x < offx) { offx = x; }
+                  int y = getJSONInt(node, "starty", "y", 0, false);
+                  if (y < offy) { offy = y; }
+                  int z = getJSONInt(node, "startz", "z", 0, false);
+                  if (z < offz) { offz = z; }
+                }
+                Pipliz.Log.Write(string.Format("Offset for complete structure is {0} {1} {2}", -offx, -offy, -offz));
               }
               foreach (JSONNode node in jsonBlocks.LoopArray()) {
                 int startx = getJSONInt(node, "startx", "x", 0, false);
@@ -124,7 +136,7 @@ namespace ScarabolMods
                 for (int x = startx; x < startx + width; x++) {
                   for (int y = starty; y < starty + height; y++) {
                     for (int z = startz; z < startz + depth; z++) {
-                      blocks.Add(new BlueprintBlock(x, y, z, typename));
+                      blocks.Add(new BlueprintBlock(x - offx, y - offy, z - offz, typename));
                     }
                   }
                 }
