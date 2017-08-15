@@ -2,6 +2,7 @@
   "buildtool" : "Hammer",
   "blueprints.gate" : "Blueprint Gate",
   "blueprints.wall" : "Blueprint Wall (10, right)",
+  "blueprints.wall2" : "Blueprint Wall (10, left)",
   "blueprints.house" : "Blueprint House",
   "blueprints.housesmall" : "Blueprint House (small)",
   "blueprints.stairs" : "Blueprint Stairs",
