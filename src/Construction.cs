@@ -133,6 +133,7 @@ namespace ScarabolMods
         blockInventory.Dump(usedNPC.Inventory);
         shouldTakeItems = true;
       } else {
+        bool placed = false;
         ushort bluetype = ItemTypes.IndexLookup.GetIndex(fullname);
         for (int i = todoblocks.Count - 1; i >= 0; i--) {
           BlueprintBlock blueblock = todoblocks[i];
@@ -163,11 +164,16 @@ namespace ScarabolMods
               if (!blockInventory.IsEmpty && i > 0) {
                 state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(todoblocks[i-1].typename));
               }
+              placed = true;
               break;
             }
           } else {
             todoblocks.RemoveAt(i);
           }
+        }
+        if (!placed) {
+          blockInventory.Dump(usedNPC.Inventory);
+          shouldTakeItems = true;
         }
       }
     }
