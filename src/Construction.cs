@@ -104,7 +104,9 @@ namespace ScarabolMods
       List<BlueprintBlock> blocks;
       BlueprintsManager.blueprints.TryGetValue(blueprintTypename, out blocks);
       todoblocks = new List<BlueprintBlock>(blocks);
-      todoblocks.Reverse();
+      if (!blueprintTypename.EndsWith("_clear")) {
+        todoblocks.Reverse();
+      }
       return this;
     }
 

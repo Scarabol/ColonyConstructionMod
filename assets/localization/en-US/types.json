@@ -1,6 +1,7 @@
 {
   "buildtool" : "Hammer",
   "blueprints.gate" : "Blueprint Gate",
+  "blueprints.gate_clear" : "Blueprint Abriss Gate",
   "blueprints.wall" : "Blueprint Wall (10, right)",
   "blueprints.wall2" : "Blueprint Wall (10, left)",
   "blueprints.tower" : "Blueprint Tower",
