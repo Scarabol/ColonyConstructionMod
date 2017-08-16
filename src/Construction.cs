@@ -68,6 +68,7 @@ namespace ScarabolMods
 
   public class ConstructionJob : BlockJobBase, IBlockJobBase, INPCTypeDefiner
   {
+    private static float EXCAVATION_DELAY = 1.5f;
     NPCInventory blockInventory;
     bool shouldTakeItems;
     string fullname;
@@ -127,9 +128,7 @@ namespace ScarabolMods
       if (!state.Inventory.IsEmpty) {
         state.Inventory.Dump(blockInventory);
       }
-      if (blockInventory.IsEmpty) {
-        shouldTakeItems = true;
-      } else if (todoblocks.Count < 1) {
+      if (todoblocks.Count < 1) {
         blockInventory.Dump(usedNPC.Inventory);
         shouldTakeItems = true;
       } else {
@@ -157,15 +156,20 @@ namespace ScarabolMods
           ushort newType = ItemTypes.IndexLookup.GetIndex(blueblock.typename);
           ushort actualType;
           if (World.TryGetTypeAt(realPosition, out actualType) && actualType != newType) {
-            if (blockInventory.TryGetOneItem(newType)) {
+            if (newType == ItemTypes.IndexLookup.GetIndex("air") || blockInventory.TryGetOneItem(newType)) {
               todoblocks.RemoveAt(i);
-              ServerManager.TryChangeBlock(realPosition, newType);
-              state.JobIsDone = true;
-              if (!blockInventory.IsEmpty && i > 0) {
-                state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(todoblocks[i-1].typename));
+              if (ServerManager.TryChangeBlock(realPosition, newType)) {
+                state.JobIsDone = true;
+                if (newType == ItemTypes.IndexLookup.GetIndex("air")) {
+                  OverrideCooldown(EXCAVATION_DELAY);
+                  state.SetIndicator(NPCIndicatorType.MissingItem, EXCAVATION_DELAY, actualType);
+                } else if (!blockInventory.IsEmpty && i > 0) {
+                  state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(todoblocks[i-1].typename));
+                }
+                usedNPC.Inventory.Add(new InventoryItem(actualType, 1));
+                placed = true;
+                break;
               }
-              placed = true;
-              break;
             }
           } else {
             todoblocks.RemoveAt(i);
@@ -185,31 +189,35 @@ namespace ScarabolMods
         ServerManager.TryChangeBlock(position, ItemTypes.IndexLookup.GetIndex("air"));
         return;
       }
-      shouldTakeItems = false;
+      shouldTakeItems = true;
       state.JobIsDone = true;
       for (int i = todoblocks.Count - 1; i >= 0; i--) {
         BlueprintBlock block = todoblocks[i];
-        ushort typeindex;
-        if (ItemTypes.IndexLookup.TryGetIndex(block.typename, out typeindex)) {
-          if (usedNPC.Colony.UsedStockpile.Remove(typeindex, 1)) {
-            state.Inventory.Add(typeindex, 1);
-            if (state.Inventory.UsedCapacity >= state.Inventory.Capacity) { // workaround for capacity issue
-              //Chat.SendToAll("oh boy too heavy");
-              if (state.Inventory.TryGetOneItem(typeindex)) {
-                //Chat.SendToAll(string.Format("put one back and now have cap {0} of {1}", state.Inventory.UsedCapacity, state.Inventory.Capacity));
-                usedNPC.Colony.UsedStockpile.Add(typeindex, 1);
+        if (!block.typename.Equals("air")) {
+          ushort typeindex;
+          if (ItemTypes.IndexLookup.TryGetIndex(block.typename, out typeindex)) {
+            if (usedNPC.Colony.UsedStockpile.Remove(typeindex, 1)) {
+              shouldTakeItems = false;
+              state.Inventory.Add(typeindex, 1);
+              if (state.Inventory.UsedCapacity >= state.Inventory.Capacity) { // workaround for capacity issue
+                //Chat.SendToAll("oh boy too heavy");
+                if (state.Inventory.TryGetOneItem(typeindex)) {
+                  //Chat.SendToAll(string.Format("put one back and now have cap {0} of {1}", state.Inventory.UsedCapacity, state.Inventory.Capacity));
+                  usedNPC.Colony.UsedStockpile.Add(typeindex, 1);
+                }
+                //Chat.SendToAll(string.Format("cap now {0} of {1}", state.Inventory.UsedCapacity, state.Inventory.Capacity));
+                return;
               }
-              //Chat.SendToAll(string.Format("cap now {0} of {1}", state.Inventory.UsedCapacity, state.Inventory.Capacity));
-              return;
             }
+          } else {
+            Chat.Send(usedNPC.Colony.Owner, string.Format("Bob here from site at {0}, the item type '{1}' does not exist. Ignoring it...", position, block.typename));
+            todoblocks.RemoveAt(i);
           }
         } else {
-          Chat.Send(usedNPC.Colony.Owner, string.Format("Bob here from site at {0}, the item type '{1}' does not exist. Ignoring it...", position, block.typename));
-          todoblocks.RemoveAt(i);
+          shouldTakeItems = false;
         }
       }
-      if (state.Inventory.IsEmpty) {
-        shouldTakeItems = true;
+      if (shouldTakeItems && todoblocks.Count > 0) {
         state.JobIsDone = false;
         state.SetIndicator(NPCIndicatorType.MissingItem, 6f, ItemTypes.IndexLookup.GetIndex(todoblocks[todoblocks.Count-1].typename));
       }
