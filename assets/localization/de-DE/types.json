@@ -8,5 +8,7 @@
   "blueprints.housesmall" : "Blaupause Haus (klein)",
   "blueprints.stairs" : "Blaupause Treppe",
   "blueprints.palisade" : "Blaupause Palisadenzaun",
-  "blueprints.palisadegate" : "Blaupause Palisadentor"
+  "blueprints.palisadegate" : "Blaupause Palisadentor",
+  "blueprints.trench_right" : "Graben (rechts)",
+  "blueprints.trench_left" : "Graben (links)"
 }

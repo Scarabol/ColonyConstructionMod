@@ -1,0 +1,8 @@
+{
+  "name" : "trench_left",
+  "blocks" : [
+    { "x" : 0, "y" : -1, "z" : 0, "typename" : "air", "height" : -3, "depth" : 10 },
+    { "x" : -1, "y" : -1, "z" : 0, "typename" : "air", "height" : -2, "depth" : 10 },
+    { "x" : -2, "y" : -1, "z" : 0, "typename" : "air", "height" : -1, "depth" : 10 }
+  ]
+}

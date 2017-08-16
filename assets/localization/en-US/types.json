@@ -8,5 +8,7 @@
   "blueprints.housesmall" : "Blueprint House (small)",
   "blueprints.stairs" : "Blueprint Stairs",
   "blueprints.palisade" : "Blueprint Palisade",
-  "blueprints.palisadegate" : "Blueprint Palisade Gate"
+  "blueprints.palisadegate" : "Blueprint Palisade Gate",
+  "blueprints.trench_right" : "Trench (right)",
+  "blueprints.trench_left" : "Trench (left)"
 }
