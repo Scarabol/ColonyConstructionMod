@@ -9,11 +9,13 @@ namespace ScarabolMods
   [ModLoader.ModManager]
   public static class BlueprintsManagerModEntries
   {
+    private static string AssetsDirectory;
     private static string RelativeTexturesPath;
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.blueprints.assemblyload")]
     public static void OnAssemblyLoaded(string path)
     {
+      AssetsDirectory = Path.Combine(Path.GetDirectoryName(path), "assets");
       // TODO this is realy hacky (maybe better in future ModAPI)
       RelativeTexturesPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "materials", "blocks", "albedo", "dummyfile")).MakeRelativeUri(new Uri(MultiPath.Combine(Path.GetDirectoryName(path), "assets", "textures"))).OriginalString;
     }
@@ -33,6 +35,7 @@ namespace ScarabolMods
           new JSONNode(NodeType.Object)
             .SetAs("onRemoveAudio", "woodDeleteLight")
             .SetAs("onPlaceAudio", "woodPlace")
+            .SetAs("icon", MultiPath.Combine(AssetsDirectory, "icons", "blueprint.png"))
             .SetAs("sideall", "planks")
             .SetAs("sidey+", "blueprintstop")
             .SetAs("npcLimit", "0")
