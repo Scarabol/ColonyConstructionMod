@@ -14,6 +14,7 @@ namespace ScarabolMods
   [ModLoader.ModManager]
   public static class ConstructionModEntries
   {
+    public static string MOD_PREFIX = "mods.scarabol.construction.";
     public static string ModDirectory;
     private static string AssetsDirectory;
 
@@ -22,7 +23,7 @@ namespace ScarabolMods
     {
       ModDirectory = Path.GetDirectoryName(path);
       AssetsDirectory = Path.Combine(ModDirectory, "assets");
-      ModLocalizationHelper.localize(Path.Combine(AssetsDirectory, "localization"), false);
+      ModLocalizationHelper.localize(Path.Combine(AssetsDirectory, "localization"), MOD_PREFIX, false);
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterStartup, "scarabol.construction.registercallbacks")]

@@ -9,7 +9,7 @@ namespace ScarabolMods
   [ModLoader.ModManager]
   public static class BlueprintsManagerModEntries
   {
-    public static string RelativeTexturesPath;
+    private static string RelativeTexturesPath;
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.blueprints.assemblyload")]
     public static void OnAssemblyLoaded(string path)
@@ -31,8 +31,12 @@ namespace ScarabolMods
       foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
         ItemTypes.AddRawType(blueprintTypename,
           new JSONNode(NodeType.Object)
+            .SetAs("onRemoveAudio", "woodDeleteLight")
+            .SetAs("onPlaceAudio", "woodPlace")
             .SetAs("sideall", "planks")
             .SetAs("sidey+", "blueprintstop")
+            .SetAs("npcLimit", "0")
+            .SetAs("onRemove", new JSONNode(NodeType.Array))
             .SetAs("isRotatable", "true")
             .SetAs("rotatablex+", blueprintTypename+"x+")
             .SetAs("rotatablex-", blueprintTypename+"x-")
@@ -84,69 +88,70 @@ namespace ScarabolMods
         try {
           JSONNode json;
           if (Pipliz.JSON.JSON.Deserialize(filepath, out json, false)) {
-            if (json != null) {
-              string blueprintName = null;
-              if (json.NodeType == NodeType.Object) {
-                json.TryGetAs<string>("name", out blueprintName);
-              }
-              string filename = Path.GetFileName(filepath);
-              if (blueprintName == null || blueprintName.Length < 1) {
-                blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", ".").ToLower();
-                Pipliz.Log.Write(string.Format("No name defined in '{0}', using '{1}' extracted from filename", filename, blueprintName));
-              }
-              blueprintName = "mods.scarabol.blueprints."+blueprintName;
-              List<BlueprintBlock> blocks = new List<BlueprintBlock>();
-              Pipliz.Log.Write(string.Format("Reading blueprint named '{0}' from '{1}'", blueprintName, filename));
-              int offx = 0;
-              int offy = 0;
-              int offz = 0;
-              JSONNode jsonBlocks;
-              if (json.NodeType == NodeType.Object) {
-                json.TryGetAs<JSONNode>("blocks", out jsonBlocks);
-              } else {
-                jsonBlocks = json; // fallback everything is an array
-                Pipliz.Log.Write(string.Format("No object defined in '{0}', using full content as array", filename));
-                foreach (JSONNode node in jsonBlocks.LoopArray()) {
-                  int x = getJSONInt(node, "startx", "x", 0, false);
-                  if (x < offx) { offx = x; }
-                  int y = getJSONInt(node, "starty", "y", 0, false);
-                  if (y < offy) { offy = y; }
-                  int z = getJSONInt(node, "startz", "z", 0, false);
-                  if (z < offz) { offz = z; }
-                }
-                Pipliz.Log.Write(string.Format("Offset for complete structure is {0} {1} {2}", -offx, -offy, -offz));
-              }
-              foreach (JSONNode node in jsonBlocks.LoopArray()) {
-                int startx = getJSONInt(node, "startx", "x", 0, false);
-                int starty = getJSONInt(node, "starty", "y", 0, false);
-                int startz = getJSONInt(node, "startz", "z", 0, false);
-                string typename;
-                try {
-                  typename = node["typename"].GetAs<string>();
-                } catch (Exception) {
-                  try {
-                    typename = node["t"].GetAs<string>();
-                  } catch (Exception) {
-                    throw new Exception(string.Format("typename not defined or not a string"));
-                  }
-                }
-                int width = getJSONInt(node, "width", "w", 1, true);
-                int height = getJSONInt(node, "height", "h", 1, true);
-                int depth = getJSONInt(node, "depth", "d", 1, true);
-                for (int x = startx; x < startx + width; x++) {
-                  for (int y = starty; y < starty + height; y++) {
-                    for (int z = startz; z < startz + depth; z++) {
-                      blocks.Add(new BlueprintBlock(x - offx, y - offy, z - offz, typename));
-                    }
-                  }
-                }
-              }
-              BlueprintsManager.blueprints.Add(blueprintName, blocks);
-              Pipliz.Log.Write(string.Format("Added blueprint '{0}' with {1} blocks", blueprintName, blocks.Count));
+            string blueprintName = null;
+            if (json.NodeType == NodeType.Object) {
+              json.TryGetAs<string>("name", out blueprintName);
             }
+            string filename = Path.GetFileName(filepath);
+            if (blueprintName == null || blueprintName.Length < 1) {
+              blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", ".").ToLower();
+              Pipliz.Log.Write(string.Format("No name defined in '{0}', using '{1}' extracted from filename", filename, blueprintName));
+            }
+            blueprintName = ConstructionModEntries.MOD_PREFIX + "blueprints." + blueprintName;
+            Pipliz.Log.Write(string.Format("Reading blueprint named '{0}' from '{1}'", blueprintName, filename));
+            int offx = 0;
+            int offy = 0;
+            int offz = 0;
+            JSONNode jsonBlocks;
+            if (json.NodeType == NodeType.Object) {
+              if (!json.TryGetAs<JSONNode>("blocks", out jsonBlocks)) {
+                Pipliz.Log.WriteError(string.Format("Expected 'blocks' key in json {0}", filename));
+                continue;
+              }
+            } else {
+              jsonBlocks = json; // fallback everything is an array
+              Pipliz.Log.Write(string.Format("No object defined in '{0}', using full content as array", filename));
+              foreach (JSONNode node in jsonBlocks.LoopArray()) {
+                int x = getJSONInt(node, "startx", "x", 0, false);
+                if (x < offx) { offx = x; }
+                int y = getJSONInt(node, "starty", "y", 0, false);
+                if (y < offy) { offy = y; }
+                int z = getJSONInt(node, "startz", "z", 0, false);
+                if (z < offz) { offz = z; }
+              }
+              Pipliz.Log.Write(string.Format("Offset for complete structure is {0} {1} {2}", -offx, -offy, -offz));
+            }
+            List<BlueprintBlock> blocks = new List<BlueprintBlock>();
+            foreach (JSONNode node in jsonBlocks.LoopArray()) {
+              int startx = getJSONInt(node, "startx", "x", 0, false);
+              int starty = getJSONInt(node, "starty", "y", 0, false);
+              int startz = getJSONInt(node, "startz", "z", 0, false);
+              string typename;
+              try {
+                typename = node["typename"].GetAs<string>();
+              } catch (Exception) {
+                try {
+                  typename = node["t"].GetAs<string>();
+                } catch (Exception) {
+                  throw new Exception(string.Format("typename not defined or not a string"));
+                }
+              }
+              int width = getJSONInt(node, "width", "w", 1, true);
+              int height = getJSONInt(node, "height", "h", 1, true);
+              int depth = getJSONInt(node, "depth", "d", 1, true);
+              for (int x = startx; x < startx + width; x++) {
+                for (int y = starty; y < starty + height; y++) {
+                  for (int z = startz; z < startz + depth; z++) {
+                    blocks.Add(new BlueprintBlock(x - offx, y - offy, z - offz, typename));
+                  }
+                }
+              }
+            }
+            BlueprintsManager.blueprints.Add(blueprintName, blocks);
+            Pipliz.Log.Write(string.Format("Added blueprint '{0}' with {1} blocks", blueprintName, blocks.Count));
           }
         } catch (Exception exception) {
-          Pipliz.Log.Write(string.Format("Exception loading from {0}; {1}", filepath, exception.Message));
+          Pipliz.Log.Write(string.Format("Exception while loading from {0}; {1}", filepath, exception.Message));
         }
       }
     }
