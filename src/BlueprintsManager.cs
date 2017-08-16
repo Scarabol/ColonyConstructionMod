@@ -111,20 +111,26 @@ namespace ScarabolMods
                 Pipliz.Log.WriteError(string.Format("Expected 'blocks' key in json {0}", filename));
                 continue;
               }
+              JSONNode jsonOffset;
+              if (json.TryGetAs<JSONNode>("offset", out jsonOffset)) {
+                offx = jsonOffset.GetAs<int>("x");
+                offy = jsonOffset.GetAs<int>("y");
+                offz = jsonOffset.GetAs<int>("z");
+              }
             } else {
               jsonBlocks = json; // fallback everything is an array
               Pipliz.Log.Write(string.Format("No object defined in '{0}', using full content as array", filename));
               foreach (JSONNode node in jsonBlocks.LoopArray()) {
                 int x = getJSONInt(node, "startx", "x", 0, false);
-                if (x < offx) { offx = x; }
+                if (x < -offx) { offx = -x; }
                 int y = getJSONInt(node, "starty", "y", 0, false);
-                if (y < offy) { offy = y; }
+                if (y < -offy) { offy = -y; }
                 int z = getJSONInt(node, "startz", "z", 0, false);
-                if (z < offz) { offz = z; }
+                if (z < -offz) { offz = -z; }
               }
-              Pipliz.Log.Write(string.Format("Offset for complete structure is {0} {1} {2}", -offx, -offy, -offz));
             }
             List<BlueprintBlock> blocks = new List<BlueprintBlock>();
+            BlueprintBlock originBlock = null;
             foreach (JSONNode node in jsonBlocks.LoopArray()) {
               int startx = getJSONInt(node, "startx", "x", 0, false);
               int starty = getJSONInt(node, "starty", "y", 0, false);
@@ -145,10 +151,19 @@ namespace ScarabolMods
               for (int x = startx; x < startx + width; x++) {
                 for (int y = starty; y < starty + height; y++) {
                   for (int z = startz; z < startz + depth; z++) {
-                    blocks.Add(new BlueprintBlock(x - offx, y - offy, z - offz, typename));
+                    int lx = x + offx, ly = y + offy, lz = z + offz;
+                    BlueprintBlock b = new BlueprintBlock(lx, ly, lz, typename);
+                    if (lx == 0 && ly == 0 && lz == -1) { // do not replace the blueprint box itself (yet)
+                      originBlock = b;
+                    } else {
+                      blocks.Add(b);
+                    }
                   }
                 }
               }
+            }
+            if (originBlock != null) {
+              blocks.Add(originBlock);
             }
             BlueprintsManager.blueprints.Add(blueprintName, blocks);
             Pipliz.Log.Write(string.Format("Added blueprint '{0}' with {1} blocks", blueprintName, blocks.Count));
