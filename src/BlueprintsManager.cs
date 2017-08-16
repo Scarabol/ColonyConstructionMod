@@ -148,9 +148,13 @@ namespace ScarabolMods
               int width = getJSONInt(node, "width", "w", 1, true);
               int height = getJSONInt(node, "height", "h", 1, true);
               int depth = getJSONInt(node, "depth", "d", 1, true);
-              for (int x = startx; x < startx + width; x++) {
-                for (int y = starty; y < starty + height; y++) {
-                  for (int z = startz; z < startz + depth; z++) {
+              int dx = 1, dy = 1, dz = 1;
+              if (width < 0) { dx = -1; }
+              if (height < 0) { dy = -1; }
+              if (depth < 0) { dz = -1; }
+              for (int x = startx; x * dx < (startx + width) * dx; x += dx) {
+                for (int y = starty; y * dy < (starty + height) * dy; y += dy) {
+                  for (int z = startz; z * dz < (startz + depth) * dz; z += dz) {
                     int lx = x + offx, ly = y + offy, lz = z + offz;
                     BlueprintBlock b = new BlueprintBlock(lx, ly, lz, typename);
                     if (lx == 0 && ly == 0 && lz == -1) { // do not replace the blueprint box itself (yet)
