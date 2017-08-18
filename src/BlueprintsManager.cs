@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using Pipliz;
 using Pipliz.JSON;
-using Pipliz.APIProvider.Jobs;
 
 namespace ScarabolMods
 {
@@ -24,42 +24,43 @@ namespace ScarabolMods
     public static void AfterAddingBaseTypes()
     {
       Pipliz.Log.Write(string.Format("Blueprints relative texture path is {0}", RelativeTexturesPath));
-      ItemTypesServer.AddTextureMapping("blueprintstop", new JSONNode()
+      ItemTypesServer.AddTextureMapping("mods.scarabol.blueprints.blueprinttop", new JSONNode()
         .SetAs("albedo", MultiPath.Combine(RelativeTexturesPath, "albedo", "blueprintsTop"))
         .SetAs("normal", "neutral")
         .SetAs("emissive", "neutral")
         .SetAs("height", "neutral")
       );
+      string iconFilepath = MultiPath.Combine(AssetsDirectory, "icons", "blueprint.png");
       foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
         ItemTypes.AddRawType(blueprintTypename,
           new JSONNode(NodeType.Object)
             .SetAs("onRemoveAudio", "woodDeleteLight")
             .SetAs("onPlaceAudio", "woodPlace")
-            .SetAs("icon", MultiPath.Combine(AssetsDirectory, "icons", "blueprint.png"))
+            .SetAs("icon", iconFilepath)
             .SetAs("sideall", "planks")
-            .SetAs("sidey+", "blueprintstop")
+            .SetAs("sidey+", "mods.scarabol.blueprints.blueprinttop")
             .SetAs("npcLimit", "0")
             .SetAs("onRemove", new JSONNode(NodeType.Array))
             .SetAs("isRotatable", "true")
-            .SetAs("rotatablex+", blueprintTypename+"x+")
-            .SetAs("rotatablex-", blueprintTypename+"x-")
-            .SetAs("rotatablez+", blueprintTypename+"z+")
-            .SetAs("rotatablez-", blueprintTypename+"z-")
+            .SetAs("rotatablex+", blueprintTypename + "x+")
+            .SetAs("rotatablex-", blueprintTypename + "x-")
+            .SetAs("rotatablez+", blueprintTypename + "z+")
+            .SetAs("rotatablez-", blueprintTypename + "z-")
             .SetAs("npcLimit", "0")
         );
-        ItemTypes.AddRawType(blueprintTypename+"x+",
+        ItemTypes.AddRawType(blueprintTypename + "x+",
           new JSONNode(NodeType.Object)
             .SetAs("parentType", blueprintTypename)
         );
-        ItemTypes.AddRawType(blueprintTypename+"x-",
+        ItemTypes.AddRawType(blueprintTypename + "x-",
           new JSONNode(NodeType.Object)
             .SetAs("parentType", blueprintTypename)
         );
-        ItemTypes.AddRawType(blueprintTypename+"z+",
+        ItemTypes.AddRawType(blueprintTypename + "z+",
           new JSONNode(NodeType.Object)
             .SetAs("parentType", blueprintTypename)
         );
-        ItemTypes.AddRawType(blueprintTypename+"z-",
+        ItemTypes.AddRawType(blueprintTypename + "z-",
           new JSONNode(NodeType.Object)
             .SetAs("parentType", blueprintTypename)
         );
@@ -67,7 +68,7 @@ namespace ScarabolMods
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.blueprints.loadrecipes")]
-    [ModLoader.ModCallbackProvidesFor("pipliz.apiprovider.registerrecipes")]
+    [ModLoader.ModCallbackDependsOn("pipliz.apiprovider.registerrecipes")]
     public static void AfterItemTypesDefined()
     {
       foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
@@ -79,7 +80,7 @@ namespace ScarabolMods
     }
   }
 
-  public class BlueprintsManager
+  public static class BlueprintsManager
   {
     public static Dictionary<string, List<BlueprintBlock>> blueprints = new Dictionary<string, List<BlueprintBlock>>();
 
@@ -101,7 +102,6 @@ namespace ScarabolMods
               Pipliz.Log.Write(string.Format("No name defined in '{0}', using '{1}' extracted from filename", filename, blueprintName));
             }
             blueprintName = ConstructionModEntries.MOD_PREFIX + "blueprints." + blueprintName;
-            Pipliz.Log.Write(string.Format("Reading blueprint named '{0}' from '{1}'", blueprintName, filename));
             int offx = 0;
             int offy = 0;
             int offz = 0;
@@ -113,20 +113,20 @@ namespace ScarabolMods
               }
               JSONNode jsonOffset;
               if (json.TryGetAs<JSONNode>("offset", out jsonOffset)) {
-                offx = jsonOffset.GetAs<int>("x");
-                offy = jsonOffset.GetAs<int>("y");
-                offz = jsonOffset.GetAs<int>("z");
+                offx = -jsonOffset.GetAs<int>("x");
+                offy = -jsonOffset.GetAs<int>("y");
+                offz = -jsonOffset.GetAs<int>("z");
               }
             } else {
               jsonBlocks = json; // fallback everything is an array
-              Pipliz.Log.Write(string.Format("No object defined in '{0}', using full content as array", filename));
+              Pipliz.Log.Write(string.Format("No json object defined in '{0}', using full content as array", filename));
               foreach (JSONNode node in jsonBlocks.LoopArray()) {
                 int x = getJSONInt(node, "startx", "x", 0, false);
-                if (x < -offx) { offx = -x; }
+                if (x < offx) { offx = x; }
                 int y = getJSONInt(node, "starty", "y", 0, false);
-                if (y < -offy) { offy = -y; }
+                if (y < offy) { offy = y; }
                 int z = getJSONInt(node, "startz", "z", 0, false);
-                if (z < -offz) { offz = -z; }
+                if (z < offz) { offz = z; }
               }
             }
             List<BlueprintBlock> blocks = new List<BlueprintBlock>();
@@ -155,7 +155,7 @@ namespace ScarabolMods
               for (int x = startx; x * dx < (startx + width) * dx; x += dx) {
                 for (int y = starty; y * dy < (starty + height) * dy; y += dy) {
                   for (int z = startz; z * dz < (startz + depth) * dz; z += dz) {
-                    int lx = x + offx, ly = y + offy, lz = z + offz;
+                    int lx = x - offx, ly = y - offy, lz = z - offz;
                     BlueprintBlock b = new BlueprintBlock(lx, ly, lz, typename);
                     if (lx == 0 && ly == 0 && lz == -1) { // do not replace the blueprint box itself (yet)
                       originBlock = b;
@@ -170,7 +170,7 @@ namespace ScarabolMods
               blocks.Add(originBlock);
             }
             BlueprintsManager.blueprints.Add(blueprintName, blocks);
-            Pipliz.Log.Write(string.Format("Added blueprint '{0}' with {1} blocks", blueprintName, blocks.Count));
+            Pipliz.Log.Write(string.Format("Added blueprint '{0}' with {1} blocks from {2}", blueprintName, blocks.Count, filename));
           }
         } catch (Exception exception) {
           Pipliz.Log.Write(string.Format("Exception while loading from {0}; {1}", filepath, exception.Message));
@@ -220,6 +220,25 @@ namespace ScarabolMods
         .SetAs("offsety", offsety)
         .SetAs("offsetz", offsetz)
         .SetAs("typename", typename);
+    }
+
+    public Vector3Int GetWorldPosition(string jobbasename, Vector3Int position, ushort bluetype) {
+      ushort hxm = ItemTypes.IndexLookup.GetIndex(jobbasename + "x-");
+      ushort hzp = ItemTypes.IndexLookup.GetIndex(jobbasename + "z+");
+      ushort hzm = ItemTypes.IndexLookup.GetIndex(jobbasename + "z-");
+      int realx = this.offsetz+1;
+      int realz = -this.offsetx;
+      if (bluetype == hxm) {
+        realx = -this.offsetz-1;
+        realz = this.offsetx;
+      } else if (bluetype == hzp) {
+        realx = this.offsetx;
+        realz = this.offsetz+1;
+      } else if (bluetype == hzm) {
+        realx = -this.offsetx;
+        realz = -this.offsetz-1;
+      }
+      return position.Add(realx, this.offsety, realz);
     }
   }
 }

@@ -138,23 +138,8 @@ namespace ScarabolMods
         ushort bluetype = ItemTypes.IndexLookup.GetIndex(fullname);
         for (int i = todoblocks.Count - 1; i >= 0; i--) {
           BlueprintBlock blueblock = todoblocks[i];
-          string name = fullname.Substring(0, fullname.Length-2);
-          ushort hxm = ItemTypes.IndexLookup.GetIndex(name+"x-");
-          ushort hzp = ItemTypes.IndexLookup.GetIndex(name+"z+");
-          ushort hzm = ItemTypes.IndexLookup.GetIndex(name+"z-");
-          int realx = blueblock.offsetz+1;
-          int realz = -blueblock.offsetx;
-          if (bluetype == hxm) {
-            realx = -blueblock.offsetz-1;
-            realz = blueblock.offsetx;
-          } else if (bluetype == hzp) {
-            realx = blueblock.offsetx;
-            realz = blueblock.offsetz+1;
-          } else if (bluetype == hzm) {
-            realx = -blueblock.offsetx;
-            realz = -blueblock.offsetz-1;
-          }
-          Vector3Int realPosition = position.Add(realx, blueblock.offsety, realz);
+          string jobname = fullname.Substring(0, fullname.Length-2);
+          Vector3Int realPosition = blueblock.GetWorldPosition(jobname, position, bluetype);
           ushort newType = ItemTypes.IndexLookup.GetIndex(blueblock.typename);
           ushort actualType;
           if (World.TryGetTypeAt(realPosition, out actualType) && actualType != newType) {

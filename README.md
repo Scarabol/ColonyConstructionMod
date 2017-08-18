@@ -11,6 +11,8 @@
 
 After installation *gamedata/mods/Scarabol/Construction/blueprints* **(on server side)** contains all available blueprints. Feel free to extent the offer, e. g. with the Save Tool.
 
+The mod supports two types of blueprint formats. The first one is just the format the Save Tool generates. The second one is basically the Save Tool format with extra features (see examples in blueprints directory).
+
 ## Build
 
 * install Linux
