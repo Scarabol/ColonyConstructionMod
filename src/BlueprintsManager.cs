@@ -105,6 +105,7 @@ namespace ScarabolMods
             int offx = 0;
             int offy = 0;
             int offz = 0;
+            List<BlueprintBlock> blocks = new List<BlueprintBlock>();
             JSONNode jsonBlocks;
             if (json.NodeType == NodeType.Object) {
               if (!json.TryGetAs<JSONNode>("blocks", out jsonBlocks)) {
@@ -120,16 +121,26 @@ namespace ScarabolMods
             } else {
               jsonBlocks = json; // fallback everything is an array
               Pipliz.Log.Write(string.Format("No json object defined in '{0}', using full content as array", filename));
+              int maxx = 0, maxy = 0, maxz = 0;
               foreach (JSONNode node in jsonBlocks.LoopArray()) {
                 int x = getJSONInt(node, "startx", "x", 0, false);
                 if (x < offx) { offx = x; }
+                if (x > maxx) { maxx = x; }
                 int y = getJSONInt(node, "starty", "y", 0, false);
                 if (y < offy) { offy = y; }
+                if (y > maxy) { maxy = y; }
                 int z = getJSONInt(node, "startz", "z", 0, false);
                 if (z < offz) { offz = z; }
+                if (z > maxz) { maxz = z; }
+              }
+              for (int x = 0 ; x <= -offx + maxx ; x++) { // add auto-clear area
+                for (int y = 0 ; y <= -offz + maxy ; y++) {
+                  for (int z = 0 ; z <= -offz + maxz ; z++) {
+                    blocks.Add(new BlueprintBlock(x, y, z, "air"));
+                  }
+                }
               }
             }
-            List<BlueprintBlock> blocks = new List<BlueprintBlock>();
             BlueprintBlock originBlock = null;
             foreach (JSONNode node in jsonBlocks.LoopArray()) {
               int startx = getJSONInt(node, "startx", "x", 0, false);
