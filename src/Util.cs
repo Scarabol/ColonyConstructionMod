@@ -16,32 +16,15 @@ namespace ScarabolMods
     public static void localize(string localePath, string keyprefix, bool verbose)
     {
       try {
-        foreach (string locFileName in new string[] { "types.json", "typeuses.json", "localization.json" }) {
-          string[] files = Directory.GetFiles(localePath, locFileName, SearchOption.AllDirectories);
+        foreach (string locFilename in new string[] { "types.json", "typeuses.json", "localization.json" }) {
+          string[] files = Directory.GetFiles(localePath, locFilename, SearchOption.AllDirectories);
           foreach (string filepath in files) {
             try {
               JSONNode jsonFromMod;
               if (Pipliz.JSON.JSON.Deserialize(filepath, out jsonFromMod, false)) {
                 string locName = Directory.GetParent(filepath).Name;
                 log(string.Format("Found mod localization file for '{0}' localization", locName), verbose);
-                string patchPath = MultiPath.Combine("gamedata", "localization", locName, locFileName);
-                JSONNode jsonToPatch;
-                if (Pipliz.JSON.JSON.Deserialize(patchPath, out jsonToPatch, false)) {
-                  foreach (KeyValuePair<string, JSONNode> entry in jsonFromMod.LoopObject()) {
-                    string realkey = keyprefix + entry.Key;
-                    string val = jsonFromMod.GetAs<string>(entry.Key);
-                    if (!jsonToPatch.HasChild(realkey)) {
-                      Pipliz.Log.Write(string.Format("translation '{0}' => '{1}' added to '{2}/{3}'. This will apply AFTER next restart!!!", realkey, val, locName, locFileName));
-                    } else if (!jsonToPatch.GetAs<string>(realkey).Equals(val)) {
-                      Pipliz.Log.Write(string.Format("translation '{0}' => '{1}' changed in '{2}/{3}'. This will apply AFTER next restart!!!", realkey, val, locName, locFileName));
-                    }
-                    jsonToPatch.SetAs(realkey, val);
-                  }
-                  Pipliz.JSON.JSON.Serialize(patchPath, jsonToPatch);
-                  log(string.Format("Patched mod localization file '{0}/{1}' into '{2}'", locName, locFileName, patchPath), verbose);
-                } else {
-                  log(string.Format("Could not deserialize json from '{0}'", patchPath), verbose);
-                }
+                localize(locName, locFilename, jsonFromMod, keyprefix, verbose);
               }
             } catch (Exception exception) {
               log(string.Format("Exception reading localization from {0}; {1}", filepath, exception.Message), verbose);
@@ -50,6 +33,32 @@ namespace ScarabolMods
         }
       } catch (DirectoryNotFoundException) {
         log(string.Format("Localization directory not found at {0}", localePath), verbose);
+      }
+    }
+
+    public static void localize(string locName, string locFilename, JSONNode jsonFromMod, string keyprefix, bool verbose)
+    {
+      try {
+        string patchPath = MultiPath.Combine("gamedata", "localization", locName, locFilename);
+        JSONNode jsonToPatch;
+        if (Pipliz.JSON.JSON.Deserialize(patchPath, out jsonToPatch, false)) {
+          foreach (KeyValuePair<string, JSONNode> entry in jsonFromMod.LoopObject()) {
+            string realkey = keyprefix + entry.Key;
+            string val = jsonFromMod.GetAs<string>(entry.Key);
+            if (!jsonToPatch.HasChild(realkey)) {
+              Pipliz.Log.Write(string.Format("translation '{0}' => '{1}' added to '{2}/{3}'. This will apply AFTER next restart!!!", realkey, val, locName, locFilename));
+            } else if (!jsonToPatch.GetAs<string>(realkey).Equals(val)) {
+              Pipliz.Log.Write(string.Format("translation '{0}' => '{1}' changed in '{2}/{3}'. This will apply AFTER next restart!!!", realkey, val, locName, locFilename));
+            }
+            jsonToPatch.SetAs(realkey, val);
+          }
+          Pipliz.JSON.JSON.Serialize(patchPath, jsonToPatch);
+          log(string.Format("Patched mod localization file '{0}/{1}' into '{2}'", locName, locFilename, patchPath), verbose);
+        } else {
+          log(string.Format("Could not deserialize json from '{0}'", patchPath), verbose);
+        }
+      } catch (Exception) {
+        log(string.Format("Exception while localizing {0}", Path.Combine(locName, locFilename)), verbose);
       }
     }
 

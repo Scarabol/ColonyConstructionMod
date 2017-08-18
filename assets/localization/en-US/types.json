@@ -1,15 +1,3 @@
 {
-  "buildtool" : "Hammer",
-  "blueprints.gate" : "Blueprint Gate",
-  "blueprints.gate_clear" : "Blueprint Abriss Gate",
-  "blueprints.wall" : "Blueprint Wall (10, right)",
-  "blueprints.wall2" : "Blueprint Wall (10, left)",
-  "blueprints.tower" : "Blueprint Tower",
-  "blueprints.house" : "Blueprint House",
-  "blueprints.housesmall" : "Blueprint House (small)",
-  "blueprints.stairs" : "Blueprint Stairs",
-  "blueprints.palisade" : "Blueprint Palisade",
-  "blueprints.palisadegate" : "Blueprint Palisade Gate",
-  "blueprints.trench_right" : "Trench (right)",
-  "blueprints.trench_left" : "Trench (left)"
+  "buildtool" : "Hammer"
 }

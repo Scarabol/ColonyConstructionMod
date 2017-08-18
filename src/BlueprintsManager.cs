@@ -9,7 +9,7 @@ namespace ScarabolMods
   [ModLoader.ModManager]
   public static class BlueprintsManagerModEntries
   {
-    private static string AssetsDirectory;
+    public static string AssetsDirectory;
     private static string RelativeTexturesPath;
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.blueprints.assemblyload")]
@@ -82,10 +82,43 @@ namespace ScarabolMods
 
   public static class BlueprintsManager
   {
+    public static string BLUEPRINTS_PREFIX = ConstructionModEntries.MOD_PREFIX + "blueprints.";
     public static Dictionary<string, List<BlueprintBlock>> blueprints = new Dictionary<string, List<BlueprintBlock>>();
 
     public static void LoadBlueprints(string blueprintsPath)
     {
+      Dictionary<string, string> prefixesBlueprints = new Dictionary<string, string>();
+      Dictionary<string, string> prefixesClear = new Dictionary<string, string>();
+      Dictionary<string, string> prefixesCapsules = new Dictionary<string, string>();
+      Dictionary<string, string> prefixesClearCapsules = new Dictionary<string, string>();
+      string[] prefixFiles = Directory.GetFiles(Path.Combine(BlueprintsManagerModEntries.AssetsDirectory, "localization"), "prefixes.json", SearchOption.AllDirectories);
+      foreach (string filepath in prefixFiles) {
+        try {
+          JSONNode jsonPrefixes;
+          if (Pipliz.JSON.JSON.Deserialize(filepath, out jsonPrefixes, false)) {
+            string locName = Directory.GetParent(filepath).Name;
+            Pipliz.Log.Write(string.Format("Found prefixes localization file for '{0}' localization", locName));
+            string blueprintsPrefix;
+            if (jsonPrefixes.TryGetAs<string>("blueprints", out blueprintsPrefix)) {
+              prefixesBlueprints[locName] = blueprintsPrefix;
+            }
+            string clearingPrefix;
+            if (jsonPrefixes.TryGetAs<string>("clear", out clearingPrefix)) {
+              prefixesClear[locName] = clearingPrefix;
+            }
+            string capsulesPrefix;
+            if (jsonPrefixes.TryGetAs<string>("capsules", out capsulesPrefix)) {
+              prefixesCapsules[locName] = capsulesPrefix;
+            }
+            string capsulesClearPrefix;
+            if (jsonPrefixes.TryGetAs<string>("capsules_clear", out capsulesClearPrefix)) {
+              prefixesClearCapsules[locName] = capsulesClearPrefix;
+            }
+          }
+        } catch (Exception exception) {
+          Pipliz.Log.WriteError(string.Format("Exception reading localization from {0}; {1}", filepath, exception.Message));
+        }
+      }
       Pipliz.Log.Write(string.Format("Loading blueprints from {0}", blueprintsPath));
       string[] files = Directory.GetFiles(blueprintsPath, "**.json", SearchOption.AllDirectories);
       foreach (string filepath in files) {
@@ -101,7 +134,6 @@ namespace ScarabolMods
               blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", ".").ToLower();
               Pipliz.Log.Write(string.Format("No name defined in '{0}', using '{1}' extracted from filename", filename, blueprintName));
             }
-            blueprintName = ConstructionModEntries.MOD_PREFIX + "blueprints." + blueprintName;
             int offx = 0;
             int offy = 0;
             int offz = 0;
@@ -117,6 +149,41 @@ namespace ScarabolMods
                 offx = -jsonOffset.GetAs<int>("x");
                 offy = -jsonOffset.GetAs<int>("y");
                 offz = -jsonOffset.GetAs<int>("z");
+              }
+              JSONNode jsonLocalization;
+              if (json.TryGetAs<JSONNode>("localization", out jsonLocalization)) {
+                foreach (KeyValuePair<string, JSONNode> locEntry in jsonLocalization.LoopObject()) {
+                  string labelPrefix;
+                  string capsulePrefix;
+                  if (!blueprintName.EndsWith("_clear")) {
+                    if (prefixesBlueprints.TryGetValue(locEntry.Key, out labelPrefix)) {
+                      labelPrefix = labelPrefix.Trim();
+                    } else {
+                      labelPrefix = "Blueprint";
+                    }
+                    if (prefixesCapsules.TryGetValue(locEntry.Key, out capsulePrefix)) {
+                      capsulePrefix = capsulePrefix.Trim();
+                    } else {
+                      capsulePrefix = "Emperor Capsule";
+                    }
+                  } else {
+                    if (prefixesClear.TryGetValue(locEntry.Key, out labelPrefix)) {
+                      labelPrefix = labelPrefix.Trim();
+                    } else {
+                      labelPrefix = "Demolition-Plan";
+                    }
+                    if (prefixesClearCapsules.TryGetValue(locEntry.Key, out capsulePrefix)) {
+                      capsulePrefix = capsulePrefix.Trim();
+                    } else {
+                      capsulePrefix = "Emperor Demolition Capsule";
+                    }
+                  }
+                  string label = ((string) locEntry.Value.BareObject).Trim();
+                  ModLocalizationHelper.localize(locEntry.Key, "types.json", new JSONNode()
+                                                 .SetAs(blueprintName, labelPrefix + " " + label)
+                                                 .SetAs(blueprintName + CapsulesModEntries.CAPSULE_SUFFIX, capsulePrefix + " " + label)
+                                                   , BLUEPRINTS_PREFIX, false);
+                }
               }
             } else {
               jsonBlocks = json; // fallback everything is an array
@@ -180,11 +247,11 @@ namespace ScarabolMods
             if (originBlock != null) {
               blocks.Add(originBlock);
             }
-            BlueprintsManager.blueprints.Add(blueprintName, blocks);
-            Pipliz.Log.Write(string.Format("Added blueprint '{0}' with {1} blocks from {2}", blueprintName, blocks.Count, filename));
+            BlueprintsManager.blueprints.Add(BLUEPRINTS_PREFIX + blueprintName, blocks);
+            Pipliz.Log.Write(string.Format("Added blueprint '{0}' with {1} blocks from {2}", BLUEPRINTS_PREFIX + blueprintName, blocks.Count, filename));
           }
         } catch (Exception exception) {
-          Pipliz.Log.Write(string.Format("Exception while loading from {0}; {1}", filepath, exception.Message));
+          Pipliz.Log.WriteError(string.Format("Exception while loading from {0}; {1}", filepath, exception.Message));
         }
       }
     }

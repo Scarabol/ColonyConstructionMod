@@ -1,15 +1,3 @@
 {
-  "buildtool" : "Hammer",
-  "blueprints.gate" : "Blaupause Torhaus",
-  "blueprints.gate_clear" : "Blaupause Abriss Torhaus",
-  "blueprints.wall" : "Blaupause Mauer (10, rechts)",
-  "blueprints.wall2" : "Blaupause Mauer (10, links)",
-  "blueprints.tower" : "Blaupause Turm",
-  "blueprints.house" : "Blaupause Haus",
-  "blueprints.housesmall" : "Blaupause Haus (klein)",
-  "blueprints.stairs" : "Blaupause Treppe",
-  "blueprints.palisade" : "Blaupause Palisadenzaun",
-  "blueprints.palisadegate" : "Blaupause Palisadentor",
-  "blueprints.trench_right" : "Graben (rechts)",
-  "blueprints.trench_left" : "Graben (links)"
+  "buildtool" : "Hammer"
 }
