@@ -89,9 +89,7 @@ namespace ScarabolMods
     public static void LoadBlueprints(string blueprintsPath)
     {
       Dictionary<string, string> prefixesBlueprints = new Dictionary<string, string>();
-      Dictionary<string, string> prefixesClear = new Dictionary<string, string>();
       Dictionary<string, string> prefixesCapsules = new Dictionary<string, string>();
-      Dictionary<string, string> prefixesClearCapsules = new Dictionary<string, string>();
       string[] prefixFiles = Directory.GetFiles(Path.Combine(BlueprintsManagerModEntries.AssetsDirectory, "localization"), "prefixes.json", SearchOption.AllDirectories);
       foreach (string filepath in prefixFiles) {
         try {
@@ -103,17 +101,9 @@ namespace ScarabolMods
             if (jsonPrefixes.TryGetAs<string>("blueprints", out blueprintsPrefix)) {
               prefixesBlueprints[locName] = blueprintsPrefix;
             }
-            string clearingPrefix;
-            if (jsonPrefixes.TryGetAs<string>("clear", out clearingPrefix)) {
-              prefixesClear[locName] = clearingPrefix;
-            }
             string capsulesPrefix;
             if (jsonPrefixes.TryGetAs<string>("capsules", out capsulesPrefix)) {
               prefixesCapsules[locName] = capsulesPrefix;
-            }
-            string capsulesClearPrefix;
-            if (jsonPrefixes.TryGetAs<string>("capsules_clear", out capsulesClearPrefix)) {
-              prefixesClearCapsules[locName] = capsulesClearPrefix;
             }
           }
         } catch (Exception exception) {
@@ -149,28 +139,15 @@ namespace ScarabolMods
                 foreach (KeyValuePair<string, JSONNode> locEntry in jsonLocalization.LoopObject()) {
                   string labelPrefix;
                   string capsulePrefix;
-                  if (!blueprintName.EndsWith("_clear")) {
-                    if (prefixesBlueprints.TryGetValue(locEntry.Key, out labelPrefix)) {
-                      labelPrefix = labelPrefix.Trim();
-                    } else {
-                      labelPrefix = "Blueprint";
-                    }
-                    if (prefixesCapsules.TryGetValue(locEntry.Key, out capsulePrefix)) {
-                      capsulePrefix = capsulePrefix.Trim();
-                    } else {
-                      capsulePrefix = "Emperor Capsule";
-                    }
+                  if (prefixesBlueprints.TryGetValue(locEntry.Key, out labelPrefix)) {
+                    labelPrefix = labelPrefix.Trim();
                   } else {
-                    if (prefixesClear.TryGetValue(locEntry.Key, out labelPrefix)) {
-                      labelPrefix = labelPrefix.Trim();
-                    } else {
-                      labelPrefix = "Demolition-Plan";
-                    }
-                    if (prefixesClearCapsules.TryGetValue(locEntry.Key, out capsulePrefix)) {
-                      capsulePrefix = capsulePrefix.Trim();
-                    } else {
-                      capsulePrefix = "Emperor Demolition Capsule";
-                    }
+                    labelPrefix = "Blueprint";
+                  }
+                  if (prefixesCapsules.TryGetValue(locEntry.Key, out capsulePrefix)) {
+                    capsulePrefix = capsulePrefix.Trim();
+                  } else {
+                    capsulePrefix = "Emperor Capsule";
                   }
                   string label = ((string) locEntry.Value.BareObject).Trim();
                   ModLocalizationHelper.localize(locEntry.Key, "types.json", new JSONNode()
@@ -194,6 +171,7 @@ namespace ScarabolMods
                 if (z < offz) { offz = z; }
                 if (z > maxz) { maxz = z; }
               }
+              // TODO optimize only clear blocks, which are not part of this blueprint
               for (int x = 0 ; x <= -offx + maxx ; x++) { // add auto-clear area
                 for (int y = 0 ; y <= -offz + maxy ; y++) {
                   for (int z = 0 ; z <= -offz + maxz ; z++) {

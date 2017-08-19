@@ -131,9 +131,6 @@ namespace ScarabolMods
           Chat.Send(causedBy, string.Format("Starting to build '{0}' at {1}", blueprintName, position));
           List<BlueprintBlock> blocks;
           if (BlueprintsManager.blueprints.TryGetValue(blueprintName, out blocks)) {
-            if (blueprintName.EndsWith("_clear")) {
-              blocks.Reverse();
-            }
             int placed = 0, removed = 0, failed = 0;
             ushort bluetype = ItemTypes.IndexLookup.GetIndex(blueprintName + capsuleName.Substring(capsuleName.Length - 2));
             foreach (BlueprintBlock block in blocks) {
