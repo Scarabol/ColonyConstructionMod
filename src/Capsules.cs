@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Pipliz;
 using Pipliz.Chatting;
 using Pipliz.JSON;
@@ -64,24 +65,13 @@ namespace ScarabolMods
       }
     }
 
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.capsules.loadrecipes")]
-    [ModLoader.ModCallbackDependsOn("scarabol.blueprints.loadrecipes")]
-    public static void AfterItemTypesDefined()
-    {
-      foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
-        RecipePlayer.AllRecipes.Add(new Recipe(new JSONNode()
-          .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", blueprintTypename + CAPSULE_SUFFIX)))
-          .SetAs("requires", new JSONNode(NodeType.Array))
-        ));
-      }
-    }
-
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesServer, "scarabol.capsules.registertypes")]
     public static void AfterItemTypesServer()
     {
       foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
         ItemTypesServer.RegisterOnAdd(blueprintTypename + CAPSULE_SUFFIX, CapsuleBlockCode.OnPlaceCapsule);
       }
+      ChatCommands.CommandManager.RegisterCommand(new CapsuleChatCommand());
     }
   }
 
@@ -153,6 +143,41 @@ namespace ScarabolMods
       } catch (Exception exception) {
         Pipliz.Log.WriteError(string.Format("Exception in OnPlaceCapsule; {0}", exception.Message));
       }
+    }
+  }
+
+  public class CapsuleChatCommand : ChatCommands.IChatCommand
+  {
+    public bool IsCommand(string chat)
+    {
+      return chat.StartsWith("/capsule ");
+    }
+
+    public bool TryDoCommand(Players.Player causedBy, string chattext)
+    {
+      if (causedBy == null) {
+        return true;
+      }
+      int amount = 1;
+      var matched = Regex.Match(chattext, @"/capsule (?<name>.+) (?<amount>\d+)");
+      if (!matched.Success) {
+        matched = Regex.Match(chattext, @"/capsule (?<name>.+)");
+        if (!matched.Success) {
+          Chat.Send(causedBy, "Command didn't match, use /capsule name amount");
+          return true;
+        }
+      } else {
+        amount = Int32.Parse(matched.Groups["amount"].Value);
+      }
+      string blueprintName = matched.Groups["name"].Value;
+      string blueprintFullname = BlueprintsManager.BLUEPRINTS_PREFIX + blueprintName;
+      if (!BlueprintsManager.blueprints.ContainsKey(blueprintFullname)) {
+        Chat.Send(causedBy, string.Format("Blueprint '{0}' not known", blueprintName));
+        return true;
+      }
+      Stockpile.GetStockPile(causedBy).Add(ItemTypes.IndexLookup.GetIndex(blueprintFullname + CapsulesModEntries.CAPSULE_SUFFIX), amount);
+      Chat.Send(causedBy, string.Format("Added {0} emperor capsule '{1}' to your stockpile", amount, blueprintName));
+      return true;
     }
   }
 }

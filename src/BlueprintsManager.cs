@@ -1,8 +1,10 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Pipliz;
 using Pipliz.JSON;
+using Pipliz.Chatting;
 
 namespace ScarabolMods
 {
@@ -68,16 +70,10 @@ namespace ScarabolMods
       }
     }
 
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.blueprints.loadrecipes")]
-    [ModLoader.ModCallbackDependsOn("pipliz.apiprovider.registerrecipes")]
-    public static void AfterItemTypesDefined()
+    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesServer, "scarabol.blueprints.registercommand")]
+    public static void AfterItemTypesServer()
     {
-      foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
-        RecipePlayer.AllRecipes.Add(new Recipe(new JSONNode()
-          .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", blueprintTypename)))
-          .SetAs("requires", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "planks")))
-        ));
-      }
+      ChatCommands.CommandManager.RegisterCommand(new BlueprintChatCommand());
     }
   }
 
@@ -117,7 +113,7 @@ namespace ScarabolMods
           JSONNode json;
           if (Pipliz.JSON.JSON.Deserialize(filepath, out json, false)) {
             string filename = Path.GetFileName(filepath);
-            string blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", ".").ToLower();
+            string blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", "_").ToLower();
             int offx = 0;
             int offy = 0;
             int offz = 0;
@@ -299,6 +295,41 @@ namespace ScarabolMods
         realz = -this.offsetz-1;
       }
       return position.Add(realx, this.offsety, realz);
+    }
+  }
+
+  public class BlueprintChatCommand : ChatCommands.IChatCommand
+  {
+    public bool IsCommand(string chat)
+    {
+      return chat.StartsWith("/blueprint ");
+    }
+
+    public bool TryDoCommand(Players.Player causedBy, string chattext)
+    {
+      if (causedBy == null) {
+        return true;
+      }
+      int amount = 1;
+      var matched = Regex.Match(chattext, @"/blueprint (?<name>.+) (?<amount>\d+)");
+      if (!matched.Success) {
+        matched = Regex.Match(chattext, @"/blueprint (?<name>.+)");
+        if (!matched.Success) {
+          Chat.Send(causedBy, "Command didn't match, use /blueprint name amount");
+          return true;
+        }
+      } else {
+        amount = Int32.Parse(matched.Groups["amount"].Value);
+      }
+      string blueprintName = matched.Groups["name"].Value;
+      string blueprintFullname = BlueprintsManager.BLUEPRINTS_PREFIX + blueprintName;
+      if (!BlueprintsManager.blueprints.ContainsKey(blueprintFullname)) {
+        Chat.Send(causedBy, string.Format("Blueprint '{0}' not known", blueprintName));
+        return true;
+      }
+      Stockpile.GetStockPile(causedBy).Add(ItemTypes.IndexLookup.GetIndex(blueprintFullname), amount);
+      Chat.Send(causedBy, string.Format("Added {0} '{1}' blueprints to your stockpile", amount, blueprintName));
+      return true;
     }
   }
 }
