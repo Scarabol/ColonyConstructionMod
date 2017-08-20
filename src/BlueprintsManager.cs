@@ -124,15 +124,8 @@ namespace ScarabolMods
         try {
           JSONNode json;
           if (Pipliz.JSON.JSON.Deserialize(filepath, out json, false)) {
-            string blueprintName = null;
-            if (json.NodeType == NodeType.Object) {
-              json.TryGetAs<string>("name", out blueprintName);
-            }
             string filename = Path.GetFileName(filepath);
-            if (blueprintName == null || blueprintName.Length < 1) {
-              blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", ".").ToLower();
-              Pipliz.Log.Write(string.Format("No name defined in '{0}', using '{1}' extracted from filename", filename, blueprintName));
-            }
+            string blueprintName = Path.GetFileNameWithoutExtension(filepath).Replace(" ", ".").ToLower();
             int offx = 0;
             int offy = 0;
             int offz = 0;
