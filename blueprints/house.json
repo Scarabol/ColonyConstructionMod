@@ -7,7 +7,8 @@
   "blocks" : [
     { "x" : 0, "y" : -1, "z" : 0, "typename" : "stonebricks", "width" : 8, "depth" : 6 },
 
-    { "x" : 0, "y" : 0, "z" : 0, "typename" : "stonebricks", "width" : 8 },
+    { "x" : 0, "y" : 0, "z" : 0, "typename" : "stonebricks", "width" : 5 },
+    { "x" : 6, "y" : 0, "z" : 0, "typename" : "stonebricks", "width" : 2 },
     { "x" : 0, "y" : 0, "z" : 1, "typename" : "stonebricks", "depth" : 5 },
     { "x" : 7, "y" : 0, "z" : 1, "typename" : "stonebricks", "depth" : 5 },
     { "x" : 1, "y" : 0, "z" : 5, "typename" : "stonebricks", "width" : 5 },

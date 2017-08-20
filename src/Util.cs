@@ -43,7 +43,10 @@ namespace ScarabolMods
         JSONNode jsonToPatch;
         if (Pipliz.JSON.JSON.Deserialize(patchPath, out jsonToPatch, false)) {
           foreach (KeyValuePair<string, JSONNode> entry in jsonFromMod.LoopObject()) {
-            string realkey = keyprefix + entry.Key;
+            string realkey = entry.Key;
+            if (!locFilename.Equals("localization.json")) {
+              realkey = keyprefix + entry.Key;
+            }
             string val = jsonFromMod.GetAs<string>(entry.Key);
             if (!jsonToPatch.HasChild(realkey)) {
               Pipliz.Log.Write(string.Format("translation '{0}' => '{1}' added to '{2}/{3}'. This will apply AFTER next restart!!!", realkey, val, locName, locFilename));

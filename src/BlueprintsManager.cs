@@ -46,7 +46,6 @@ namespace ScarabolMods
             .SetAs("rotatablex-", blueprintTypename + "x-")
             .SetAs("rotatablez+", blueprintTypename + "z+")
             .SetAs("rotatablez-", blueprintTypename + "z-")
-            .SetAs("npcLimit", "0")
         );
         ItemTypes.AddRawType(blueprintTypename + "x+",
           new JSONNode(NodeType.Object)
@@ -300,10 +299,10 @@ namespace ScarabolMods
         .SetAs("typename", typename);
     }
 
-    public Vector3Int GetWorldPosition(string jobbasename, Vector3Int position, ushort bluetype) {
-      ushort hxm = ItemTypes.IndexLookup.GetIndex(jobbasename + "x-");
-      ushort hzp = ItemTypes.IndexLookup.GetIndex(jobbasename + "z+");
-      ushort hzm = ItemTypes.IndexLookup.GetIndex(jobbasename + "z-");
+    public Vector3Int GetWorldPosition(string typeBasename, Vector3Int position, ushort bluetype) {
+      ushort hxm = ItemTypes.IndexLookup.GetIndex(typeBasename + "x-");
+      ushort hzp = ItemTypes.IndexLookup.GetIndex(typeBasename + "z+");
+      ushort hzm = ItemTypes.IndexLookup.GetIndex(typeBasename + "z-");
       int realx = this.offsetz+1;
       int realz = -this.offsetx;
       if (bluetype == hxm) {

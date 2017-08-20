@@ -90,6 +90,7 @@ namespace ScarabolMods
       }
       return base.GetJSON()
         .SetAs("inventory", blockInventory.GetJSON())
+        .SetAs("shouldTakeItems", shouldTakeItems)
         .SetAs("fullname", fullname)
         .SetAs("todoblocks", jsonTodos)
       ;
@@ -113,6 +114,7 @@ namespace ScarabolMods
     public override ITrackableBlock InitializeFromJSON(Players.Player player, JSONNode node)
     {
       blockInventory = new NPCInventory(node["inventory"]);
+      shouldTakeItems = node.GetAs<bool>("shouldTakeItems");
       fullname = node.GetAs<string>("fullname");
       JSONNode jsonTodos = node["todoblocks"];
       todoblocks = new List<BlueprintBlock>();
