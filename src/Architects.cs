@@ -37,6 +37,7 @@ namespace ScarabolMods
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.architects.addrawtypes")]
+    [ModLoader.ModCallbackDependsOn("scarabol.blueprints.addrawtypes")]
     public static void AfterAddingBaseTypes()
     {
       ItemTypesServer.AddTextureMapping(ConstructionModEntries.MOD_PREFIX + "architecttop", new JSONNode()
@@ -69,20 +70,24 @@ namespace ScarabolMods
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.architects.loadrecipes")]
-    [ModLoader.ModCallbackProvidesFor("pipliz.apiprovider.registerrecipes")]
     public static void AfterItemTypesDefined()
     {
-      RecipePlayer.AllRecipes.Add(new Recipe(new JSONNode()
-        .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", JOB_ITEM_KEY)))
-        .SetAs("requires", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "planks")))));
+      List<InventoryItem> requirements = new List<InventoryItem>() { new InventoryItem("planks", 1) };
       List<Recipe> architectRecipes = new List<Recipe>();
       foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
-        Recipe architectBlueprintRecipe = new Recipe(new JSONNode()
-          .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", blueprintTypename)))
-          .SetAs("requires", new JSONNode(NodeType.Array)));
+        Recipe architectBlueprintRecipe = new Recipe(requirements, new InventoryItem(blueprintTypename, 1));
         architectRecipes.Add(architectBlueprintRecipe);
       }
       RecipeManager.AddRecipes(JOB_NAME, architectRecipes);
+    }
+
+    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.architects.addplayercrafts")]
+    public static void AfterWorldLoad()
+    {
+      // add recipes here, otherwise they're inserted before vanilla recipes in player crafts
+      RecipePlayer.AllRecipes.Add(new Recipe(new JSONNode()
+        .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", JOB_ITEM_KEY)))
+        .SetAs("requires", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "planks")))));
     }
   }
 

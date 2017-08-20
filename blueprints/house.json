@@ -6,17 +6,16 @@
   "blocks" : [
     { "x" : 0, "y" : -1, "z" : 0, "typename" : "stonebricks", "width" : 8, "depth" : 6 },
 
-    { "x" : 0, "y" : 0, "z" : 0, "typename" : "stonebricks", "width" : 5 },
+    { "x" : 0, "y" : 0, "z" : 0, "typename" : "stonebricks", "width" : 2 },
+    { "x" : 3, "y" : 0, "z" : 0, "typename" : "stonebricks", "width" : 2 },
     { "x" : 6, "y" : 0, "z" : 0, "typename" : "stonebricks", "width" : 2 },
     { "x" : 0, "y" : 0, "z" : 1, "typename" : "stonebricks", "depth" : 5 },
     { "x" : 7, "y" : 0, "z" : 1, "typename" : "stonebricks", "depth" : 5 },
     { "x" : 1, "y" : 0, "z" : 5, "typename" : "stonebricks", "width" : 5 },
     { "x" : 6, "y" : 0, "z" : 5, "typename" : "stonebricks" },
-    { "x" : 6, "y" : 0, "z" : 2, "typename" : "planks", "depth" : 3 },
 
     { "x" : 0, "y" : 1, "z" : 0, "typename" : "stonebricks" },
     { "x" : 1, "y" : 1, "z" : 0, "typename" : "planks" },
-    { "x" : 4, "y" : 1, "z" : 0, "typename" : "planks" },
     { "x" : 6, "y" : 1, "z" : 0, "typename" : "planks" },
     { "x" : 7, "y" : 1, "z" : 0, "typename" : "stonebricks" },
     { "x" : 0, "y" : 1, "z" : 1, "typename" : "planks" },
@@ -31,8 +30,6 @@
     { "x" : 7, "y" : 1, "z" : 5, "typename" : "stonebricks" },
     { "x" : 7, "y" : 1, "z" : 1, "typename" : "planks" },
     { "x" : 7, "y" : 1, "z" : 4, "typename" : "planks" },
-    { "x" : 6, "y" : 1, "z" : 3, "typename" : "planks" },
-    { "x" : 6, "y" : 1, "z" : 4, "typename" : "planks" },
     { "x" : 0, "y" : 2, "z" : 0, "typename" : "stonebricks" },
     { "x" : 1, "y" : 2, "z" : 0, "typename" : "planks" },
     { "x" : 2, "y" : 2, "z" : 0, "typename" : "planks" },
@@ -57,7 +54,6 @@
     { "x" : 4, "y" : 2, "z" : 5, "typename" : "planks" },
     { "x" : 5, "y" : 2, "z" : 5, "typename" : "planks" },
     { "x" : 6, "y" : 2, "z" : 5, "typename" : "planks" },
-    { "x" : 6, "y" : 2, "z" : 4, "typename" : "planks" },
     { "x" : 0, "y" : 3, "z" : 0, "typename" : "stonebricks" },
     { "x" : 1, "y" : 3, "z" : 0, "typename" : "stonebricks" },
     { "x" : 2, "y" : 3, "z" : 0, "typename" : "stonebricks" },
@@ -72,6 +68,7 @@
     { "x" : 3, "y" : 3, "z" : 1, "typename" : "planks" },
     { "x" : 4, "y" : 3, "z" : 1, "typename" : "planks" },
     { "x" : 5, "y" : 3, "z" : 1, "typename" : "planks" },
+    { "x" : 6, "y" : 3, "z" : 1, "typename" : "planks" },
     { "x" : 7, "y" : 3, "z" : 1, "typename" : "stonebricks" },
     { "x" : 0, "y" : 3, "z" : 2, "typename" : "stonebricks" },
     { "x" : 1, "y" : 3, "z" : 2, "typename" : "planks" },
@@ -79,6 +76,7 @@
     { "x" : 3, "y" : 3, "z" : 2, "typename" : "planks" },
     { "x" : 4, "y" : 3, "z" : 2, "typename" : "planks" },
     { "x" : 5, "y" : 3, "z" : 2, "typename" : "planks" },
+    { "x" : 6, "y" : 3, "z" : 2, "typename" : "planks" },
     { "x" : 7, "y" : 3, "z" : 2, "typename" : "stonebricks" },
     { "x" : 0, "y" : 3, "z" : 3, "typename" : "stonebricks" },
     { "x" : 1, "y" : 3, "z" : 3, "typename" : "planks" },
@@ -86,6 +84,7 @@
     { "x" : 3, "y" : 3, "z" : 3, "typename" : "planks" },
     { "x" : 4, "y" : 3, "z" : 3, "typename" : "planks" },
     { "x" : 5, "y" : 3, "z" : 3, "typename" : "planks" },
+    { "x" : 6, "y" : 3, "z" : 3, "typename" : "planks" },
     { "x" : 7, "y" : 3, "z" : 3, "typename" : "stonebricks" },
     { "x" : 0, "y" : 3, "z" : 4, "typename" : "stonebricks" },
     { "x" : 1, "y" : 3, "z" : 4, "typename" : "planks" },
@@ -93,6 +92,7 @@
     { "x" : 3, "y" : 3, "z" : 4, "typename" : "planks" },
     { "x" : 4, "y" : 3, "z" : 4, "typename" : "planks" },
     { "x" : 5, "y" : 3, "z" : 4, "typename" : "planks" },
+    { "x" : 6, "y" : 3, "z" : 4, "typename" : "planks" },
     { "x" : 7, "y" : 3, "z" : 4, "typename" : "stonebricks" },
     { "x" : 0, "y" : 3, "z" : 5, "typename" : "stonebricks" },
     { "x" : 1, "y" : 3, "z" : 5, "typename" : "stonebricks" },
@@ -142,5 +142,5 @@
     { "x" : -1, "y" : 6, "z" : 4, "typename" : "straw", "width" : 10 },
     { "x" : -1, "y" : 7, "z" : 2, "typename" : "straw", "width" : 10 },
     { "x" : -1, "y" : 7, "z" : 3, "typename" : "straw", "width" : 10 }
-    ]
+  ]
 }

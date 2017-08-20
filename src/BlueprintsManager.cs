@@ -44,7 +44,6 @@ namespace ScarabolMods
             .SetAs("sideall", "planks")
             .SetAs("sidey+", "mods.scarabol.blueprints.blueprinttop")
             .SetAs("npcLimit", "0")
-            .SetAs("onRemove", new JSONNode(NodeType.Array))
             .SetAs("isRotatable", "true")
             .SetAs("rotatablex+", blueprintTypename + "x+")
             .SetAs("rotatablex-", blueprintTypename + "x-")
@@ -68,12 +67,6 @@ namespace ScarabolMods
             .SetAs("parentType", blueprintTypename)
         );
       }
-    }
-
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesServer, "scarabol.blueprints.registercommand")]
-    public static void AfterItemTypesServer()
-    {
-      ChatCommands.CommandManager.RegisterCommand(new BlueprintChatCommand());
     }
   }
 
@@ -154,7 +147,7 @@ namespace ScarabolMods
               }
             } else {
               jsonBlocks = json; // fallback everything is an array
-              Pipliz.Log.Write(string.Format("No json object defined in '{0}', using full content as array", filename));
+              Pipliz.Log.Write(string.Format("No json object defined in '{0}', using full content as blocks array", filename));
               int maxx = 0, maxy = 0, maxz = 0;
               foreach (JSONNode node in jsonBlocks.LoopArray()) {
                 int x = getJSONInt(node, "startx", "x", 0, false);
@@ -199,6 +192,7 @@ namespace ScarabolMods
                 }
               }
               if (isRotatable) {
+                Pipliz.Log.Write(string.Format("ignoring rotatable type {0} in blueprint", typename));
                 continue;
               }
               int width = getJSONInt(node, "width", "w", 1, true);
@@ -267,7 +261,8 @@ namespace ScarabolMods
     }
 
     public BlueprintBlock(JSONNode node)
-      : this(node.GetAs<int>("offsetx"), node.GetAs<int>("offsety"), node.GetAs<int>("offsetz"), node.GetAs<string>("typename")) {
+      : this(node.GetAs<int>("offsetx"), node.GetAs<int>("offsety"), node.GetAs<int>("offsetz"), node.GetAs<string>("typename"))
+    {
     }
 
     public JSONNode GetJSON() {
@@ -295,41 +290,6 @@ namespace ScarabolMods
         realz = -this.offsetz-1;
       }
       return position.Add(realx, this.offsety, realz);
-    }
-  }
-
-  public class BlueprintChatCommand : ChatCommands.IChatCommand
-  {
-    public bool IsCommand(string chat)
-    {
-      return chat.StartsWith("/blueprint ");
-    }
-
-    public bool TryDoCommand(Players.Player causedBy, string chattext)
-    {
-      if (causedBy == null) {
-        return true;
-      }
-      int amount = 1;
-      var matched = Regex.Match(chattext, @"/blueprint (?<name>.+) (?<amount>\d+)");
-      if (!matched.Success) {
-        matched = Regex.Match(chattext, @"/blueprint (?<name>.+)");
-        if (!matched.Success) {
-          Chat.Send(causedBy, "Command didn't match, use /blueprint name amount");
-          return true;
-        }
-      } else {
-        amount = Int32.Parse(matched.Groups["amount"].Value);
-      }
-      string blueprintName = matched.Groups["name"].Value;
-      string blueprintFullname = BlueprintsManager.BLUEPRINTS_PREFIX + blueprintName;
-      if (!BlueprintsManager.blueprints.ContainsKey(blueprintFullname)) {
-        Chat.Send(causedBy, string.Format("Blueprint '{0}' not known", blueprintName));
-        return true;
-      }
-      Stockpile.GetStockPile(causedBy).Add(ItemTypes.IndexLookup.GetIndex(blueprintFullname), amount);
-      Chat.Send(causedBy, string.Format("Added {0} '{1}' blueprints to your stockpile", amount, blueprintName));
-      return true;
     }
   }
 }

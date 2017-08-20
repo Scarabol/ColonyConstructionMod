@@ -38,7 +38,6 @@ namespace ScarabolMods
             .SetAs("sideall", "planks")
             .SetAs("sidey+", "mods.scarabol.blueprints.blueprinttop")
             .SetAs("isSolid", "false")
-            .SetAs("onRemove", new JSONNode(NodeType.Array))
             .SetAs("isRotatable", "true")
             .SetAs("rotatablex+", blueprintTypename + CAPSULE_SUFFIX + "x+")
             .SetAs("rotatablex-", blueprintTypename + CAPSULE_SUFFIX + "x-")

@@ -56,6 +56,5 @@
     { "x" : 4, "y" : 8, "z" : 2, "typename" : "stonebricks" },
     { "x" : 4, "y" : 8, "z" : 0, "typename" : "stonebricks" },
     { "x" : 2, "y" : 8, "z" : 0, "typename" : "stonebricks" }
-
   ]
 }

@@ -10,5 +10,5 @@
     { "x" : 0, "y" : 2, "z" : 4, "typename" : "planks", "height" : 2 },
     { "x" : 0, "y" : 2, "z" : 6, "typename" : "planks", "height" : 2 },
     { "x" : 0, "y" : 2, "z" : 8, "typename" : "planks", "height" : 2 }
-    ]
+  ]
 }

@@ -1,3 +1,4 @@
 {
-  "buildtool" : "Hammer"
+  "buildtool" : "Hammer",
+  "architects.table" : "Architects Table"
 }

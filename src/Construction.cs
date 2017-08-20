@@ -15,9 +15,12 @@ namespace ScarabolMods
   public static class ConstructionModEntries
   {
     public static string MOD_PREFIX = "mods.scarabol.construction.";
+    public static string JOB_ITEM_KEY = MOD_PREFIX + "buildtool";
+    public static float EXCAVATION_DELAY = 2.0f;
     public static string ModDirectory;
     private static string AssetsDirectory;
     private static string RelativeIconsPath;
+    private static Recipe buildtoolRecipe;
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.construction.assemblyload")]
     public static void OnAssemblyLoaded(string path)
@@ -48,7 +51,7 @@ namespace ScarabolMods
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.construction.addrawtypes")]
     public static void AfterAddingBaseTypes()
     {
-      ItemTypes.AddRawType("mods.scarabol.construction.buildtool",
+      ItemTypes.AddRawType(JOB_ITEM_KEY,
         new JSONNode(NodeType.Object)
           .SetAs<int>("npcLimit", 1)
           .SetAs("icon", Path.Combine(RelativeIconsPath, "buildtool.png"))
@@ -57,21 +60,24 @@ namespace ScarabolMods
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.construction.loadrecipes")]
+    [ModLoader.ModCallbackDependsOn("pipliz.blocknpcs.loadrecipes")]
     [ModLoader.ModCallbackProvidesFor("pipliz.apiprovider.registerrecipes")]
     public static void AfterItemTypesDefined()
     {
-      Recipe buildtoolRecipe = new Recipe(new JSONNode()
-        .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "mods.scarabol.construction.buildtool")))
-        .SetAs("requires", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "ironingot")).AddToArray(new JSONNode().SetAs("type", "planks")))
-      );
-      RecipePlayer.AllRecipes.Add(buildtoolRecipe);
+      buildtoolRecipe = new Recipe(new List<InventoryItem>() { new InventoryItem("ironingot", 1), new InventoryItem("planks", 1) }, new InventoryItem(JOB_ITEM_KEY, 1));
       RecipeManager.AddRecipes("pipliz.crafter", new List<Recipe>() { buildtoolRecipe });
+    }
+
+    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.construction.addplayercrafts")]
+    public static void AfterWorldLoad()
+    {
+      // add recipes here, otherwise they're inserted before vanilla recipes in player crafts
+      RecipePlayer.AllRecipes.Add(buildtoolRecipe);
     }
   }
 
   public class ConstructionJob : BlockJobBase, IBlockJobBase, INPCTypeDefiner
   {
-    private static float EXCAVATION_DELAY = 1.5f;
     NPCInventory blockInventory;
     bool shouldTakeItems;
     string fullname;
@@ -83,7 +89,7 @@ namespace ScarabolMods
 
     public override bool NeedsItems { get { return shouldTakeItems; } }
 
-    public override InventoryItem RecruitementItem { get { return new InventoryItem(ItemTypes.IndexLookup.GetIndex("mods.scarabol.construction.buildtool"), 1); } }
+    public override InventoryItem RecruitementItem { get { return new InventoryItem(ItemTypes.IndexLookup.GetIndex(ConstructionModEntries.JOB_ITEM_KEY), 1); } }
 
     public override JSONNode GetJSON()
     {
@@ -115,7 +121,8 @@ namespace ScarabolMods
     public override ITrackableBlock InitializeFromJSON(Players.Player player, JSONNode node)
     {
       blockInventory = new NPCInventory(node["inventory"]);
-      shouldTakeItems = node.GetAs<bool>("shouldTakeItems");
+      shouldTakeItems = false;
+      node.TryGetAs<bool>("shouldTakeItems", out shouldTakeItems);
       fullname = node.GetAs<string>("fullname");
       JSONNode jsonTodos = node["todoblocks"];
       todoblocks = new List<BlueprintBlock>();
@@ -138,7 +145,9 @@ namespace ScarabolMods
         shouldTakeItems = true;
       } else {
         bool placed = false;
+        ushort airtype = ItemTypes.IndexLookup.GetIndex("air");
         ushort bluetype = ItemTypes.IndexLookup.GetIndex(fullname);
+        ushort scaffoldType = ItemTypes.IndexLookup.GetIndex(ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
         for (int i = todoblocks.Count - 1; i >= 0; i--) {
           BlueprintBlock blueblock = todoblocks[i];
           string jobname = fullname.Substring(0, fullname.Length-2);
@@ -146,17 +155,19 @@ namespace ScarabolMods
           ushort newType = ItemTypes.IndexLookup.GetIndex(blueblock.typename);
           ushort actualType;
           if (World.TryGetTypeAt(realPosition, out actualType) && actualType != newType) {
-            if (newType == ItemTypes.IndexLookup.GetIndex("air") || blockInventory.TryGetOneItem(newType)) {
+            if (newType == airtype || blockInventory.TryGetOneItem(newType)) {
               todoblocks.RemoveAt(i);
               if (ServerManager.TryChangeBlock(realPosition, newType)) {
                 state.JobIsDone = true;
-                if (newType == ItemTypes.IndexLookup.GetIndex("air")) {
-                  OverrideCooldown(EXCAVATION_DELAY);
-                  state.SetIndicator(NPCIndicatorType.MissingItem, EXCAVATION_DELAY, actualType);
+                if (newType == airtype) {
+                  OverrideCooldown(ConstructionModEntries.EXCAVATION_DELAY);
+                  state.SetIndicator(NPCIndicatorType.MissingItem, ConstructionModEntries.EXCAVATION_DELAY, actualType);
                 } else if (!blockInventory.IsEmpty && i > 0) {
                   state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(todoblocks[i-1].typename));
                 }
-                usedNPC.Inventory.Add(new InventoryItem(actualType, 1));
+                if (actualType != airtype && actualType != scaffoldType) {
+                  usedNPC.Inventory.Add(new InventoryItem(actualType, 1));
+                }
                 placed = true;
                 break;
               }
@@ -186,7 +197,7 @@ namespace ScarabolMods
         if (!block.typename.Equals("air")) {
           ushort typeindex;
           if (ItemTypes.IndexLookup.TryGetIndex(block.typename, out typeindex)) {
-            if (usedNPC.Colony.UsedStockpile.Remove(typeindex, 1)) {
+            if (usedNPC.Colony.UsedStockpile.TryRemove(typeindex, 1)) {
               shouldTakeItems = false;
               state.Inventory.Add(typeindex, 1);
               if (state.Inventory.UsedCapacity >= state.Inventory.Capacity) { // workaround for capacity issue
