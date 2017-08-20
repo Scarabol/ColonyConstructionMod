@@ -1,0 +1,13 @@
+{
+  "name" : "wall2_right",
+  "localization" : {
+    "en-US" : "Wall Type 2 (8, right)",
+    "de-DE" : "Mauer Typ 2 (8, rechts)"
+  },
+  "offset" : { "x" : 0, "y" : 0, "z" : -1 },
+  "blocks" : [
+    { "x" : 0, "y" : -1, "z" : 0, "typename" : "stonebricks", "height" : 7, "depth" : 8 },
+    { "x" : -1, "y" : 4, "z" : 0, "typename" : "planks", "depth" : 8 },
+    { "x" : -2, "y" : 4, "z" : 0, "typename" : "planks", "height" : 2, "depth" : 8 }
+    ]
+}
