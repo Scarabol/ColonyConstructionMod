@@ -11,13 +11,15 @@ namespace ScarabolMods
   {
     public static string AssetsDirectory;
     private static string RelativeTexturesPath;
+    private static string RelativeIconsPath;
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.blueprints.assemblyload")]
     public static void OnAssemblyLoaded(string path)
     {
       AssetsDirectory = Path.Combine(Path.GetDirectoryName(path), "assets");
       // TODO this is realy hacky (maybe better in future ModAPI)
-      RelativeTexturesPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "materials", "blocks", "albedo", "dummyfile")).MakeRelativeUri(new Uri(MultiPath.Combine(Path.GetDirectoryName(path), "assets", "textures"))).OriginalString;
+      RelativeTexturesPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "materials", "blocks", "albedo", "dummyfile")).MakeRelativeUri(new Uri(Path.Combine(AssetsDirectory, "textures"))).OriginalString;
+      RelativeIconsPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "icons", "dummyfile")).MakeRelativeUri(new Uri(MultiPath.Combine(AssetsDirectory, "icons"))).OriginalString;
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.blueprints.addrawtypes")]
@@ -30,7 +32,7 @@ namespace ScarabolMods
         .SetAs("emissive", "neutral")
         .SetAs("height", "neutral")
       );
-      string iconFilepath = MultiPath.Combine(AssetsDirectory, "icons", "blueprint.png");
+      string iconFilepath = MultiPath.Combine(RelativeIconsPath, "blueprint.png");
       foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
         ItemTypes.AddRawType(blueprintTypename,
           new JSONNode(NodeType.Object)

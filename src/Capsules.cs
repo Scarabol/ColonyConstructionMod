@@ -14,20 +14,21 @@ namespace ScarabolMods
   {
     public static string CAPSULE_SUFFIX = ".capsule";
     public static string ModDirectory;
-    private static string AssetsDirectory;
+    private static string RelativeIconsPath;
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.capsules.assemblyload")]
     public static void OnAssemblyLoaded(string path)
     {
       ModDirectory = Path.GetDirectoryName(path);
-      AssetsDirectory = Path.Combine(ModDirectory, "assets");
+      // TODO this is realy hacky (maybe better in future ModAPI)
+      RelativeIconsPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "icons", "dummyfile")).MakeRelativeUri(new Uri(MultiPath.Combine(ModDirectory, "assets", "icons"))).OriginalString;
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.capsules.addrawtypes")]
     [ModLoader.ModCallbackDependsOn("scarabol.blueprints.addrawtypes")]
     public static void AfterAddingBaseTypes()
     {
-      string iconFilepath = MultiPath.Combine(AssetsDirectory, "icons", "capsule.png");
+      string iconFilepath = Path.Combine(RelativeIconsPath, "capsule.png");
       foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
         ItemTypes.AddRawType(blueprintTypename + CAPSULE_SUFFIX,
           new JSONNode(NodeType.Object)

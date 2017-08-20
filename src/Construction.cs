@@ -17,6 +17,7 @@ namespace ScarabolMods
     public static string MOD_PREFIX = "mods.scarabol.construction.";
     public static string ModDirectory;
     private static string AssetsDirectory;
+    private static string RelativeIconsPath;
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.construction.assemblyload")]
     public static void OnAssemblyLoaded(string path)
@@ -24,6 +25,8 @@ namespace ScarabolMods
       ModDirectory = Path.GetDirectoryName(path);
       AssetsDirectory = Path.Combine(ModDirectory, "assets");
       ModLocalizationHelper.localize(Path.Combine(AssetsDirectory, "localization"), MOD_PREFIX, false);
+      // TODO this is realy hacky (maybe better in future ModAPI)
+      RelativeIconsPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "icons", "dummyfile")).MakeRelativeUri(new Uri(MultiPath.Combine(AssetsDirectory, "icons"))).OriginalString;
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterStartup, "scarabol.construction.registercallbacks")]
@@ -48,7 +51,7 @@ namespace ScarabolMods
       ItemTypes.AddRawType("mods.scarabol.construction.buildtool",
         new JSONNode(NodeType.Object)
           .SetAs<int>("npcLimit", 1)
-          .SetAs("icon", Path.Combine(Path.Combine(AssetsDirectory, "icons"), "buildtool.png"))
+          .SetAs("icon", Path.Combine(RelativeIconsPath, "buildtool.png"))
           .SetAs<bool>("isPlaceable", false)
       );
     }
