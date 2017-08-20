@@ -1,6 +1,6 @@
 # important variables
 modname = Construction
-version = 1.4
+version = 1.5
 
 moddir = Scarabol/$(modname)
 zipname = Colony$(modname)Mod-$(version)-mods.zip
