@@ -49,17 +49,24 @@ namespace ScarabolMods
     {
       foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
         ItemTypesServer.RegisterOnAdd(blueprintTypename, ScaffoldBlockCode.AddScaffolds);
+        ItemTypesServer.RegisterOnAdd(blueprintTypename + CapsulesModEntries.CAPSULE_SUFFIX, ScaffoldBlockCode.AddScaffolds);
         ItemTypesServer.RegisterOnRemove(blueprintTypename, ScaffoldBlockCode.RemoveScaffolds);
+        ItemTypesServer.RegisterOnRemove(blueprintTypename + CapsulesModEntries.CAPSULE_SUFFIX, ScaffoldBlockCode.RemoveScaffolds);
       }
     }
   }
 
   public static class ScaffoldBlockCode
   {
-    public static void AddScaffolds(Vector3Int position, ushort bluetype, Players.Player causedBy)
+    public static void AddScaffolds(Vector3Int position, ushort newtype, Players.Player causedBy)
     {
-      string blueprintFullname = ItemTypes.IndexLookup.GetName(bluetype);
-      string blueprintBasename = blueprintFullname.Substring(0, blueprintFullname.Length-2);
+      string itemtypeFullname = ItemTypes.IndexLookup.GetName(newtype);
+      string blueprintBasename = itemtypeFullname.Substring(0, itemtypeFullname.Length-2);
+      ushort bluetype = newtype;
+      if (blueprintBasename.EndsWith(CapsulesModEntries.CAPSULE_SUFFIX)) {
+        blueprintBasename = blueprintBasename.Substring(0, blueprintBasename.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length);
+        bluetype = ItemTypes.IndexLookup.GetIndex(blueprintBasename + itemtypeFullname.Substring(itemtypeFullname.Length-2));
+      }
       List<BlueprintBlock> blocks;
       if (BlueprintsManager.blueprints.TryGetValue(blueprintBasename, out blocks)) {
         if (blocks.Count > ScaffoldsModEntries.PREVIEW_BLOCKS_THRESHOLD) {
@@ -87,10 +94,15 @@ namespace ScarabolMods
       }
     }
 
-    public static void RemoveScaffolds(Vector3Int position, ushort bluetype, Players.Player causedBy)
+    public static void RemoveScaffolds(Vector3Int position, ushort wastype, Players.Player causedBy)
     {
-      string blueprintFullname = ItemTypes.IndexLookup.GetName(bluetype);
-      string blueprintBasename = blueprintFullname.Substring(0, blueprintFullname.Length-2);
+      string itemtypeFullname = ItemTypes.IndexLookup.GetName(wastype);
+      string blueprintBasename = itemtypeFullname.Substring(0, itemtypeFullname.Length-2);
+      ushort bluetype = wastype;
+      if (blueprintBasename.EndsWith(CapsulesModEntries.CAPSULE_SUFFIX)) {
+        blueprintBasename = blueprintBasename.Substring(0, blueprintBasename.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length);
+        bluetype = ItemTypes.IndexLookup.GetIndex(blueprintBasename + itemtypeFullname.Substring(itemtypeFullname.Length-2));
+      }
       List<BlueprintBlock> blocks;
       if (BlueprintsManager.blueprints.TryGetValue(blueprintBasename, out blocks)) {
         if (blocks.Count > ScaffoldsModEntries.PREVIEW_BLOCKS_THRESHOLD) {
