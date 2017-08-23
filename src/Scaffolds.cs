@@ -76,12 +76,13 @@ namespace ScarabolMods
         ushort airtype = ItemTypes.IndexLookup.GetIndex("air");
         ushort scaffoldType = ItemTypes.IndexLookup.GetIndex(ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
         foreach (BlueprintBlock block in blocks) {
+          if (block.typename.Equals("air")) {
+            continue;
+          }
           Vector3Int realPos = block.GetWorldPosition(blueprintBasename, position, bluetype);
-          if (!position.Equals(realPos)) {
-            ushort wasType;
-            if (World.TryGetTypeAt(realPos, out wasType) && wasType == airtype) {
-              ServerManager.TryChangeBlock(realPos, scaffoldType);
-            }
+          ushort wasType;
+          if (World.TryGetTypeAt(realPos, out wasType) && wasType == airtype) {
+            ServerManager.TryChangeBlock(realPos, scaffoldType);
           }
         }
         ThreadManager.InvokeOnMainThread(delegate ()
@@ -111,12 +112,13 @@ namespace ScarabolMods
         ushort airtype = ItemTypes.IndexLookup.GetIndex("air");
         ushort scaffoldType = ItemTypes.IndexLookup.GetIndex(ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
         foreach (BlueprintBlock block in blocks) {
+          if (block.typename.Equals("air")) {
+            continue;
+          }
           Vector3Int realPos = block.GetWorldPosition(blueprintBasename, position, bluetype);
-          if (!position.Equals(realPos)) {
-            ushort wasType;
-            if (World.TryGetTypeAt(realPos, out wasType) && wasType == scaffoldType) {
-              ServerManager.TryChangeBlock(realPos, airtype);
-            }
+          ushort wasType;
+          if (World.TryGetTypeAt(realPos, out wasType) && wasType == scaffoldType) {
+            ServerManager.TryChangeBlock(realPos, airtype);
           }
         }
       }
