@@ -1,0 +1,10 @@
+{
+  "localization" : {
+    "en-US" : "Hedge (10)",
+    "de-DE" : "Hecke (10)"
+  },
+  "offset" : { "x" : 0, "y" : 0, "z" : -1 },
+  "blocks" : [
+    { "x" : 0, "y" : 0, "z" : 0, "typename" : "leavestemperate", "height" : 3, "depth" : 10 }
+  ]
+}

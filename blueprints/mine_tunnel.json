@@ -1,0 +1,17 @@
+{
+  "localization" : {
+    "en-US" : "Mine Tunnel",
+    "de-DE" : "Minenstollen"
+  },
+  "blocks" : [
+    { "x" : 0, "y" : 0, "z" : 0, "typename" : "air", "height" : 3, "depth" : 10 },
+    { "x" : -1, "y" : 0, "z" : 0, "typename" : "air", "height" : 3, "depth" : 10 },
+    { "x" : 1, "y" : 0, "z" : 0, "typename" : "air", "height" : 3, "depth" : 10 },
+    { "x" : -2, "y" : 0, "z" : 0, "typename" : "air", "height" : 3, "depth" : 10 },
+    { "x" : 2, "y" : 0, "z" : 0, "typename" : "air", "height" : 3, "depth" : 10 },
+    { "x" : -3, "y" : 0, "z" : 0, "typename" : "air", "height" : 2, "depth" : 10 },
+    { "x" : 3, "y" : 0, "z" : 0, "typename" : "air", "height" : 2, "depth" : 10 },
+    { "x" : -4, "y" : 0, "z" : 0, "typename" : "air", "height" : 1, "depth" : 10 },
+    { "x" : 4, "y" : 0, "z" : 0, "typename" : "air", "height" : 1, "depth" : 10 }
+  ]
+}
