@@ -166,7 +166,7 @@ namespace ScarabolMods
                   state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(todoblocks[i-1].typename));
                 }
                 if (actualType != airtype && actualType != scaffoldType) {
-                  usedNPC.Inventory.Add(new InventoryItem(actualType, 1));
+                  usedNPC.Inventory.Add(ItemTypes.RemovalItems(actualType));
                 }
                 placed = true;
                 break;
