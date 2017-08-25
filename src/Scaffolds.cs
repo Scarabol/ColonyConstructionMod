@@ -15,23 +15,13 @@ namespace ScarabolMods
   public static class ScaffoldsModEntries
   {
     public static string SCAFFOLD_ITEM_TYPE = ConstructionModEntries.MOD_PREFIX + "scaffold";
-    public static int PREVIEW_BLOCKS_THRESHOLD = 1000;
-    private static string AssetsDirectory;
-    private static string RelativeTexturesPath;
-
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.scaffolds.assemblyload")]
-    public static void OnAssemblyLoaded(string path)
-    {
-      AssetsDirectory = Path.Combine(Path.GetDirectoryName(path), "assets");
-      // TODO this is realy hacky (maybe better in future ModAPI)
-      RelativeTexturesPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "materials", "blocks", "albedo", "dummyfile")).MakeRelativeUri(new Uri(Path.Combine(AssetsDirectory, "textures"))).OriginalString;
-    }
+    public static int MAX_PREVIEW_BLOCKS_THRESHOLD = 1000;
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.scaffolds.addrawtypes")]
     public static void AfterAddingBaseTypes()
     {
       ItemTypesServer.AddTextureMapping(SCAFFOLD_ITEM_TYPE, new JSONNode()
-        .SetAs("albedo", MultiPath.Combine(RelativeTexturesPath, "albedo", "scaffold"))
+        .SetAs("albedo", MultiPath.Combine(ConstructionModEntries.RelativeTexturesPath, "albedo", "scaffold"))
         .SetAs("normal", "neutral")
         .SetAs("emissive", "neutral")
         .SetAs("height", "neutral")
@@ -47,7 +37,7 @@ namespace ScarabolMods
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesServer, "scarabol.scaffolds.registertypes")]
     public static void AfterItemTypesServer()
     {
-      foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
+      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
         ItemTypesServer.RegisterOnAdd(blueprintTypename, ScaffoldBlockCode.AddScaffolds);
         ItemTypesServer.RegisterOnAdd(blueprintTypename + CapsulesModEntries.CAPSULE_SUFFIX, ScaffoldBlockCode.AddScaffolds);
         ItemTypesServer.RegisterOnRemove(blueprintTypename, ScaffoldBlockCode.RemoveScaffolds);
@@ -67,15 +57,15 @@ namespace ScarabolMods
         blueprintBasename = blueprintBasename.Substring(0, blueprintBasename.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length);
         bluetype = ItemTypes.IndexLookup.GetIndex(blueprintBasename + itemtypeFullname.Substring(itemtypeFullname.Length-2));
       }
-      List<BlueprintBlock> blocks;
-      if (BlueprintsManager.blueprints.TryGetValue(blueprintBasename, out blocks)) {
-        if (blocks.Count > ScaffoldsModEntries.PREVIEW_BLOCKS_THRESHOLD) {
+      List<BlueprintTodoBlock> blocks;
+      if (ManagerBlueprints.blueprints.TryGetValue(blueprintBasename, out blocks)) {
+        if (blocks.Count > ScaffoldsModEntries.MAX_PREVIEW_BLOCKS_THRESHOLD) {
           Chat.Send(causedBy, "Blueprint contains too many blocks for preview");
           return;
         }
-        ushort airtype = ItemTypes.IndexLookup.GetIndex("air");
+        ushort airtype = BlockTypes.Builtin.BuiltinBlocks.Air;
         ushort scaffoldType = ItemTypes.IndexLookup.GetIndex(ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
-        foreach (BlueprintBlock block in blocks) {
+        foreach (BlueprintTodoBlock block in blocks) {
           if (block.typename.Equals("air")) {
             continue;
           }
@@ -104,14 +94,14 @@ namespace ScarabolMods
         blueprintBasename = blueprintBasename.Substring(0, blueprintBasename.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length);
         bluetype = ItemTypes.IndexLookup.GetIndex(blueprintBasename + itemtypeFullname.Substring(itemtypeFullname.Length-2));
       }
-      List<BlueprintBlock> blocks;
-      if (BlueprintsManager.blueprints.TryGetValue(blueprintBasename, out blocks)) {
-        if (blocks.Count > ScaffoldsModEntries.PREVIEW_BLOCKS_THRESHOLD) {
+      List<BlueprintTodoBlock> blocks;
+      if (ManagerBlueprints.blueprints.TryGetValue(blueprintBasename, out blocks)) {
+        if (blocks.Count > ScaffoldsModEntries.MAX_PREVIEW_BLOCKS_THRESHOLD) {
           return;
         }
-        ushort airtype = ItemTypes.IndexLookup.GetIndex("air");
+        ushort airtype = BlockTypes.Builtin.BuiltinBlocks.Air;
         ushort scaffoldType = ItemTypes.IndexLookup.GetIndex(ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
-        foreach (BlueprintBlock block in blocks) {
+        foreach (BlueprintTodoBlock block in blocks) {
           if (block.typename.Equals("air")) {
             continue;
           }

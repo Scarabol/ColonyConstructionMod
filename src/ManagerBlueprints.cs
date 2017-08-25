@@ -8,78 +8,16 @@ using Pipliz.Chatting;
 
 namespace ScarabolMods
 {
-  [ModLoader.ModManager]
-  public static class BlueprintsManagerModEntries
-  {
-    public static string AssetsDirectory;
-    private static string RelativeTexturesPath;
-    private static string RelativeIconsPath;
-
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.blueprints.assemblyload")]
-    public static void OnAssemblyLoaded(string path)
-    {
-      AssetsDirectory = Path.Combine(Path.GetDirectoryName(path), "assets");
-      // TODO this is realy hacky (maybe better in future ModAPI)
-      RelativeTexturesPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "materials", "blocks", "albedo", "dummyfile")).MakeRelativeUri(new Uri(Path.Combine(AssetsDirectory, "textures"))).OriginalString;
-      RelativeIconsPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "icons", "dummyfile")).MakeRelativeUri(new Uri(MultiPath.Combine(AssetsDirectory, "icons"))).OriginalString;
-    }
-
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.blueprints.addrawtypes")]
-    public static void AfterAddingBaseTypes()
-    {
-      Pipliz.Log.Write(string.Format("Blueprints relative texture path is {0}", RelativeTexturesPath));
-      ItemTypesServer.AddTextureMapping("mods.scarabol.blueprints.blueprinttop", new JSONNode()
-        .SetAs("albedo", MultiPath.Combine(RelativeTexturesPath, "albedo", "blueprintsTop"))
-        .SetAs("normal", "neutral")
-        .SetAs("emissive", "neutral")
-        .SetAs("height", "neutral")
-      );
-      string iconFilepath = MultiPath.Combine(RelativeIconsPath, "blueprint.png");
-      foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
-        ItemTypes.AddRawType(blueprintTypename,
-          new JSONNode(NodeType.Object)
-            .SetAs("onRemoveAudio", "woodDeleteLight")
-            .SetAs("onPlaceAudio", "woodPlace")
-            .SetAs("icon", iconFilepath)
-            .SetAs("sideall", "planks")
-            .SetAs("sidey+", "mods.scarabol.blueprints.blueprinttop")
-            .SetAs("npcLimit", "0")
-            .SetAs("isRotatable", "true")
-            .SetAs("rotatablex+", blueprintTypename + "x+")
-            .SetAs("rotatablex-", blueprintTypename + "x-")
-            .SetAs("rotatablez+", blueprintTypename + "z+")
-            .SetAs("rotatablez-", blueprintTypename + "z-")
-        );
-        ItemTypes.AddRawType(blueprintTypename + "x+",
-          new JSONNode(NodeType.Object)
-            .SetAs("parentType", blueprintTypename)
-        );
-        ItemTypes.AddRawType(blueprintTypename + "x-",
-          new JSONNode(NodeType.Object)
-            .SetAs("parentType", blueprintTypename)
-        );
-        ItemTypes.AddRawType(blueprintTypename + "z+",
-          new JSONNode(NodeType.Object)
-            .SetAs("parentType", blueprintTypename)
-        );
-        ItemTypes.AddRawType(blueprintTypename + "z-",
-          new JSONNode(NodeType.Object)
-            .SetAs("parentType", blueprintTypename)
-        );
-      }
-    }
-  }
-
-  public static class BlueprintsManager
+  public static class ManagerBlueprints
   {
     public static string BLUEPRINTS_PREFIX = ConstructionModEntries.MOD_PREFIX + "blueprints.";
-    public static Dictionary<string, List<BlueprintBlock>> blueprints = new Dictionary<string, List<BlueprintBlock>>();
+    public static Dictionary<string, List<BlueprintTodoBlock>> blueprints = new Dictionary<string, List<BlueprintTodoBlock>>();
 
     public static void LoadBlueprints(string blueprintsPath)
     {
       Dictionary<string, string> prefixesBlueprints = new Dictionary<string, string>();
       Dictionary<string, string> prefixesCapsules = new Dictionary<string, string>();
-      string[] prefixFiles = Directory.GetFiles(Path.Combine(BlueprintsManagerModEntries.AssetsDirectory, "localization"), "prefixes.json", SearchOption.AllDirectories);
+      string[] prefixFiles = Directory.GetFiles(Path.Combine(ConstructionModEntries.AssetsDirectory, "localization"), "prefixes.json", SearchOption.AllDirectories);
       foreach (string filepath in prefixFiles) {
         try {
           JSONNode jsonPrefixes;
@@ -110,7 +48,7 @@ namespace ScarabolMods
             int offx = 0;
             int offy = 0;
             int offz = 0;
-            List<BlueprintBlock> blocks = new List<BlueprintBlock>();
+            List<BlueprintTodoBlock> blocks = new List<BlueprintTodoBlock>();
             JSONNode jsonBlocks;
             if (json.NodeType == NodeType.Object) {
               if (!json.TryGetAs<JSONNode>("blocks", out jsonBlocks)) {
@@ -164,12 +102,12 @@ namespace ScarabolMods
               for (int x = 0 ; x <= -offx + maxx ; x++) { // add auto-clear area
                 for (int y = 0 ; y <= -offz + maxy ; y++) {
                   for (int z = 0 ; z <= -offz + maxz ; z++) {
-                    blocks.Add(new BlueprintBlock(x, y, z, "air"));
+                    blocks.Add(new BlueprintTodoBlock(x, y, z, "air"));
                   }
                 }
               }
             }
-            BlueprintBlock originBlock = null;
+            BlueprintTodoBlock originBlock = null;
             foreach (JSONNode node in jsonBlocks.LoopArray()) {
               int startx = getJSONInt(node, "startx", "x", 0, false);
               int starty = getJSONInt(node, "starty", "y", 0, false);
@@ -206,7 +144,7 @@ namespace ScarabolMods
                 for (int y = starty; y * dy < (starty + height) * dy; y += dy) {
                   for (int z = startz; z * dz < (startz + depth) * dz; z += dz) {
                     int lx = x - offx, ly = y - offy, lz = z - offz;
-                    BlueprintBlock b = new BlueprintBlock(lx, ly, lz, typename);
+                    BlueprintTodoBlock b = new BlueprintTodoBlock(lx, ly, lz, typename);
                     if (lx == 0 && ly == 0 && lz == -1) { // do not replace the blueprint box itself (yet)
                       originBlock = b;
                     } else {
@@ -219,7 +157,7 @@ namespace ScarabolMods
             if (originBlock != null) {
               blocks.Add(originBlock);
             }
-            BlueprintsManager.blueprints.Add(BLUEPRINTS_PREFIX + blueprintName, blocks);
+            blueprints.Add(BLUEPRINTS_PREFIX + blueprintName, blocks);
             Pipliz.Log.Write(string.Format("Added blueprint '{0}' with {1} blocks from {2}", BLUEPRINTS_PREFIX + blueprintName, blocks.Count, filename));
           }
         } catch (Exception exception) {
@@ -243,53 +181,6 @@ namespace ScarabolMods
           }
         }
       }
-    }
-  }
-
-  public class BlueprintBlock
-  {
-    public int offsetx;
-    public int offsety;
-    public int offsetz;
-    public string typename;
-
-    public BlueprintBlock(int offsetx, int offsety, int offsetz, string typename) {
-      this.offsetx = offsetx;
-      this.offsety = offsety;
-      this.offsetz = offsetz;
-      this.typename = typename;
-    }
-
-    public BlueprintBlock(JSONNode node)
-      : this(node.GetAs<int>("offsetx"), node.GetAs<int>("offsety"), node.GetAs<int>("offsetz"), node.GetAs<string>("typename"))
-    {
-    }
-
-    public JSONNode GetJSON() {
-      return new JSONNode()
-        .SetAs("offsetx", offsetx)
-        .SetAs("offsety", offsety)
-        .SetAs("offsetz", offsetz)
-        .SetAs("typename", typename);
-    }
-
-    public Vector3Int GetWorldPosition(string typeBasename, Vector3Int position, ushort bluetype) {
-      ushort hxm = ItemTypes.IndexLookup.GetIndex(typeBasename + "x-");
-      ushort hzp = ItemTypes.IndexLookup.GetIndex(typeBasename + "z+");
-      ushort hzm = ItemTypes.IndexLookup.GetIndex(typeBasename + "z-");
-      int realx = this.offsetz+1;
-      int realz = -this.offsetx;
-      if (bluetype == hxm) {
-        realx = -this.offsetz-1;
-        realz = this.offsetx;
-      } else if (bluetype == hzp) {
-        realx = this.offsetx;
-        realz = this.offsetz+1;
-      } else if (bluetype == hzm) {
-        realx = -this.offsetx;
-        realz = -this.offsetz-1;
-      }
-      return position.Add(realx, this.offsety, realz);
     }
   }
 }

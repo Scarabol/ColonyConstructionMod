@@ -16,18 +16,6 @@ namespace ScarabolMods
   {
     public static string JOB_NAME = "scarabol.architect";
     public static string JOB_ITEM_KEY = ConstructionModEntries.MOD_PREFIX + "architects.table";
-    private static string AssetsDirectory;
-    private static string RelativeTexturesPath;
-    private static string RelativeIconsPath;
-
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.architects.assemblyload")]
-    public static void OnAssemblyLoaded(string path)
-    {
-      AssetsDirectory = Path.Combine(Path.GetDirectoryName(path), "assets");
-      // TODO this is realy hacky (maybe better in future ModAPI)
-      RelativeTexturesPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "materials", "blocks", "albedo", "dummyfile")).MakeRelativeUri(new Uri(Path.Combine(AssetsDirectory, "textures"))).OriginalString;
-      RelativeIconsPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "icons", "dummyfile")).MakeRelativeUri(new Uri(MultiPath.Combine(AssetsDirectory, "icons"))).OriginalString;
-    }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterDefiningNPCTypes, "scarabol.architects.registerjobs")]
     [ModLoader.ModCallbackProvidesFor("pipliz.apiprovider.jobs.resolvetypes")]
@@ -41,13 +29,13 @@ namespace ScarabolMods
     public static void AfterAddingBaseTypes()
     {
       ItemTypesServer.AddTextureMapping(ConstructionModEntries.MOD_PREFIX + "architecttop", new JSONNode()
-        .SetAs("albedo", MultiPath.Combine(RelativeTexturesPath, "albedo", "architectTop"))
+        .SetAs("albedo", MultiPath.Combine(ConstructionModEntries.RelativeTexturesPath, "albedo", "architectTop"))
         .SetAs("normal", "neutral")
         .SetAs("emissive", "neutral")
         .SetAs("height", "neutral")
       );
       ItemTypes.AddRawType(JOB_ITEM_KEY, new JSONNode(NodeType.Object)
-                           .SetAs("icon", Path.Combine(RelativeIconsPath, "architect.png"))
+                           .SetAs("icon", Path.Combine(ConstructionModEntries.RelativeIconsPath, "architect.png"))
                            .SetAs("onPlaceAudio", "woodPlace")
                            .SetAs("onRemoveAudio", "woodDeleteLight")
                            .SetAs("isRotatable", true)
@@ -74,7 +62,7 @@ namespace ScarabolMods
     {
       List<InventoryItem> requirements = new List<InventoryItem>() { new InventoryItem("planks", 1) };
       List<Recipe> architectRecipes = new List<Recipe>();
-      foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
+      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
         Recipe architectBlueprintRecipe = new Recipe(requirements, new InventoryItem(blueprintTypename, 1));
         architectRecipes.Add(architectBlueprintRecipe);
       }

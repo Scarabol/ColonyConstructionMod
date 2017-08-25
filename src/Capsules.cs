@@ -13,30 +13,27 @@ namespace ScarabolMods
   [ModLoader.ModManager]
   public static class CapsulesModEntries
   {
+    public static string CAPSULE_PERMISSION = ConstructionModEntries.MOD_PREFIX + "usecapsules";
     public static string CAPSULE_SUFFIX = ".capsule";
-    public static string ModDirectory;
-    private static string RelativeIconsPath;
-
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.capsules.assemblyload")]
-    public static void OnAssemblyLoaded(string path)
-    {
-      ModDirectory = Path.GetDirectoryName(path);
-      // TODO this is realy hacky (maybe better in future ModAPI)
-      RelativeIconsPath = new Uri(MultiPath.Combine(Path.GetFullPath("gamedata"), "textures", "icons", "dummyfile")).MakeRelativeUri(new Uri(MultiPath.Combine(ModDirectory, "assets", "icons"))).OriginalString;
-    }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.capsules.addrawtypes")]
     [ModLoader.ModCallbackDependsOn("scarabol.blueprints.addrawtypes")]
     public static void AfterAddingBaseTypes()
     {
-      string iconFilepath = Path.Combine(RelativeIconsPath, "capsule.png");
-      foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
+      ItemTypesServer.AddTextureMapping(ConstructionModEntries.MOD_PREFIX + "capsuletop", new JSONNode()
+        .SetAs("albedo", MultiPath.Combine(ConstructionModEntries.RelativeTexturesPath, "albedo", "capsulesTop"))
+        .SetAs("normal", "neutral")
+        .SetAs("emissive", "neutral")
+        .SetAs("height", "neutral")
+      );
+      string iconFilepath = Path.Combine(ConstructionModEntries.RelativeIconsPath, "capsule.png");
+      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
         ItemTypes.AddRawType(blueprintTypename + CAPSULE_SUFFIX,
           new JSONNode(NodeType.Object)
             .SetAs("onPlaceAudio", "woodPlace")
             .SetAs("icon", iconFilepath)
             .SetAs("sideall", "planks")
-            .SetAs("sidey+", "mods.scarabol.blueprints.blueprinttop")
+            .SetAs("sidey+", ConstructionModEntries.MOD_PREFIX + "capsuletop")
             .SetAs("isSolid", "false")
             .SetAs("isRotatable", "true")
             .SetAs("rotatablex+", blueprintTypename + CAPSULE_SUFFIX + "x+")
@@ -67,7 +64,7 @@ namespace ScarabolMods
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesServer, "scarabol.capsules.registertypes")]
     public static void AfterItemTypesServer()
     {
-      foreach (string blueprintTypename in BlueprintsManager.blueprints.Keys) {
+      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
         ItemTypesServer.RegisterOnAdd(blueprintTypename + CAPSULE_SUFFIX, CapsuleBlockCode.OnPlaceCapsule);
       }
       ChatCommands.CommandManager.RegisterCommand(new CapsuleChatCommand());
@@ -78,70 +75,41 @@ namespace ScarabolMods
   {
     public static void OnPlaceCapsule(Vector3Int position, ushort capsuleType, Players.Player causedBy)
     {
-      try {
-        ThreadManager.InvokeOnMainThread(delegate ()
-        {
-          ushort realType;
-          if (World.TryGetTypeAt(position, out realType) && realType != capsuleType) {
-            return;
-          }
-          ServerManager.TryChangeBlock(position, ItemTypes.IndexLookup.GetIndex("air"));
-          bool granted = false;
-          JSONNode jsonCapsulePermissionsFile;
-          if (Pipliz.JSON.JSON.Deserialize(Path.Combine(CapsulesModEntries.ModDirectory, "capsule_permissions.json"), out jsonCapsulePermissionsFile, false)) {
-            JSONNode jsonGrantedArray;
-            if (jsonCapsulePermissionsFile.TryGetAs<JSONNode>("granted", out jsonGrantedArray)) {
-              if (jsonGrantedArray.NodeType != NodeType.Array) {
-                Pipliz.Log.WriteError("permissions object is not an array, please contact the server administrator");
-                return;
-              }
-              foreach (JSONNode jsonGranted in jsonGrantedArray.LoopArray()) {
-                string permission = (string) jsonGranted.BareObject;
-                if (PermissionsManager.HasPermission(causedBy, permission)) {
-                  Pipliz.Log.WriteError(string.Format("Capsule permission granted for {0}", permission));
-                  granted = true;
-                  break;
-                }
+      if (!PermissionsManager.CheckAndWarnPermission(causedBy, CapsulesModEntries.CAPSULE_PERMISSION)) {
+        ServerManager.TryChangeBlock(position, BlockTypes.Builtin.BuiltinBlocks.Air);
+        return;
+      }
+      ThreadManager.InvokeOnMainThread(delegate ()
+      {
+        ushort realType;
+        if (World.TryGetTypeAt(position, out realType) && realType != capsuleType) {
+          return;
+        }
+        ServerManager.TryChangeBlock(position, BlockTypes.Builtin.BuiltinBlocks.Air);
+        string capsuleName = ItemTypes.IndexLookup.GetName(capsuleType);
+        string blueprintName = capsuleName.Substring(0, capsuleName.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length - 2);
+        Chat.Send(causedBy, string.Format("Starting to build '{0}' at {1}", blueprintName, position));
+        List<BlueprintTodoBlock> blocks;
+        if (ManagerBlueprints.blueprints.TryGetValue(blueprintName, out blocks)) {
+          int placed = 0, removed = 0, failed = 0;
+          ushort bluetype = ItemTypes.IndexLookup.GetIndex(blueprintName + capsuleName.Substring(capsuleName.Length - 2));
+          foreach (BlueprintTodoBlock block in blocks) {
+            Vector3Int realPosition = block.GetWorldPosition(blueprintName, position, bluetype);
+            if (ServerManager.TryChangeBlock(realPosition, ItemTypes.IndexLookup.GetIndex(block.typename))) {
+              if (block.typename.Equals("air")) {
+                removed++;
+              } else {
+                placed++;
               }
             } else {
-              Pipliz.Log.WriteError("No permissions array defined in the file, please contact the server administrator");
-              return;
+              failed++;
             }
-          } else {
-            Pipliz.Log.WriteError("Could not find permissions file, please contact the server administrator");
-            return;
           }
-          if (!granted) {
-            Chat.Send(causedBy, "You don't have permission to use capsules");
-            return;
-          }
-          string capsuleName = ItemTypes.IndexLookup.GetName(capsuleType);
-          string blueprintName = capsuleName.Substring(0, capsuleName.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length - 2);
-          Chat.Send(causedBy, string.Format("Starting to build '{0}' at {1}", blueprintName, position));
-          List<BlueprintBlock> blocks;
-          if (BlueprintsManager.blueprints.TryGetValue(blueprintName, out blocks)) {
-            int placed = 0, removed = 0, failed = 0;
-            ushort bluetype = ItemTypes.IndexLookup.GetIndex(blueprintName + capsuleName.Substring(capsuleName.Length - 2));
-            foreach (BlueprintBlock block in blocks) {
-              Vector3Int realPosition = block.GetWorldPosition(blueprintName, position, bluetype);
-              if (ServerManager.TryChangeBlock(realPosition, ItemTypes.IndexLookup.GetIndex(block.typename))) {
-                if (block.typename.Equals("air")) {
-                  removed++;
-                } else {
-                  placed++;
-                }
-              } else {
-                failed++;
-              }
-            }
-            Chat.Send(causedBy, string.Format("Completed '{0}' at {1} with {2} placed, {3} removed and {4} failed blocks", blueprintName, position, placed, removed, failed));
-          } else {
-            Chat.Send(causedBy, string.Format("Blueprint '{0}' not found", blueprintName));
-          }
-        }, 2.0);
-      } catch (Exception exception) {
-        Pipliz.Log.WriteError(string.Format("Exception in OnPlaceCapsule; {0}", exception.Message));
-      }
+          Chat.Send(causedBy, string.Format("Completed '{0}' at {1} with {2} placed, {3} removed and {4} failed blocks", blueprintName, position, placed, removed, failed));
+        } else {
+          Chat.Send(causedBy, string.Format("Blueprint '{0}' not found", blueprintName));
+        }
+      }, 2.0);
     }
   }
 
@@ -156,6 +124,8 @@ namespace ScarabolMods
     {
       if (causedBy == null) {
         return true;
+      } else if (!PermissionsManager.CheckAndWarnPermission(causedBy, CapsulesModEntries.CAPSULE_PERMISSION)) {
+        return true;
       }
       int amount = 1;
       var matched = Regex.Match(chattext, @"/capsule (?<name>.+) (?<amount>\d+)");
@@ -169,8 +139,8 @@ namespace ScarabolMods
         amount = Int32.Parse(matched.Groups["amount"].Value);
       }
       string blueprintName = matched.Groups["name"].Value;
-      string blueprintFullname = BlueprintsManager.BLUEPRINTS_PREFIX + blueprintName;
-      if (!BlueprintsManager.blueprints.ContainsKey(blueprintFullname)) {
+      string blueprintFullname = ManagerBlueprints.BLUEPRINTS_PREFIX + blueprintName;
+      if (!ManagerBlueprints.blueprints.ContainsKey(blueprintFullname)) {
         Chat.Send(causedBy, string.Format("Blueprint '{0}' not known", blueprintName));
         return true;
       }
