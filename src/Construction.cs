@@ -195,29 +195,31 @@ namespace ScarabolMods
         ServerManager.TryChangeBlock(position, BlockTypes.Builtin.BuiltinBlocks.Air);
         return;
       }
-      shouldTakeItems = true;
       state.JobIsDone = true;
-      for (int i = todoblocks.Count - 1; i >= 0; i--) {
-        BlueprintTodoBlock block = todoblocks[i];
-        if (!block.typename.Equals("air")) {
-          ushort typeindex;
-          if (ItemTypes.IndexLookup.TryGetIndex(block.typename, out typeindex)) {
-            if (usedNPC.Colony.UsedStockpile.TryRemove(typeindex, 1)) {
-              shouldTakeItems = false;
-              state.Inventory.Add(typeindex, 1);
-              if (state.Inventory.UsedCapacity >= state.Inventory.Capacity) { // workaround for capacity issue
-                if (state.Inventory.TryGetOneItem(typeindex)) {
-                  usedNPC.Colony.UsedStockpile.Add(typeindex, 1);
+      if (!ToSleep) {
+        shouldTakeItems = true;
+        for (int i = todoblocks.Count - 1; i >= 0; i--) {
+          BlueprintTodoBlock block = todoblocks[i];
+          if (!block.typename.Equals("air")) {
+            ushort typeindex;
+            if (ItemTypes.IndexLookup.TryGetIndex(block.typename, out typeindex)) {
+              if (usedNPC.Colony.UsedStockpile.TryRemove(typeindex, 1)) {
+                shouldTakeItems = false;
+                state.Inventory.Add(typeindex, 1);
+                if (state.Inventory.UsedCapacity >= state.Inventory.Capacity) { // workaround for capacity issue
+                  if (state.Inventory.TryGetOneItem(typeindex)) {
+                    usedNPC.Colony.UsedStockpile.Add(typeindex, 1);
+                  }
+                  return;
                 }
-                return;
               }
+            } else {
+              Chat.Send(usedNPC.Colony.Owner, string.Format("Bob here from site at {0}, the item type '{1}' does not exist. Ignoring it...", position, block.typename));
+              todoblocks.RemoveAt(i);
             }
           } else {
-            Chat.Send(usedNPC.Colony.Owner, string.Format("Bob here from site at {0}, the item type '{1}' does not exist. Ignoring it...", position, block.typename));
-            todoblocks.RemoveAt(i);
+            shouldTakeItems = false;
           }
-        } else {
-          shouldTakeItems = false;
         }
       }
       if (todoblocks.Count < 1) {
