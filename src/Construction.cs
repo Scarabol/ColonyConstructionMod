@@ -168,7 +168,7 @@ namespace ScarabolMods
                   OverrideCooldown(ConstructionModEntries.EXCAVATION_DELAY);
                   state.SetIndicator(NPCIndicatorType.MissingItem, ConstructionModEntries.EXCAVATION_DELAY, actualType);
                 } else if (!blockInventory.IsEmpty && i > 0) {
-                  state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(todoblocks[i-1].typename));
+                  state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(todoblocks[i].typename));
                 }
                 if (actualType != BlockTypes.Builtin.BuiltinBlocks.Air && actualType != scaffoldType) {
                   usedNPC.Inventory.Add(ItemTypes.RemovalItems(actualType));
