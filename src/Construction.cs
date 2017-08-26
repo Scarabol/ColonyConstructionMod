@@ -153,6 +153,10 @@ namespace ScarabolMods
         for (int i = todoblocks.Count - 1; i >= 0; i--) {
           BlueprintTodoBlock todoblock = todoblocks[i];
           Vector3Int realPosition = todoblock.GetWorldPosition(jobname, position, bluetype);
+          if (realPosition.y <= 0) {
+            todoblocks.RemoveAt(i);
+            continue;
+          }
           ushort newType = ItemTypes.IndexLookup.GetIndex(todoblock.typename);
           ushort actualType;
           if (World.TryGetTypeAt(realPosition, out actualType) && actualType != newType) {

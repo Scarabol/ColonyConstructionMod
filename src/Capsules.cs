@@ -95,7 +95,7 @@ namespace ScarabolMods
           ushort bluetype = ItemTypes.IndexLookup.GetIndex(blueprintName + capsuleName.Substring(capsuleName.Length - 2));
           foreach (BlueprintTodoBlock block in blocks) {
             Vector3Int realPosition = block.GetWorldPosition(blueprintName, position, bluetype);
-            if (ServerManager.TryChangeBlock(realPosition, ItemTypes.IndexLookup.GetIndex(block.typename))) {
+            if (realPosition.y > 0 && ServerManager.TryChangeBlock(realPosition, ItemTypes.IndexLookup.GetIndex(block.typename))) {
               if (block.typename.Equals("air")) {
                 removed++;
               } else {
