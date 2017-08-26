@@ -60,9 +60,7 @@ namespace ScarabolMods
     public static void AfterWorldLoad()
     {
       // add recipes here, otherwise they're inserted before vanilla recipes in player crafts
-      RecipePlayer.AllRecipes.Add(new Recipe(new JSONNode()
-        .SetAs("results", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", JOB_ITEM_KEY)))
-        .SetAs("requires", new JSONNode(NodeType.Array).AddToArray(new JSONNode().SetAs("type", "planks")))));
+      RecipePlayer.AllRecipes.Add(new Recipe(new InventoryItem("planks", 1), new InventoryItem(JOB_ITEM_KEY, 1)));
     }
   }
 
