@@ -220,7 +220,10 @@ namespace ScarabolMods
           shouldTakeItems = false;
         }
       }
-      if (shouldTakeItems && todoblocks.Count > 0) {
+      if (todoblocks.Count < 1) {
+        ServerManager.TryChangeBlock(position, BlockTypes.Builtin.BuiltinBlocks.Air);
+        return;
+      } else if (shouldTakeItems) {
         state.JobIsDone = false;
         state.SetIndicator(NPCIndicatorType.MissingItem, 6f, ItemTypes.IndexLookup.GetIndex(todoblocks[todoblocks.Count-1].typename));
       }
