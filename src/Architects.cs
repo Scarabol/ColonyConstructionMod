@@ -38,23 +38,10 @@ namespace ScarabolMods
                            .SetAs("icon", Path.Combine(ConstructionModEntries.RelativeIconsPath, "architect.png"))
                            .SetAs("onPlaceAudio", "woodPlace")
                            .SetAs("onRemoveAudio", "woodDeleteLight")
-                           .SetAs("isRotatable", true)
-                           .SetAs("rotatablex+", JOB_ITEM_KEY + "x+")
-                           .SetAs("rotatablex-", JOB_ITEM_KEY + "x-")
-                           .SetAs("rotatablez+", JOB_ITEM_KEY + "z+")
-                           .SetAs("rotatablez-", JOB_ITEM_KEY + "z-")
                            .SetAs("sideall", "planks")
                            .SetAs("sidey+", ConstructionModEntries.MOD_PREFIX + "architecttop")
                            .SetAs("npcLimit", 0)
       );
-      ItemTypes.AddRawType(JOB_ITEM_KEY + "x+", new JSONNode(NodeType.Object)
-                           .SetAs("parentType", JOB_ITEM_KEY));
-      ItemTypes.AddRawType(JOB_ITEM_KEY + "x-", new JSONNode(NodeType.Object)
-                           .SetAs("parentType", JOB_ITEM_KEY));
-      ItemTypes.AddRawType(JOB_ITEM_KEY + "z+", new JSONNode(NodeType.Object)
-                           .SetAs("parentType", JOB_ITEM_KEY));
-      ItemTypes.AddRawType(JOB_ITEM_KEY + "z-", new JSONNode(NodeType.Object)
-                           .SetAs("parentType", JOB_ITEM_KEY));
     }
 
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.architects.loadrecipes")]
@@ -87,16 +74,7 @@ namespace ScarabolMods
 
     public override int MaxRecipeCraftsPerHaul { get { return 1; } }
 
-    public override List<string> GetCraftingLimitsTriggers ()
-    {
-      return new List<string>()
-      {
-        ArchitectsModEntries.JOB_ITEM_KEY + "x+",
-        ArchitectsModEntries.JOB_ITEM_KEY + "x-",
-        ArchitectsModEntries.JOB_ITEM_KEY + "z+",
-        ArchitectsModEntries.JOB_ITEM_KEY + "z-"
-      };
-    }
+    public override List<string> GetCraftingLimitsTriggers () { return new List<string>() { ArchitectsModEntries.JOB_ITEM_KEY }; }
 
     NPCTypeSettings INPCTypeDefiner.GetNPCTypeDefinition()
     {
