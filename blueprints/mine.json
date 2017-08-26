@@ -41,7 +41,15 @@
     { "x" : 0, "y" : -16, "z" : 0, "typename" : "air", "width" : 3, "height" : -1, "depth" : 3 },
     { "x" : 2, "y" : -15, "z" : 0, "typename" : "stonebricks", "height" : -2 },
     { "x" : 0, "y" : -17, "z" : 0, "typename" : "air", "width" : 3, "height" : -1, "depth" : 3 },
-    { "x" : 2, "y" : -16, "z" : 0, "typename" : "stonebricks", "height" : -2 },
-    { "x" : 0, "y" : -18, "z" : 0, "typename" : "air", "width" : 3, "height" : -1, "depth" : 3 }
+    { "x" : 1, "y" : -16, "z" : 0, "typename" : "stonebricks", "height" : -2 },
+    { "x" : 0, "y" : -18, "z" : 0, "typename" : "air", "width" : 3, "height" : -1, "depth" : 3 },
+    { "x" : 0, "y" : -17, "z" : 0, "typename" : "stonebricks", "height" : -2 },
+    { "x" : 0, "y" : -19, "z" : 0, "typename" : "air", "width" : 3, "height" : -1, "depth" : 3 },
+    { "x" : 0, "y" : -18, "z" : 1, "typename" : "stonebricks", "height" : -2 },
+    { "x" : 0, "y" : -20, "z" : 0, "typename" : "air", "width" : 3, "height" : -1, "depth" : 3 },
+    { "x" : 0, "y" : -19, "z" : 2, "typename" : "stonebricks", "height" : -2 },
+    { "x" : 0, "y" : -21, "z" : 0, "typename" : "air", "width" : 3, "height" : -1, "depth" : 3 },
+    { "x" : 1, "y" : -20, "z" : 2, "typename" : "stonebricks", "height" : -2 },
+    { "x" : 2, "y" : -21, "z" : 2, "typename" : "stonebricks" }
   ]
 }

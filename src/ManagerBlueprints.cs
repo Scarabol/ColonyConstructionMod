@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 using Pipliz;
 using Pipliz.JSON;
 using Pipliz.Chatting;
@@ -48,7 +49,7 @@ namespace ScarabolMods
             int offx = 0;
             int offy = 0;
             int offz = 0;
-            List<BlueprintTodoBlock> blocks = new List<BlueprintTodoBlock>();
+            Dictionary<string, BlueprintTodoBlock> blocks = new Dictionary<string, BlueprintTodoBlock>();
             JSONNode jsonBlocks;
             if (json.NodeType == NodeType.Object) {
               if (!json.TryGetAs<JSONNode>("blocks", out jsonBlocks)) {
@@ -98,11 +99,10 @@ namespace ScarabolMods
                 if (z < offz) { offz = z; }
                 if (z > maxz) { maxz = z; }
               }
-              // TODO optimize only clear blocks, which are not part of this blueprint
               for (int x = 0 ; x <= -offx + maxx ; x++) { // add auto-clear area
                 for (int y = 0 ; y <= -offz + maxy ; y++) {
                   for (int z = 0 ; z <= -offz + maxz ; z++) {
-                    blocks.Add(new BlueprintTodoBlock(x, y, z, "air"));
+                    blocks[string.Format("{0}?{1}?{2}", x, y, z)] = new BlueprintTodoBlock(x, y, z, "air");
                   }
                 }
               }
@@ -143,21 +143,21 @@ namespace ScarabolMods
               for (int x = startx; x * dx < (startx + width) * dx; x += dx) {
                 for (int y = starty; y * dy < (starty + height) * dy; y += dy) {
                   for (int z = startz; z * dz < (startz + depth) * dz; z += dz) {
-                    int lx = x - offx, ly = y - offy, lz = z - offz;
-                    BlueprintTodoBlock b = new BlueprintTodoBlock(lx, ly, lz, typename);
-                    if (lx == 0 && ly == 0 && lz == -1) { // do not replace the blueprint box itself (yet)
+                    int absX = x - offx, absY = y - offy, absZ = z - offz;
+                    BlueprintTodoBlock b = new BlueprintTodoBlock(absX, absY, absZ, typename);
+                    if (absX == 0 && absY == 0 && absZ == -1) { // do not replace the blueprint box itself (yet)
                       originBlock = b;
                     } else {
-                      blocks.Add(b);
+                      blocks[string.Format("{0}?{1}?{2}", absX, absY, absZ)] = b;
                     }
                   }
                 }
               }
             }
             if (originBlock != null) {
-              blocks.Add(originBlock);
+              blocks[string.Format("{0}?{1}?{2}", 0, 0, -1)] = originBlock;
             }
-            blueprints.Add(BLUEPRINTS_PREFIX + blueprintName, blocks);
+            blueprints.Add(BLUEPRINTS_PREFIX + blueprintName, blocks.Values.ToList());
             Pipliz.Log.Write(string.Format("Added blueprint '{0}' with {1} blocks from {2}", BLUEPRINTS_PREFIX + blueprintName, blocks.Count, filename));
           }
         } catch (Exception exception) {
