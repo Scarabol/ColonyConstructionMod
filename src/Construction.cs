@@ -162,7 +162,7 @@ namespace ScarabolMods
           if (World.TryGetTypeAt(realPosition, out actualType) && actualType != newType) {
             if (newType == BlockTypes.Builtin.BuiltinBlocks.Air || blockInventory.TryGetOneItem(newType)) {
               todoblocks.RemoveAt(i);
-              if (ServerManager.TryChangeBlock(realPosition, newType)) {
+              if (ServerManager.TryChangeBlock(realPosition, newType, ServerManager.SetBlockFlags.DefaultAudio)) {
                 state.JobIsDone = true;
                 if (newType == BlockTypes.Builtin.BuiltinBlocks.Air) {
                   OverrideCooldown(ConstructionModEntries.EXCAVATION_DELAY);
