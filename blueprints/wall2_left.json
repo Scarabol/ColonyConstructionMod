@@ -1,7 +1,8 @@
 {
   "localization" : {
     "en-US" : "Wall Type 2 (8, left)",
-    "de-DE" : "Mauer Typ 2 (8, links)"
+    "de-DE" : "Mauer Typ 2 (8, links)",
+    "fr-FR" : "Mur de type 2 (8, gauche)"
   },
   "offset" : { "x" : 0, "y" : 0, "z" : -1 },
   "blocks" : [
