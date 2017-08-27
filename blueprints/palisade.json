@@ -1,7 +1,8 @@
 {
   "localization" : {
     "en-US" : "Palisade (10)",
-    "de-DE" : "Palisadenzaun (10)"
+    "de-DE" : "Palisadenzaun (10)",
+    "fr-FR" : "Palissade (10)
   },
   "blocks" : [
     { "x" : 0, "y" : 0, "z" : 0, "typename" : "planks", "height" : 2, "depth" : 10 },
