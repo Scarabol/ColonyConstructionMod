@@ -1,7 +1,8 @@
 {
   "localization" : {
     "en-US" : "Street Lantern",
-    "de-DE" : "Straßenlaterne"
+    "de-DE" : "Straßenlaterne",
+    "fr-FR" : "Lanterne de rue"
   },
   "blocks" : [
     { "x" : 0, "y" : 0, "z" : 0, "typename" : "planks", "height" : 3 },
