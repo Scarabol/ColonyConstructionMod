@@ -122,17 +122,6 @@ namespace ScarabolMods
                   throw new Exception(string.Format("typename not defined or not a string"));
                 }
               }
-              bool isRotatable = false;
-              foreach (string xz in new string[] { "x+", "x-", "z+", "z-" }) {
-                if (typename.EndsWith(xz)) {
-                  isRotatable = true;
-                  break;
-                }
-              }
-              if (isRotatable) {
-                Pipliz.Log.Write(string.Format("ignoring rotatable type {0} in blueprint", typename));
-                continue;
-              }
               int width = getJSONInt(node, "width", "w", 1, true);
               int height = getJSONInt(node, "height", "h", 1, true);
               int depth = getJSONInt(node, "depth", "d", 1, true);

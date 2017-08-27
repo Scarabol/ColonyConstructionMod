@@ -160,7 +160,8 @@ namespace ScarabolMods
           ushort newType = ItemTypes.IndexLookup.GetIndex(todoblock.typename);
           ushort actualType;
           if (World.TryGetTypeAt(realPosition, out actualType) && actualType != newType) {
-            if (newType == BlockTypes.Builtin.BuiltinBlocks.Air || blockInventory.TryGetOneItem(newType)) {
+            ushort baseType = ItemTypes.IndexLookup.GetIndex(TypeHelper.RotatableToBasetype(todoblock.typename));
+            if (newType == BlockTypes.Builtin.BuiltinBlocks.Air || blockInventory.TryGetOneItem(baseType)) {
               todoblocks.RemoveAt(i);
               if (ServerManager.TryChangeBlock(realPosition, newType, ServerManager.SetBlockFlags.DefaultAudio)) {
                 state.JobIsDone = true;
@@ -202,7 +203,7 @@ namespace ScarabolMods
           BlueprintTodoBlock block = todoblocks[i];
           if (!block.typename.Equals("air")) {
             ushort typeindex;
-            if (ItemTypes.IndexLookup.TryGetIndex(block.typename, out typeindex)) {
+            if (ItemTypes.IndexLookup.TryGetIndex(TypeHelper.RotatableToBasetype(block.typename), out typeindex)) {
               if (usedNPC.Colony.UsedStockpile.TryRemove(typeindex, 1)) {
                 shouldTakeItems = false;
                 state.Inventory.Add(typeindex, 1);

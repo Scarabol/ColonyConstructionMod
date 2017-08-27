@@ -83,4 +83,16 @@ namespace ScarabolMods
       return result.ToString().TrimEnd(Path.DirectorySeparatorChar);
     }
   }
+
+  public static class TypeHelper
+  {
+    public static string RotatableToBasetype(string typename)
+    {
+      if (typename.EndsWith("x+") || typename.EndsWith("x-") || typename.EndsWith("z+") || typename.EndsWith("z-")) {
+        return typename.Substring(0, typename.Length - 2);
+      } else {
+        return typename;
+      }
+    }
+  }
 }
