@@ -9,10 +9,18 @@
     { "x" : 0, "y" : 0, "z" : 0, "typename" : "stonebricks", "depth" : 7, "height" : 6 },
     { "x" : 6, "y" : 0, "z" : 0, "typename" : "stonebricks", "depth" : 7, "height" : 6 },
     { "x" : 1, "y" : 0, "z" : 0, "typename" : "stonebricks", "height" : 3 },
+    { "x" : 1, "y" : 2, "z" : -1, "typename" : "torchz+" },
+    { "x" : 1, "y" : 2, "z" : 1, "typename" : "torchz-" },
     { "x" : 5, "y" : 0, "z" : 0, "typename" : "stonebricks", "height" : 3 },
+    { "x" : 5, "y" : 2, "z" : -1, "typename" : "torchz+" },
+    { "x" : 5, "y" : 2, "z" : 1, "typename" : "torchz-" },
     { "x" : 1, "y" : 3, "z" : 0, "typename" : "stonebricks", "width" : 5, "height" : 3 },
     { "x" : 1, "y" : 0, "z" : 6, "typename" : "stonebricks", "height" : 3 },
+    { "x" : 1, "y" : 2, "z" : 5, "typename" : "torchz+" },
+    { "x" : 1, "y" : 2, "z" : 7, "typename" : "torchz-" },
     { "x" : 5, "y" : 0, "z" : 6, "typename" : "stonebricks", "height" : 3 },
+    { "x" : 5, "y" : 2, "z" : 5, "typename" : "torchz+" },
+    { "x" : 5, "y" : 2, "z" : 7, "typename" : "torchz-" },
     { "x" : 1, "y" : 3, "z" : 6, "typename" : "stonebricks", "width" : 5, "height" : 3 },
     { "x" : 1, "y" : 4, "z" : 1, "typename" : "stonebricks", "width" : 5, "depth" : 5 }
   ]

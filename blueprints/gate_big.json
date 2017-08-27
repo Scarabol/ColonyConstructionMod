@@ -1,0 +1,85 @@
+{
+  "localization" : {
+    "en-US" : "Big Gate",
+    "de-DE" : "Großes Torhaus",
+    "fr-FR" : "Grande Porte"
+  },
+  "blocks" : [
+    { "x" : 0, "y" : -1, "z" : 0, "typename" : "stonebricks", "width" : 9, "depth" : 9 },
+
+    { "x" : 0, "y" : 0, "z" : 0, "typename" : "stonebricks", "width" : 3 },
+    { "x" : 6, "y" : 0, "z" : 0, "typename" : "stonebricks", "width" : 3 },
+    { "x" : 8, "y" : 0, "z" : 1, "typename" : "stonebricks", "depth" : 7 },
+    { "x" : 8, "y" : 0, "z" : 8, "typename" : "stonebricks", "width" : -3 },
+    { "x" : 2, "y" : 0, "z" : 8, "typename" : "stonebricks", "width" : -3 },
+    { "x" : 0, "y" : 0, "z" : 7, "typename" : "stonebricks", "depth" : -7 },
+
+    { "x" : 0, "y" : 1, "z" : 0, "typename" : "stonebricks", "width" : 3 },
+    { "x" : 6, "y" : 1, "z" : 0, "typename" : "stonebricks", "width" : 3 },
+    { "x" : 8, "y" : 1, "z" : 1, "typename" : "stonebricks", "depth" : 7 },
+    { "x" : 8, "y" : 1, "z" : 8, "typename" : "stonebricks", "width" : -3 },
+    { "x" : 2, "y" : 1, "z" : 8, "typename" : "stonebricks", "width" : -3 },
+    { "x" : 0, "y" : 1, "z" : 7, "typename" : "stonebricks", "depth" : -7 },
+
+    { "x" : 0, "y" : 2, "z" : 0, "typename" : "stonebricks", "width" : 3 },
+    { "x" : 2, "y" : 2, "z" : -1, "typename" : "torchz+" },
+    { "x" : 2, "y" : 2, "z" : 1, "typename" : "torchz-" },
+    { "x" : 6, "y" : 2, "z" : 0, "typename" : "stonebricks", "width" : 3 },
+    { "x" : 6, "y" : 2, "z" : -1, "typename" : "torchz+" },
+    { "x" : 6, "y" : 2, "z" : 1, "typename" : "torchz-" },
+    { "x" : 8, "y" : 2, "z" : 1, "typename" : "stonebricks", "depth" : 7 },
+    { "x" : 8, "y" : 2, "z" : 8, "typename" : "stonebricks", "width" : -3 },
+    { "x" : 2, "y" : 2, "z" : 7, "typename" : "torchz+" },
+    { "x" : 2, "y" : 2, "z" : 9, "typename" : "torchz-" },
+    { "x" : 2, "y" : 2, "z" : 8, "typename" : "stonebricks", "width" : -3 },
+    { "x" : 6, "y" : 2, "z" : 7, "typename" : "torchz+" },
+    { "x" : 6, "y" : 2, "z" : 9, "typename" : "torchz-" },
+    { "x" : 0, "y" : 2, "z" : 7, "typename" : "stonebricks", "depth" : -7 },
+
+    { "x" : 0, "y" : 3, "z" : 0, "typename" : "stonebricks", "width" : 3 },
+    { "x" : 6, "y" : 3, "z" : 0, "typename" : "stonebricks", "width" : 3 },
+    { "x" : 8, "y" : 3, "z" : 1, "typename" : "stonebricks", "depth" : 7 },
+    { "x" : 8, "y" : 3, "z" : 8, "typename" : "stonebricks", "width" : -3 },
+    { "x" : 2, "y" : 3, "z" : 8, "typename" : "stonebricks", "width" : -3 },
+    { "x" : 0, "y" : 3, "z" : 7, "typename" : "stonebricks", "depth" : -7 },
+
+    { "x" : 0, "y" : 4, "z" : 0, "typename" : "stonebricks", "width" : 9 },
+    { "x" : 8, "y" : 4, "z" : 1, "typename" : "stonebricks", "depth" : 7 },
+    { "x" : 8, "y" : 4, "z" : 8, "typename" : "stonebricks", "width" : -9 },
+    { "x" : 0, "y" : 4, "z" : 7, "typename" : "stonebricks", "depth" : -7 },
+
+    { "x" : 0, "y" : 5, "z" : 0, "typename" : "stonebricks", "width" : 9 },
+    { "x" : 8, "y" : 5, "z" : 1, "typename" : "stonebricks", "depth" : 7 },
+    { "x" : 8, "y" : 5, "z" : 8, "typename" : "stonebricks", "width" : -9 },
+    { "x" : 0, "y" : 5, "z" : 7, "typename" : "stonebricks", "depth" : -7 },
+
+    { "x" : 0, "y" : 6, "z" : 0, "typename" : "stonebricks", "width" : 9 },
+    { "x" : 8, "y" : 6, "z" : 1, "typename" : "stonebricks", "depth" : 7 },
+    { "x" : 8, "y" : 6, "z" : 8, "typename" : "stonebricks", "width" : -9 },
+    { "x" : 0, "y" : 6, "z" : 7, "typename" : "stonebricks", "depth" : -7 },
+
+    { "x" : 0, "y" : 7, "z" : 0, "typename" : "stonebricks", "width" : 9 },
+    { "x" : 8, "y" : 7, "z" : 1, "typename" : "stonebricks", "depth" : 7 },
+    { "x" : 8, "y" : 7, "z" : 8, "typename" : "stonebricks", "width" : -9 },
+    { "x" : 0, "y" : 7, "z" : 7, "typename" : "stonebricks", "depth" : -7 },
+
+    { "x" : 0, "y" : 8, "z" : 0, "typename" : "stonebricks" },
+    { "x" : 2, "y" : 8, "z" : 0, "typename" : "stonebricks" },
+    { "x" : 4, "y" : 8, "z" : 0, "typename" : "stonebricks" },
+    { "x" : 6, "y" : 8, "z" : 0, "typename" : "stonebricks" },
+    { "x" : 8, "y" : 8, "z" : 0, "typename" : "stonebricks" },
+    { "x" : 8, "y" : 8, "z" : 2, "typename" : "stonebricks" },
+    { "x" : 8, "y" : 8, "z" : 4, "typename" : "stonebricks" },
+    { "x" : 8, "y" : 8, "z" : 6, "typename" : "stonebricks" },
+    { "x" : 8, "y" : 8, "z" : 8, "typename" : "stonebricks" },
+    { "x" : 6, "y" : 8, "z" : 8, "typename" : "stonebricks" },
+    { "x" : 4, "y" : 8, "z" : 8, "typename" : "stonebricks" },
+    { "x" : 2, "y" : 8, "z" : 8, "typename" : "stonebricks" },
+    { "x" : 0, "y" : 8, "z" : 8, "typename" : "stonebricks" },
+    { "x" : 0, "y" : 8, "z" : 6, "typename" : "stonebricks" },
+    { "x" : 0, "y" : 8, "z" : 4, "typename" : "stonebricks" },
+    { "x" : 0, "y" : 8, "z" : 2, "typename" : "stonebricks" },
+
+    { "x" : 1, "y" : 6, "z" : 1, "typename" : "stonebricks", "width" : 7, "depth" : 7 }
+  ]
+}
