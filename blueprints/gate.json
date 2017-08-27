@@ -1,7 +1,7 @@
 {
   "localization" : {
     "en-US" : "Gate",
-    "de-DE" : "Torhaus"
+    "de-DE" : "Torhaus",
     "fr-FR" : "Porte"
   },
   "blocks" : [

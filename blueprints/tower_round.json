@@ -1,7 +1,8 @@
 {
   "localization" : {
     "en-US" : "Round-Tower",
-    "de-DE" : "Rundturm"
+    "de-DE" : "Rundturm",
+    "fr-FR" : "Tours ronde"
   },
   "blocks" : [
     { "x" : 0, "y" : -1, "z" : 2, "typename" : "stonebricks", "depth" : 3 },
