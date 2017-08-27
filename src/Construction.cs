@@ -149,7 +149,7 @@ namespace ScarabolMods
         bool placed = false;
         ushort bluetype = ItemTypes.IndexLookup.GetIndex(fullname);
         ushort scaffoldType = ItemTypes.IndexLookup.GetIndex(ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
-        string jobname = fullname.Substring(0, fullname.Length-2);
+        string jobname = TypeHelper.RotatableToBasetype(fullname);
         for (int i = todoblocks.Count - 1; i >= 0; i--) {
           BlueprintTodoBlock todoblock = todoblocks[i];
           Vector3Int realPosition = todoblock.GetWorldPosition(jobname, position, bluetype);
@@ -167,9 +167,9 @@ namespace ScarabolMods
                 state.JobIsDone = true;
                 if (newType == BlockTypes.Builtin.BuiltinBlocks.Air) {
                   OverrideCooldown(ConstructionModEntries.EXCAVATION_DELAY);
-                  state.SetIndicator(NPCIndicatorType.MissingItem, ConstructionModEntries.EXCAVATION_DELAY, actualType);
+                  state.SetIndicator(NPCIndicatorType.Crafted, ConstructionModEntries.EXCAVATION_DELAY, actualType);
                 } else if (!blockInventory.IsEmpty && i > 0) {
-                  state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(todoblocks[i].typename));
+                  state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(todoblock.typename));
                 }
                 if (actualType != BlockTypes.Builtin.BuiltinBlocks.Air && actualType != scaffoldType) {
                   usedNPC.Inventory.Add(ItemTypes.RemovalItems(actualType));
