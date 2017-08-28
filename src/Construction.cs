@@ -53,11 +53,10 @@ namespace ScarabolMods
     [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.construction.addrawtypes")]
     public static void AfterAddingBaseTypes()
     {
-      ItemTypes.AddRawType(JOB_ITEM_KEY,
-        new JSONNode(NodeType.Object)
-          .SetAs<int>("npcLimit", 1)
-          .SetAs("icon", Path.Combine(RelativeIconsPath, "buildtool.png"))
-          .SetAs<bool>("isPlaceable", false)
+      ItemTypes.AddRawType(JOB_ITEM_KEY, new JSONNode(NodeType.Object)
+                           .SetAs("npcLimit", 1)
+                           .SetAs("icon", Path.Combine(RelativeIconsPath, "buildtool.png"))
+                           .SetAs("isPlaceable", false)
       );
     }
 
@@ -124,7 +123,7 @@ namespace ScarabolMods
     {
       blockInventory = new NPCInventory(node["inventory"]);
       shouldTakeItems = false;
-      node.TryGetAs<bool>("shouldTakeItems", out shouldTakeItems);
+      node.TryGetAs("shouldTakeItems", out shouldTakeItems);
       fullname = node.GetAs<string>("fullname");
       JSONNode jsonTodos = node["todoblocks"];
       todoblocks = new List<BlueprintTodoBlock>();
@@ -238,6 +237,12 @@ namespace ScarabolMods
         state.JobIsDone = false;
         state.SetIndicator(NPCIndicatorType.MissingItem, 6f, ItemTypes.IndexLookup.GetIndex(todoblocks[todoblocks.Count-1].typename));
       }
+    }
+
+    public override void OnRemove ()
+    {
+      blockInventory.TryDump(Stockpile.GetStockPile(owner));
+      base.OnRemove();
     }
 
     NPCTypeSettings INPCTypeDefiner.GetNPCTypeDefinition()

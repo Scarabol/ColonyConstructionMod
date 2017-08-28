@@ -6,6 +6,7 @@
   },
   "blocks" : [
     { "x" : 0, "y" : 0, "z" : 0, "typename" : "planks", "height" : 4 },
-    { "x" : 0, "y" : 3, "z" : -1, "typename" : "torchz+" }
+    { "x" : 0, "y" : 3, "z" : -1, "typename" : "planks" },
+    { "x" : 0, "y" : 3, "z" : -2, "typename" : "torchz+" }
   ]
 }

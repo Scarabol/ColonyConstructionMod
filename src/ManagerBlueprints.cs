@@ -26,11 +26,11 @@ namespace ScarabolMods
             string locName = Directory.GetParent(filepath).Name;
             Pipliz.Log.Write(string.Format("Found prefixes localization file for '{0}' localization", locName));
             string blueprintsPrefix;
-            if (jsonPrefixes.TryGetAs<string>("blueprints", out blueprintsPrefix)) {
+            if (jsonPrefixes.TryGetAs("blueprints", out blueprintsPrefix)) {
               prefixesBlueprints[locName] = blueprintsPrefix;
             }
             string capsulesPrefix;
-            if (jsonPrefixes.TryGetAs<string>("capsules", out capsulesPrefix)) {
+            if (jsonPrefixes.TryGetAs("capsules", out capsulesPrefix)) {
               prefixesCapsules[locName] = capsulesPrefix;
             }
           }
@@ -52,18 +52,18 @@ namespace ScarabolMods
             Dictionary<string, BlueprintTodoBlock> blocks = new Dictionary<string, BlueprintTodoBlock>();
             JSONNode jsonBlocks;
             if (json.NodeType == NodeType.Object) {
-              if (!json.TryGetAs<JSONNode>("blocks", out jsonBlocks)) {
+              if (!json.TryGetAs("blocks", out jsonBlocks)) {
                 Pipliz.Log.WriteError(string.Format("Expected 'blocks' key in json {0}", filename));
                 continue;
               }
               JSONNode jsonOffset;
-              if (json.TryGetAs<JSONNode>("offset", out jsonOffset)) {
+              if (json.TryGetAs("offset", out jsonOffset)) {
                 offx = -jsonOffset.GetAs<int>("x");
                 offy = -jsonOffset.GetAs<int>("y");
                 offz = -jsonOffset.GetAs<int>("z");
               }
               JSONNode jsonLocalization;
-              if (json.TryGetAs<JSONNode>("localization", out jsonLocalization)) {
+              if (json.TryGetAs("localization", out jsonLocalization)) {
                 foreach (KeyValuePair<string, JSONNode> locEntry in jsonLocalization.LoopObject()) {
                   string labelPrefix;
                   string capsulePrefix;
