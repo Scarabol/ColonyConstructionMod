@@ -157,10 +157,18 @@ namespace ScarabolMods
             todoblocks.RemoveAt(i);
             continue;
           }
-          ushort newType = ItemTypes.IndexLookup.GetIndex(todoblock.typename);
+          string baseTypename = TypeHelper.RotatableToBasetype(todoblock.typename);
+          string rotatedTypename = todoblock.typename;
+          if (!baseTypename.Equals(todoblock.typename)) {
+            Vector3Int jobVec = TypeHelper.RotatableToVector(fullname);
+            Vector3Int blockVec = TypeHelper.RotatableToVector(todoblock.typename);
+            Vector3Int combinedVec = new Vector3Int(- jobVec.z * blockVec.x + jobVec.x * blockVec.z, 0, jobVec.x * blockVec.x + jobVec.z * blockVec.z);
+            rotatedTypename = baseTypename + TypeHelper.VectorToXZ(combinedVec);
+          }
+          ushort newType = ItemTypes.IndexLookup.GetIndex(rotatedTypename);
           ushort actualType;
           if (World.TryGetTypeAt(realPosition, out actualType) && actualType != newType) {
-            ushort baseType = ItemTypes.IndexLookup.GetIndex(TypeHelper.RotatableToBasetype(todoblock.typename));
+            ushort baseType = ItemTypes.IndexLookup.GetIndex(baseTypename);
             if (newType == BlockTypes.Builtin.BuiltinBlocks.Air || blockInventory.TryGetOneItem(baseType)) {
               todoblocks.RemoveAt(i);
               if (ServerManager.TryChangeBlock(realPosition, newType, ServerManager.SetBlockFlags.DefaultAudio)) {
@@ -169,7 +177,7 @@ namespace ScarabolMods
                   OverrideCooldown(ConstructionModEntries.EXCAVATION_DELAY);
                   state.SetIndicator(NPCIndicatorType.Crafted, ConstructionModEntries.EXCAVATION_DELAY, actualType);
                 } else if (!blockInventory.IsEmpty && i > 0) {
-                  state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(todoblock.typename));
+                  state.SetIndicator(NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex(rotatedTypename));
                 }
                 if (actualType != BlockTypes.Builtin.BuiltinBlocks.Air && actualType != scaffoldType) {
                   usedNPC.Inventory.Add(ItemTypes.RemovalItems(actualType));

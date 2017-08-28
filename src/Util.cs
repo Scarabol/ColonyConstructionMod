@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using Pipliz;
 using Pipliz.JSON;
 
 namespace ScarabolMods
@@ -127,6 +128,55 @@ namespace ScarabolMods
         return typename.Substring(0, typename.Length - 2);
       } else {
         return typename;
+      }
+    }
+
+    public static string GetXZFromTypename(string typename)
+    {
+      if (typename.EndsWith("x+") || typename.EndsWith("x-") || typename.EndsWith("z+") || typename.EndsWith("z-")) {
+        return typename.Substring(typename.Length - 2);
+      } else {
+        return "";
+      }
+    }
+
+    public static Vector3Int RotatableToVector(string typename)
+    {
+      string xz = GetXZFromTypename(typename);
+      if (xz.Equals("x+")) {
+        return new Vector3Int(1, 0, 0);
+      } else if (xz.Equals("x-")) {
+        return new Vector3Int(-1, 0, 0);
+      } else if (xz.Equals("y+")) {
+        return new Vector3Int(0, 1, 0);
+      } else if (xz.Equals("y-")) {
+        return new Vector3Int(0, -1, 0);
+      } else if (xz.Equals("z+")) {
+        return new Vector3Int(0, 0, 1);
+      } else if (xz.Equals("z-")) {
+        return new Vector3Int(0, 0, -1);
+      } else {
+        return new Vector3Int(0, 0, 0);
+      }
+    }
+
+    public static string VectorToXZ(Vector3Int vec)
+    {
+      if (vec.x == 1) {
+        return "x+";
+      } else if (vec.x == -1) {
+        return "x-";
+      } else if (vec.y == 1) {
+        return "y+";
+      } else if (vec.y == -1) {
+        return "y-";
+      } else if (vec.z == 1) {
+        return "z+";
+      } else if (vec.z == -1) {
+        return "z-";
+      } else {
+        Pipliz.Log.WriteError(string.Format("Malformed vector {0}", vec));
+        return "x+";
       }
     }
   }
