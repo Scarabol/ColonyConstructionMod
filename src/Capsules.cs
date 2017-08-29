@@ -85,7 +85,15 @@ namespace ScarabolMods
           ushort bluetype = ItemTypes.IndexLookup.GetIndex(blueprintName + capsuleName.Substring(capsuleName.Length - 2));
           foreach (BlueprintTodoBlock block in blocks) {
             Vector3Int realPosition = block.GetWorldPosition(blueprintName, position, bluetype);
-            if (realPosition.y > 0 && ServerManager.TryChangeBlock(realPosition, ItemTypes.IndexLookup.GetIndex(block.typename))) {
+            string baseTypename = TypeHelper.RotatableToBasetype(block.typename);
+            string rotatedTypename = block.typename;
+            if (!baseTypename.Equals(block.typename)) {
+              Vector3Int jobVec = TypeHelper.RotatableToVector(capsuleName);
+              Vector3Int blockVec = TypeHelper.RotatableToVector(block.typename);
+              Vector3Int combinedVec = new Vector3Int(- jobVec.z * blockVec.x + jobVec.x * blockVec.z, 0, jobVec.x * blockVec.x + jobVec.z * blockVec.z);
+              rotatedTypename = baseTypename + TypeHelper.VectorToXZ(combinedVec);
+            }
+            if (realPosition.y > 0 && ServerManager.TryChangeBlock(realPosition, ItemTypes.IndexLookup.GetIndex(rotatedTypename))) {
               if (block.typename.Equals("air")) {
                 removed++;
               } else {
