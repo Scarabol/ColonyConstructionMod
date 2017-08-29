@@ -17,98 +17,97 @@ namespace ScarabolMods
     public static string SCAFFOLD_ITEM_TYPE = ConstructionModEntries.MOD_PREFIX + "scaffold";
     public static int MAX_PREVIEW_BLOCKS_THRESHOLD = 1000;
 
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.scaffolds.addrawtypes")]
-    public static void AfterAddingBaseTypes()
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.scaffolds.addrawtypes")]
+    public static void AfterAddingBaseTypes ()
     {
-      ItemTypesServer.AddTextureMapping(SCAFFOLD_ITEM_TYPE, new JSONNode()
-        .SetAs("albedo", MultiPath.Combine(ConstructionModEntries.RelativeTexturesPath, "albedo", "scaffold"))
-        .SetAs("normal", "neutral")
-        .SetAs("emissive", "neutral")
-        .SetAs("height", "neutral")
+      ItemTypesServer.AddTextureMapping (SCAFFOLD_ITEM_TYPE, new JSONNode ()
+        .SetAs ("albedo", MultiPath.Combine (ConstructionModEntries.RelativeTexturesPath, "albedo", "scaffold"))
+        .SetAs ("normal", "neutral")
+        .SetAs ("emissive", "neutral")
+        .SetAs ("height", "neutral")
       );
-      ItemTypes.AddRawType(SCAFFOLD_ITEM_TYPE, new JSONNode(NodeType.Object)
-                           .SetAs("sideall", SCAFFOLD_ITEM_TYPE)
-                           .SetAs("onRemove", new JSONNode(NodeType.Array))
-                           .SetAs("isSolid", false)
-                           .SetAs("destructionTime", 100)
+      ItemTypes.AddRawType (SCAFFOLD_ITEM_TYPE, new JSONNode ()
+        .SetAs ("sideall", SCAFFOLD_ITEM_TYPE)
+        .SetAs ("onRemove", new JSONNode (NodeType.Array))
+        .SetAs ("isSolid", false)
+        .SetAs ("destructionTime", 100)
       );
     }
 
-    [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesServer, "scarabol.scaffolds.registertypes")]
-    public static void AfterItemTypesServer()
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesServer, "scarabol.scaffolds.registertypes")]
+    public static void AfterItemTypesServer ()
     {
       foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
-        ItemTypesServer.RegisterOnAdd(blueprintTypename, ScaffoldBlockCode.AddScaffolds);
-        ItemTypesServer.RegisterOnAdd(blueprintTypename + CapsulesModEntries.CAPSULE_SUFFIX, ScaffoldBlockCode.AddScaffolds);
-        ItemTypesServer.RegisterOnRemove(blueprintTypename, ScaffoldBlockCode.RemoveScaffolds);
-        ItemTypesServer.RegisterOnRemove(blueprintTypename + CapsulesModEntries.CAPSULE_SUFFIX, ScaffoldBlockCode.RemoveScaffolds);
+        ItemTypesServer.RegisterOnAdd (blueprintTypename, ScaffoldBlockCode.AddScaffolds);
+        ItemTypesServer.RegisterOnAdd (blueprintTypename + CapsulesModEntries.CAPSULE_SUFFIX, ScaffoldBlockCode.AddScaffolds);
+        ItemTypesServer.RegisterOnRemove (blueprintTypename, ScaffoldBlockCode.RemoveScaffolds);
+        ItemTypesServer.RegisterOnRemove (blueprintTypename + CapsulesModEntries.CAPSULE_SUFFIX, ScaffoldBlockCode.RemoveScaffolds);
       }
     }
   }
 
   public static class ScaffoldBlockCode
   {
-    public static void AddScaffolds(Vector3Int position, ushort newtype, Players.Player causedBy)
+    public static void AddScaffolds (Vector3Int position, ushort newtype, Players.Player causedBy)
     {
-      string itemtypeFullname = ItemTypes.IndexLookup.GetName(newtype);
-      string blueprintBasename = itemtypeFullname.Substring(0, itemtypeFullname.Length-2);
+      string itemtypeFullname = ItemTypes.IndexLookup.GetName (newtype);
+      string blueprintBasename = itemtypeFullname.Substring (0, itemtypeFullname.Length - 2);
       ushort bluetype = newtype;
-      if (blueprintBasename.EndsWith(CapsulesModEntries.CAPSULE_SUFFIX)) {
-        blueprintBasename = blueprintBasename.Substring(0, blueprintBasename.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length);
-        bluetype = ItemTypes.IndexLookup.GetIndex(blueprintBasename + itemtypeFullname.Substring(itemtypeFullname.Length-2));
+      if (blueprintBasename.EndsWith (CapsulesModEntries.CAPSULE_SUFFIX)) {
+        blueprintBasename = blueprintBasename.Substring (0, blueprintBasename.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length);
+        bluetype = ItemTypes.IndexLookup.GetIndex (blueprintBasename + itemtypeFullname.Substring (itemtypeFullname.Length - 2));
       }
       List<BlueprintTodoBlock> blocks;
-      if (ManagerBlueprints.blueprints.TryGetValue(blueprintBasename, out blocks)) {
+      if (ManagerBlueprints.blueprints.TryGetValue (blueprintBasename, out blocks)) {
         if (blocks.Count > ScaffoldsModEntries.MAX_PREVIEW_BLOCKS_THRESHOLD) {
-          Chat.Send(causedBy, "Blueprint contains too many blocks for preview");
+          Chat.Send (causedBy, "Blueprint contains too many blocks for preview");
           return;
         }
         ushort airtype = BlockTypes.Builtin.BuiltinBlocks.Air;
-        ushort scaffoldType = ItemTypes.IndexLookup.GetIndex(ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
+        ushort scaffoldType = ItemTypes.IndexLookup.GetIndex (ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
         foreach (BlueprintTodoBlock block in blocks) {
-          if (block.typename.Equals("air")) {
+          if (block.typename.Equals ("air")) {
             continue;
           }
-          Vector3Int realPos = block.GetWorldPosition(blueprintBasename, position, bluetype);
+          Vector3Int realPos = block.GetWorldPosition (blueprintBasename, position, bluetype);
           ushort wasType;
-          if (World.TryGetTypeAt(realPos, out wasType) && wasType == airtype) {
-            ServerManager.TryChangeBlock(realPos, scaffoldType);
+          if (World.TryGetTypeAt (realPos, out wasType) && wasType == airtype) {
+            ServerManager.TryChangeBlock (realPos, scaffoldType);
           }
         }
-        ThreadManager.InvokeOnMainThread(delegate ()
-        {
+        ThreadManager.InvokeOnMainThread (delegate () {
           ushort actualType;
-          if (World.TryGetTypeAt(position, out actualType) && actualType == newtype) {
-            RemoveScaffolds(position, bluetype, causedBy);
+          if (World.TryGetTypeAt (position, out actualType) && actualType == newtype) {
+            RemoveScaffolds (position, bluetype, causedBy);
           }
         }, 8.0f);
       }
     }
 
-    public static void RemoveScaffolds(Vector3Int position, ushort wastype, Players.Player causedBy)
+    public static void RemoveScaffolds (Vector3Int position, ushort wastype, Players.Player causedBy)
     {
-      string itemtypeFullname = ItemTypes.IndexLookup.GetName(wastype);
-      string blueprintBasename = itemtypeFullname.Substring(0, itemtypeFullname.Length-2);
+      string itemtypeFullname = ItemTypes.IndexLookup.GetName (wastype);
+      string blueprintBasename = itemtypeFullname.Substring (0, itemtypeFullname.Length - 2);
       ushort bluetype = wastype;
-      if (blueprintBasename.EndsWith(CapsulesModEntries.CAPSULE_SUFFIX)) {
-        blueprintBasename = blueprintBasename.Substring(0, blueprintBasename.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length);
-        bluetype = ItemTypes.IndexLookup.GetIndex(blueprintBasename + itemtypeFullname.Substring(itemtypeFullname.Length-2));
+      if (blueprintBasename.EndsWith (CapsulesModEntries.CAPSULE_SUFFIX)) {
+        blueprintBasename = blueprintBasename.Substring (0, blueprintBasename.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length);
+        bluetype = ItemTypes.IndexLookup.GetIndex (blueprintBasename + itemtypeFullname.Substring (itemtypeFullname.Length - 2));
       }
       List<BlueprintTodoBlock> blocks;
-      if (ManagerBlueprints.blueprints.TryGetValue(blueprintBasename, out blocks)) {
+      if (ManagerBlueprints.blueprints.TryGetValue (blueprintBasename, out blocks)) {
         if (blocks.Count > ScaffoldsModEntries.MAX_PREVIEW_BLOCKS_THRESHOLD) {
           return;
         }
         ushort airtype = BlockTypes.Builtin.BuiltinBlocks.Air;
-        ushort scaffoldType = ItemTypes.IndexLookup.GetIndex(ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
+        ushort scaffoldType = ItemTypes.IndexLookup.GetIndex (ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
         foreach (BlueprintTodoBlock block in blocks) {
-          if (block.typename.Equals("air")) {
+          if (block.typename.Equals ("air")) {
             continue;
           }
-          Vector3Int realPos = block.GetWorldPosition(blueprintBasename, position, bluetype);
+          Vector3Int realPos = block.GetWorldPosition (blueprintBasename, position, bluetype);
           ushort wasType;
-          if (World.TryGetTypeAt(realPos, out wasType) && wasType == scaffoldType) {
-            ServerManager.TryChangeBlock(realPos, airtype);
+          if (World.TryGetTypeAt (realPos, out wasType) && wasType == scaffoldType) {
+            ServerManager.TryChangeBlock (realPos, airtype);
           }
         }
       }
