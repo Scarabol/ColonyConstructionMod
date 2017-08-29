@@ -1,4 +1,4 @@
-# Colony Survival Contruction Mod by Scarabol
+# Colony Survival Construction Mod by Scarabol
 
 ## Installation
 
