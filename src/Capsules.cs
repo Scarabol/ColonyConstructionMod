@@ -42,22 +42,12 @@ namespace ScarabolMods
             .SetAs("rotatablez-", blueprintTypename + CAPSULE_SUFFIX + "z-")
             .SetAs("npcLimit", "0")
         );
-        ItemTypes.AddRawType(blueprintTypename + CAPSULE_SUFFIX + "x+",
-          new JSONNode(NodeType.Object)
-            .SetAs("parentType", blueprintTypename + CAPSULE_SUFFIX)
-        );
-        ItemTypes.AddRawType(blueprintTypename + CAPSULE_SUFFIX + "x-",
-          new JSONNode(NodeType.Object)
-            .SetAs("parentType", blueprintTypename + CAPSULE_SUFFIX)
-        );
-        ItemTypes.AddRawType(blueprintTypename + CAPSULE_SUFFIX + "z+",
-          new JSONNode(NodeType.Object)
-            .SetAs("parentType", blueprintTypename + CAPSULE_SUFFIX)
-        );
-        ItemTypes.AddRawType(blueprintTypename + CAPSULE_SUFFIX + "z-",
-          new JSONNode(NodeType.Object)
-            .SetAs("parentType", blueprintTypename + CAPSULE_SUFFIX)
-        );
+        foreach (string xz in new string[] { "x+", "x-", "z+", "z-" }) {
+          ItemTypes.AddRawType(blueprintTypename + CAPSULE_SUFFIX + xz,
+            new JSONNode(NodeType.Object)
+              .SetAs("parentType", blueprintTypename + CAPSULE_SUFFIX)
+          );
+        }
       }
     }
 
