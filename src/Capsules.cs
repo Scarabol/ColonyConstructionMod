@@ -81,25 +81,28 @@ namespace ScarabolMods
         List<BlueprintTodoBlock> blocks;
         if (ManagerBlueprints.blueprints.TryGetValue (blueprintName, out blocks)) {
           int placed = 0, removed = 0, failed = 0;
-          ushort bluetype = ItemTypes.IndexLookup.GetIndex (blueprintName + capsuleName.Substring (capsuleName.Length - 2));
-          foreach (BlueprintTodoBlock block in blocks) {
-            Vector3Int realPosition = block.GetWorldPosition (blueprintName, position, bluetype);
-            string baseTypename = TypeHelper.RotatableToBasetype (block.typename);
-            string rotatedTypename = block.typename;
-            if (!baseTypename.Equals (block.typename)) {
-              Vector3Int jobVec = TypeHelper.RotatableToVector (capsuleName);
-              Vector3Int blockVec = TypeHelper.RotatableToVector (block.typename);
-              Vector3Int combinedVec = new Vector3Int (-jobVec.z * blockVec.x + jobVec.x * blockVec.z, 0, jobVec.x * blockVec.x + jobVec.z * blockVec.z);
-              rotatedTypename = baseTypename + TypeHelper.VectorToXZ (combinedVec);
-            }
-            if (realPosition.y > 0 && ServerManager.TryChangeBlock (realPosition, ItemTypes.IndexLookup.GetIndex (rotatedTypename))) {
-              if (block.typename.Equals ("air")) {
-                removed++;
-              } else {
-                placed++;
+          ushort bluetype;
+          if (ItemTypes.IndexLookup.TryGetIndex (blueprintName + capsuleName.Substring (capsuleName.Length - 2), out bluetype)) {
+            foreach (BlueprintTodoBlock block in blocks) {
+              Vector3Int realPosition = block.GetWorldPosition (blueprintName, position, bluetype);
+              string baseTypename = TypeHelper.RotatableToBasetype (block.typename);
+              string rotatedTypename = block.typename;
+              if (!baseTypename.Equals (block.typename)) {
+                Vector3Int jobVec = TypeHelper.RotatableToVector (capsuleName);
+                Vector3Int blockVec = TypeHelper.RotatableToVector (block.typename);
+                Vector3Int combinedVec = new Vector3Int (-jobVec.z * blockVec.x + jobVec.x * blockVec.z, 0, jobVec.x * blockVec.x + jobVec.z * blockVec.z);
+                rotatedTypename = baseTypename + TypeHelper.VectorToXZ (combinedVec);
               }
-            } else {
-              failed++;
+              ushort rotatedType;
+              if (realPosition.y > 0 && ItemTypes.IndexLookup.TryGetIndex (rotatedTypename, out rotatedType) && ServerManager.TryChangeBlock (realPosition, rotatedType)) {
+                if (block.typename.Equals ("air")) {
+                  removed++;
+                } else {
+                  placed++;
+                }
+              } else {
+                failed++;
+              }
             }
           }
           Chat.Send (causedBy, string.Format ("Completed '{0}' at {1} with {2} placed, {3} removed and {4} failed blocks", blueprintName, position, placed, removed, failed));

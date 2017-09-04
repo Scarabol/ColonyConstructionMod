@@ -77,6 +77,13 @@ namespace ScarabolMods
       return new List<string> () { ArchitectsModEntries.JOB_ITEM_KEY };
     }
 
+    protected override void OnRecipeCrafted ()
+    {
+      foreach (InventoryItem result in selectedRecipe.Results) {
+        RecipeLimits.SetLimit (owner, result.Type, System.Math.Max (0, RecipeLimits.GetLimit (owner, result.Type) - 1));
+      }
+    }
+
     NPCTypeSettings INPCTypeDefiner.GetNPCTypeDefinition ()
     {
       NPCTypeSettings def = NPCTypeSettings.Default;
