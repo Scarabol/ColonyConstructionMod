@@ -130,14 +130,15 @@ namespace ScarabolMods
               int starty = getJSONInt (node, "starty", "y", 0, false);
               int startz = getJSONInt (node, "startz", "z", 0, false);
               string typename;
-              try {
-                typename = node ["typename"].GetAs<string> ();
-              } catch (Exception) {
-                try {
-                  typename = node ["t"].GetAs<string> ();
-                } catch (Exception) {
+              if (!node.TryGetAs ("typename", out typename)) {
+                if (!node.TryGetAs ("t", out typename)) {
                   throw new Exception (string.Format ("typename not defined or not a string"));
                 }
+              }
+              if (typename.EndsWith ("x+")) {
+                typename = typename.Substring (0, typename.Length - 2) + "x-";
+              } else if (typename.EndsWith ("x-")) {
+                typename = typename.Substring (0, typename.Length - 2) + "x+";
               }
               int width = getJSONInt (node, "width", "w", 1, true);
               int height = getJSONInt (node, "height", "h", 1, true);
