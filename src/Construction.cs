@@ -54,9 +54,9 @@ namespace ScarabolMods
     public static void AfterAddingBaseTypes ()
     {
       ItemTypes.AddRawType (JOB_ITEM_KEY, new JSONNode ()
-                           .SetAs ("npcLimit", 1)
-                           .SetAs ("icon", Path.Combine (RelativeIconsPath, "buildtool.png"))
-                           .SetAs ("isPlaceable", false)
+        .SetAs ("npcLimit", 1)
+        .SetAs ("icon", Path.Combine (RelativeIconsPath, "buildtool.png"))
+        .SetAs ("isPlaceable", false)
       );
     }
 
