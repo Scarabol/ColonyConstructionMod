@@ -47,11 +47,9 @@ namespace ScarabolMods
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.architects.loadrecipes")]
     public static void AfterItemTypesDefined ()
     {
-      List<InventoryItem> requirements = new List<InventoryItem> () { new InventoryItem ("planks", 1) };
       List<Recipe> architectRecipes = new List<Recipe> ();
       foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
-        Recipe architectBlueprintRecipe = new Recipe (requirements, new InventoryItem (blueprintTypename, 1));
-        architectRecipes.Add (architectBlueprintRecipe);
+        architectRecipes.Add (new ArchitectRecipe (blueprintTypename));
       }
       RecipeManager.AddRecipes (JOB_NAME, architectRecipes);
     }
@@ -92,6 +90,23 @@ namespace ScarabolMods
       def.maskColor1 = new UnityEngine.Color32 (220, 220, 220, 255);
       def.type = NPCTypeID.GetNextID ();
       return def;
+    }
+  }
+
+  public class ArchitectRecipe : Recipe
+  {
+    public ArchitectRecipe (string blueprintTypename)
+      : base (new InventoryItem ("planks", 1), new InventoryItem (blueprintTypename, 1))
+    {
+    }
+
+    public override int ShouldBeMade (Stockpile stockpile)
+    {
+      int Amount = 0;
+      foreach (InventoryItem resultItem in this.Results) {
+        Amount = System.Math.Max (Amount, RecipeLimits.GetLimit (stockpile.Owner, resultItem.Type));
+      }
+      return Amount;
     }
   }
 }
