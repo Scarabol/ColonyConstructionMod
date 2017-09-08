@@ -43,6 +43,7 @@ namespace ScarabolMods
         string patchPath = MultiPath.Combine ("gamedata", "localization", locName, locFilename);
         JSONNode jsonToPatch;
         if (Pipliz.JSON.JSON.Deserialize (patchPath, out jsonToPatch, false)) {
+          bool changed = false;
           foreach (KeyValuePair<string, JSONNode> entry in jsonFromMod.LoopObject()) {
             string realkey = entry.Key;
             if (!locFilename.Equals ("localization.json")) {
@@ -51,13 +52,17 @@ namespace ScarabolMods
             string val = jsonFromMod.GetAs<string> (entry.Key);
             if (!jsonToPatch.HasChild (realkey)) {
               Pipliz.Log.Write (string.Format ("localization '{0}' => '{1}' added to '{2}'. This will apply AFTER next restart!!!", realkey, val, Path.Combine (locName, locFilename)));
+              changed = true;
             } else if (!jsonToPatch.GetAs<string> (realkey).Equals (val)) {
               Pipliz.Log.Write (string.Format ("localization '{0}' => '{1}' changed in '{2}'. This will apply AFTER next restart!!!", realkey, val, Path.Combine (locName, locFilename)));
+              changed = true;
             }
             jsonToPatch.SetAs (realkey, val);
           }
-          Pipliz.JSON.JSON.Serialize (patchPath, jsonToPatch);
-          log (string.Format ("Patched mod localization file '{0}/{1}' into '{2}'", locName, locFilename, patchPath), verbose);
+          if (changed) {
+            Pipliz.JSON.JSON.Serialize (patchPath, jsonToPatch);
+            log (string.Format ("Patched mod localization file '{0}/{1}' into '{2}'", locName, locFilename, patchPath), verbose);
+          }
         } else {
           log (string.Format ("Could not deserialize json from '{0}'", patchPath), verbose);
         }
