@@ -5,9 +5,10 @@ using Pipliz;
 using Pipliz.Chatting;
 using Pipliz.JSON;
 using Pipliz.Threading;
-using Pipliz.APIProvider.Recipes;
 using Pipliz.APIProvider.Jobs;
 using NPC;
+using Server.NPCs;
+using BlockTypes.Builtin;
 
 namespace ScarabolMods
 {
@@ -19,8 +20,6 @@ namespace ScarabolMods
     public static float EXCAVATION_DELAY = 2.0f;
     public static string ModDirectory;
     public static string AssetsDirectory;
-    public static string RelativeTexturesPath;
-    public static string RelativeIconsPath;
     private static Recipe buildtoolRecipe;
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.construction.assemblyload")]
@@ -29,9 +28,6 @@ namespace ScarabolMods
       ModDirectory = Path.GetDirectoryName (path);
       AssetsDirectory = Path.Combine (ModDirectory, "assets");
       ModLocalizationHelper.localize (Path.Combine (AssetsDirectory, "localization"), MOD_PREFIX, false);
-      // TODO this is really hacky (maybe better in future ModAPI)
-      RelativeTexturesPath = new Uri (MultiPath.Combine (Path.GetFullPath ("gamedata"), "textures", "materials", "blocks", "albedo", "dummyfile")).MakeRelativeUri (new Uri (Path.Combine (AssetsDirectory, "textures"))).OriginalString;
-      RelativeIconsPath = new Uri (MultiPath.Combine (Path.GetFullPath ("gamedata"), "textures", "icons", "dummyfile")).MakeRelativeUri (new Uri (MultiPath.Combine (AssetsDirectory, "icons"))).OriginalString;
     }
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterStartup, "scarabol.construction.registercallbacks")]
@@ -41,9 +37,9 @@ namespace ScarabolMods
       ManagerBlueprints.LoadBlueprints (Path.Combine (ModDirectory, "blueprints"));
     }
 
-    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterDefiningNPCTypes, "scarabol.construction.registerjobs")]
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.construction.registerjobs")]
     [ModLoader.ModCallbackProvidesFor ("pipliz.apiprovider.jobs.resolvetypes")]
-    public static void AfterDefiningNPCTypes ()
+    public static void RegisterJobs ()
     {
       foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
         BlockJobManagerTracker.Register<ConstructionJob> (blueprintTypename);
@@ -51,32 +47,32 @@ namespace ScarabolMods
     }
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.construction.addrawtypes")]
-    public static void AfterAddingBaseTypes ()
+    public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
-      ItemTypes.AddRawType (JOB_ITEM_KEY, new JSONNode ()
+      itemTypes.Add (JOB_ITEM_KEY, new ItemTypesServer.ItemTypeRaw (JOB_ITEM_KEY, new JSONNode ()
         .SetAs ("npcLimit", 1)
-        .SetAs ("icon", Path.Combine (RelativeIconsPath, "buildtool.png"))
+        .SetAs ("icon", MultiPath.Combine (AssetsDirectory, "icons", "buildtool.png"))
         .SetAs ("isPlaceable", false)
-      );
+      ));
     }
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.construction.loadrecipes")]
-    [ModLoader.ModCallbackDependsOn ("pipliz.blocknpcs.loadrecipes")]
     [ModLoader.ModCallbackProvidesFor ("pipliz.apiprovider.registerrecipes")]
-    public static void AfterItemTypesDefined ()
+    public static void LoadRecipes ()
     {
-      buildtoolRecipe = new Recipe (new List<InventoryItem> () {
-        new InventoryItem ("ironingot", 1),
-        new InventoryItem ("planks", 1)
+      buildtoolRecipe = new Recipe (JOB_ITEM_KEY + ".recipe", new List<InventoryItem> () {
+        new InventoryItem (BuiltinBlocks.IronIngot, 1),
+        new InventoryItem (BuiltinBlocks.Planks, 1)
       }, new InventoryItem (JOB_ITEM_KEY, 1));
-      RecipeManager.AddRecipes ("pipliz.crafter", new List<Recipe> () { buildtoolRecipe });
+      RecipeStorage.AddRecipe (buildtoolRecipe);
+      RecipeStorage.AddBlockToRecipeMapping ("workbench", JOB_ITEM_KEY + ".recipe");
     }
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.construction.addplayercrafts")]
     public static void AfterWorldLoad ()
     {
       // add recipes here, otherwise they're inserted before vanilla recipes in player crafts
-      RecipePlayer.AllRecipes.Add (buildtoolRecipe);
+      RecipePlayer.AddDefaultRecipe (buildtoolRecipe);
     }
   }
 
@@ -170,18 +166,18 @@ namespace ScarabolMods
           ushort actualType;
           if (World.TryGetTypeAt (realPosition, out actualType) && actualType != newType) {
             ushort baseType = ItemTypes.IndexLookup.GetIndex (baseTypename);
-            if (newType == BlockTypes.Builtin.BuiltinBlocks.Air || blockInventory.TryGetOneItem (baseType)) {
+            if (newType == BuiltinBlocks.Air || blockInventory.TryGetOneItem (baseType)) {
               todoblocks.RemoveAt (i);
               if (ServerManager.TryChangeBlock (realPosition, newType, ServerManager.SetBlockFlags.DefaultAudio)) {
                 state.JobIsDone = true;
-                if (newType == BlockTypes.Builtin.BuiltinBlocks.Air) {
+                if (newType == BuiltinBlocks.Air) {
                   OverrideCooldown (ConstructionModEntries.EXCAVATION_DELAY);
                   state.SetIndicator (NPCIndicatorType.Crafted, ConstructionModEntries.EXCAVATION_DELAY, actualType);
                 } else if (!blockInventory.IsEmpty && i > 0) {
                   state.SetIndicator (NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex (rotatedTypename));
                 }
-                if (actualType != BlockTypes.Builtin.BuiltinBlocks.Air && actualType != scaffoldType) {
-                  usedNPC.Inventory.Add (ItemTypes.RemovalItems (actualType));
+                if (actualType != BuiltinBlocks.Air && actualType != scaffoldType) {
+                  usedNPC.Inventory.Add (ItemTypes.GetType (actualType).OnRemoveItems);
                 }
                 placed = true;
                 break;
@@ -202,7 +198,7 @@ namespace ScarabolMods
     {
       state.Inventory.TryDump (usedNPC.Colony.UsedStockpile);
       if (todoblocks.Count < 1) {
-        ServerManager.TryChangeBlock (position, BlockTypes.Builtin.BuiltinBlocks.Air);
+        ServerManager.TryChangeBlock (position, BuiltinBlocks.Air);
         return;
       }
       state.JobIsDone = true;
@@ -233,7 +229,7 @@ namespace ScarabolMods
         }
       }
       if (todoblocks.Count < 1) {
-        ServerManager.TryChangeBlock (position, BlockTypes.Builtin.BuiltinBlocks.Air);
+        ServerManager.TryChangeBlock (position, BuiltinBlocks.Air);
         return;
       } else if (shouldTakeItems) {
         state.JobIsDone = false;
@@ -247,14 +243,14 @@ namespace ScarabolMods
       base.OnRemove ();
     }
 
-    NPCTypeSettings INPCTypeDefiner.GetNPCTypeDefinition ()
+    NPCTypeStandardSettings INPCTypeDefiner.GetNPCTypeDefinition ()
     {
-      NPCTypeSettings def = NPCTypeSettings.Default;
-      def.keyName = NPCTypeKey;
-      def.printName = "Constructor";
-      def.maskColor1 = new UnityEngine.Color32 (75, 100, 140, 255);
-      def.type = NPCTypeID.GetNextID ();
-      return def;
+      return new NPCTypeStandardSettings () {
+        keyName = NPCTypeKey,
+        printName = "Constructor",
+        maskColor1 = new UnityEngine.Color32 (75, 100, 140, 255),
+        type = NPCTypeID.GetNextID ()
+      };
     }
   }
 }

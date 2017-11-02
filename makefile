@@ -16,18 +16,15 @@ default:
 clean:
 	rm -f "$(dllname)" "modInfo.json"
 
-enable:
-	echo '{\n\t"assemblies" : [\n\t\t{\n\t\t\t"path" : "$(dllname)",\n\t\t\t"enabled" : true\n\t\t}\n\t]\n}' > modInfo.json
-
-all: clean default enable
+all: clean default
 
 release: default
 	rm -f "$(zipname)"
 	cd ../../ && zip -r "$(moddir)/$(zipname)" "$(moddir)/modInfo.json" "$(moddir)/$(dllname)" "$(moddir)/capsule_permissions.json" "$(moddir)/assets/" "$(moddir)/blueprints/"
 
-client: default enable
+client: default
 	cd ../../../../ && ./colonyclient.x86_64
 
-server: default enable
+server: default
 	cd ../../../../ && ./colonyserver.x86_64
 

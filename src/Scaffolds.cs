@@ -5,7 +5,6 @@ using Pipliz;
 using Pipliz.Chatting;
 using Pipliz.JSON;
 using Pipliz.Threading;
-using Pipliz.APIProvider.Recipes;
 using Pipliz.APIProvider.Jobs;
 using NPC;
 
@@ -18,24 +17,21 @@ namespace ScarabolMods
     public static int MAX_PREVIEW_BLOCKS_THRESHOLD = 1000;
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.scaffolds.addrawtypes")]
-    public static void AfterAddingBaseTypes ()
+    public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
-      ItemTypesServer.AddTextureMapping (SCAFFOLD_ITEM_TYPE, new JSONNode ()
-        .SetAs ("albedo", MultiPath.Combine (ConstructionModEntries.RelativeTexturesPath, "albedo", "scaffold"))
-        .SetAs ("normal", "neutral")
-        .SetAs ("emissive", "neutral")
-        .SetAs ("height", "neutral")
-      );
-      ItemTypes.AddRawType (SCAFFOLD_ITEM_TYPE, new JSONNode ()
+      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
+      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "scaffold");
+      ItemTypesServer.SetTextureMapping (SCAFFOLD_ITEM_TYPE, textureMapping);
+      itemTypes.Add (SCAFFOLD_ITEM_TYPE, new ItemTypesServer.ItemTypeRaw (SCAFFOLD_ITEM_TYPE, new JSONNode ()
         .SetAs ("sideall", SCAFFOLD_ITEM_TYPE)
         .SetAs ("onRemove", new JSONNode (NodeType.Array))
         .SetAs ("isSolid", false)
         .SetAs ("destructionTime", 100)
-      );
+      ));
     }
 
-    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesServer, "scarabol.scaffolds.registertypes")]
-    public static void AfterItemTypesServer ()
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.scaffolds.registertypes")]
+    public static void AfterItemTypesDefined ()
     {
       foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
         ItemTypesServer.RegisterOnAdd (blueprintTypename, ScaffoldBlockCode.AddScaffolds);

@@ -1,0 +1,16 @@
+{
+  "assemblies" : [
+    {
+      "name" : "scarabol.construction",
+      "path" : "Construction.dll",
+      "enabled" : true,
+      "compatibleversions" : [
+        {
+          "Major" : 0,
+          "Minor" : 4,
+          "Build" : 0
+        }
+      ]
+    }
+  ]
+}

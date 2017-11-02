@@ -18,17 +18,14 @@ namespace ScarabolMods
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.capsules.addrawtypes")]
     [ModLoader.ModCallbackDependsOn ("scarabol.blueprints.addrawtypes")]
-    public static void AfterAddingBaseTypes ()
+    public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
-      ItemTypesServer.AddTextureMapping (ConstructionModEntries.MOD_PREFIX + "capsuletop", new JSONNode ()
-        .SetAs ("albedo", MultiPath.Combine (ConstructionModEntries.RelativeTexturesPath, "albedo", "capsulesTop"))
-        .SetAs ("normal", "neutral")
-        .SetAs ("emissive", "neutral")
-        .SetAs ("height", "neutral")
-      );
-      string iconFilepath = Path.Combine (ConstructionModEntries.RelativeIconsPath, "capsule.png");
+      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
+      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "capsulesTop");
+      ItemTypesServer.SetTextureMapping (ConstructionModEntries.MOD_PREFIX + "capsuletop", textureMapping);
+      string iconFilepath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "icons", "capsule.png");
       foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
-        ItemTypes.AddRawType (blueprintTypename + CAPSULE_SUFFIX,
+        itemTypes.Add (blueprintTypename + CAPSULE_SUFFIX, new ItemTypesServer.ItemTypeRaw (blueprintTypename + CAPSULE_SUFFIX,
           new JSONNode ()
             .SetAs ("onPlaceAudio", "woodPlace")
             .SetAs ("icon", iconFilepath)
@@ -41,18 +38,18 @@ namespace ScarabolMods
             .SetAs ("rotatablez+", blueprintTypename + CAPSULE_SUFFIX + "z+")
             .SetAs ("rotatablez-", blueprintTypename + CAPSULE_SUFFIX + "z-")
             .SetAs ("npcLimit", "0")
-        );
+        ));
         foreach (string xz in new string[] { "x+", "x-", "z+", "z-" }) {
-          ItemTypes.AddRawType (blueprintTypename + CAPSULE_SUFFIX + xz,
+          itemTypes.Add (blueprintTypename + CAPSULE_SUFFIX + xz, new ItemTypesServer.ItemTypeRaw (blueprintTypename + CAPSULE_SUFFIX + xz,
             new JSONNode ()
               .SetAs ("parentType", blueprintTypename + CAPSULE_SUFFIX)
-          );
+          ));
         }
       }
     }
 
-    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesServer, "scarabol.capsules.registertypes")]
-    public static void AfterItemTypesServer ()
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.capsules.registertypes")]
+    public static void AfterItemTypesDefined ()
     {
       foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
         ItemTypesServer.RegisterOnAdd (blueprintTypename + CAPSULE_SUFFIX, CapsuleBlockCode.OnPlaceCapsule);

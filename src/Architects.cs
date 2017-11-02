@@ -5,9 +5,10 @@ using Pipliz;
 using Pipliz.Chatting;
 using Pipliz.JSON;
 using Pipliz.Threading;
-using Pipliz.APIProvider.Recipes;
 using Pipliz.APIProvider.Jobs;
 using NPC;
+using Server.NPCs;
+using BlockTypes.Builtin;
 
 namespace ScarabolMods
 {
@@ -17,48 +18,35 @@ namespace ScarabolMods
     public static string JOB_NAME = "scarabol.architect";
     public static string JOB_ITEM_KEY = ConstructionModEntries.MOD_PREFIX + "architects.table";
 
-    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterDefiningNPCTypes, "scarabol.architects.registerjobs")]
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.architects.registerjobs")]
     [ModLoader.ModCallbackProvidesFor ("pipliz.apiprovider.jobs.resolvetypes")]
-    public static void AfterDefiningNPCTypes ()
+    public static void RegisterJobs ()
     {
       BlockJobManagerTracker.Register<ArchitectJob> (JOB_ITEM_KEY);
     }
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.architects.addrawtypes")]
     [ModLoader.ModCallbackDependsOn ("scarabol.blueprints.addrawtypes")]
-    public static void AfterAddingBaseTypes ()
+    public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
-      ItemTypesServer.AddTextureMapping (ConstructionModEntries.MOD_PREFIX + "architecttop", new JSONNode ()
-        .SetAs ("albedo", MultiPath.Combine (ConstructionModEntries.RelativeTexturesPath, "albedo", "architectTop"))
-        .SetAs ("normal", "neutral")
-        .SetAs ("emissive", "neutral")
-        .SetAs ("height", "neutral")
-      );
-      ItemTypes.AddRawType (JOB_ITEM_KEY, new JSONNode ()
-        .SetAs ("icon", Path.Combine (ConstructionModEntries.RelativeIconsPath, "architect.png"))
+      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
+      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "architectTop");
+      ItemTypesServer.SetTextureMapping (ConstructionModEntries.MOD_PREFIX + "architecttop", textureMapping);
+      itemTypes.Add (JOB_ITEM_KEY, new ItemTypesServer.ItemTypeRaw (JOB_ITEM_KEY, new JSONNode ()
+        .SetAs ("icon", MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "icons", "architect.png"))
         .SetAs ("onPlaceAudio", "woodPlace")
         .SetAs ("onRemoveAudio", "woodDeleteLight")
         .SetAs ("sideall", "planks")
         .SetAs ("sidey+", ConstructionModEntries.MOD_PREFIX + "architecttop")
         .SetAs ("npcLimit", 0)
-      );
-    }
-
-    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.architects.loadrecipes")]
-    public static void AfterItemTypesDefined ()
-    {
-      List<Recipe> architectRecipes = new List<Recipe> ();
-      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
-        architectRecipes.Add (new ArchitectRecipe (blueprintTypename));
-      }
-      RecipeManager.AddRecipes (JOB_NAME, architectRecipes);
+      ));
     }
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.architects.addplayercrafts")]
     public static void AfterWorldLoad ()
     {
       // add recipes here, otherwise they're inserted before vanilla recipes in player crafts
-      RecipePlayer.AllRecipes.Add (new Recipe (new InventoryItem ("planks", 1), new InventoryItem (JOB_ITEM_KEY, 1)));
+      RecipePlayer.AddDefaultRecipe (new Recipe (JOB_ITEM_KEY + ".recipe", new InventoryItem (BuiltinBlocks.Planks, 1), new InventoryItem (JOB_ITEM_KEY, 1)));
     }
   }
 
@@ -77,36 +65,40 @@ namespace ScarabolMods
 
     protected override void OnRecipeCrafted ()
     {
-      foreach (InventoryItem result in selectedRecipe.Results) {
-        RecipeLimits.SetLimit (owner, result.Type, System.Math.Max (0, RecipeLimits.GetLimit (owner, result.Type) - 1));
-      }
+      var recipeStorage = RecipeStorage.GetPlayerStorage (owner);
+      recipeStorage.SetLimit (selectedRecipe.Name, recipeStorage.GetLimit (selectedRecipe.Name) - 1);
     }
 
-    NPCTypeSettings INPCTypeDefiner.GetNPCTypeDefinition ()
+    NPCTypeStandardSettings INPCTypeDefiner.GetNPCTypeDefinition ()
     {
-      NPCTypeSettings def = NPCTypeSettings.Default;
-      def.keyName = NPCTypeKey;
-      def.printName = "Architect";
-      def.maskColor1 = new UnityEngine.Color32 (220, 220, 220, 255);
-      def.type = NPCTypeID.GetNextID ();
-      return def;
+      return new NPCTypeStandardSettings () {
+        keyName = NPCTypeKey,
+        printName = "Architect",
+        maskColor1 = new UnityEngine.Color32 (220, 220, 220, 255),
+        type = NPCTypeID.GetNextID ()
+      };
+    }
+
+    public override IList<Recipe> GetCraftingLimitsRecipes ()
+    {
+      List<Recipe> result = new List<Recipe> ();
+      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
+        result.Add (new ArchitectRecipe (blueprintTypename));
+      }
+      return result;
     }
   }
 
   public class ArchitectRecipe : Recipe
   {
     public ArchitectRecipe (string blueprintTypename)
-      : base (new InventoryItem ("planks", 1), new InventoryItem (blueprintTypename, 1))
+      : base (blueprintTypename + ".recipe", new InventoryItem (BuiltinBlocks.Planks, 1), new InventoryItem (blueprintTypename, 1), 0)
     {
     }
 
     public override int ShouldBeMade (Stockpile stockpile)
     {
-      int Amount = 0;
-      foreach (InventoryItem resultItem in this.Results) {
-        Amount = System.Math.Max (Amount, RecipeLimits.GetLimit (stockpile.Owner, resultItem.Type));
-      }
-      return Amount;
+      return RecipeStorage.GetPlayerStorage (stockpile.Owner).GetLimit (this.Name);
     }
   }
 }

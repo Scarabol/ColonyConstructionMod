@@ -12,18 +12,14 @@ namespace ScarabolMods
   public static class BlueprintsModEntries
   {
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.blueprints.addrawtypes")]
-    public static void AfterAddingBaseTypes ()
+    public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
-      Pipliz.Log.Write (string.Format ("Blueprints relative texture path is {0}", ConstructionModEntries.RelativeTexturesPath));
-      ItemTypesServer.AddTextureMapping (ConstructionModEntries.MOD_PREFIX + "blueprinttop", new JSONNode ()
-        .SetAs ("albedo", MultiPath.Combine (ConstructionModEntries.RelativeTexturesPath, "albedo", "blueprintsTop"))
-        .SetAs ("normal", "neutral")
-        .SetAs ("emissive", "neutral")
-        .SetAs ("height", "neutral")
-      );
-      string iconFilepath = MultiPath.Combine (ConstructionModEntries.RelativeIconsPath, "blueprint.png");
+      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
+      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "blueprintsTop");
+      ItemTypesServer.SetTextureMapping (ConstructionModEntries.MOD_PREFIX + "blueprinttop", textureMapping);
+      string iconFilepath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "icons", "blueprint.png");
       foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
-        ItemTypes.AddRawType (blueprintTypename,
+        itemTypes.Add (blueprintTypename, new ItemTypesServer.ItemTypeRaw (blueprintTypename,
           new JSONNode ()
             .SetAs ("onRemoveAudio", "woodDeleteLight")
             .SetAs ("onPlaceAudio", "woodPlace")
@@ -36,23 +32,23 @@ namespace ScarabolMods
             .SetAs ("rotatablex-", blueprintTypename + "x-")
             .SetAs ("rotatablez+", blueprintTypename + "z+")
             .SetAs ("rotatablez-", blueprintTypename + "z-")
-        );
-        ItemTypes.AddRawType (blueprintTypename + "x+",
+        ));
+        itemTypes.Add (blueprintTypename + "x+", new ItemTypesServer.ItemTypeRaw (blueprintTypename + "x+",
           new JSONNode ()
             .SetAs ("parentType", blueprintTypename)
-        );
-        ItemTypes.AddRawType (blueprintTypename + "x-",
+        ));
+        itemTypes.Add (blueprintTypename + "x-", new ItemTypesServer.ItemTypeRaw (blueprintTypename + "x-",
           new JSONNode ()
             .SetAs ("parentType", blueprintTypename)
-        );
-        ItemTypes.AddRawType (blueprintTypename + "z+",
+        ));
+        itemTypes.Add (blueprintTypename + "z+", new ItemTypesServer.ItemTypeRaw (blueprintTypename + "z+",
           new JSONNode ()
             .SetAs ("parentType", blueprintTypename)
-        );
-        ItemTypes.AddRawType (blueprintTypename + "z-",
+        ));
+        itemTypes.Add (blueprintTypename + "z-", new ItemTypesServer.ItemTypeRaw (blueprintTypename + "z-",
           new JSONNode ()
             .SetAs ("parentType", blueprintTypename)
-        );
+        ));
       }
     }
   }
