@@ -7,6 +7,7 @@ using Pipliz.JSON;
 using Pipliz.Threading;
 using Pipliz.APIProvider.Jobs;
 using NPC;
+using BlockTypes.Builtin;
 
 namespace ScarabolMods
 {
@@ -59,7 +60,6 @@ namespace ScarabolMods
           Chat.Send (causedBy, "Blueprint contains too many blocks for preview");
           return;
         }
-        ushort airtype = BlockTypes.Builtin.BuiltinBlocks.Air;
         ushort scaffoldType = ItemTypes.IndexLookup.GetIndex (ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
         foreach (BlueprintTodoBlock block in blocks) {
           if (block.typename.Equals ("air")) {
@@ -67,7 +67,7 @@ namespace ScarabolMods
           }
           Vector3Int realPos = block.GetWorldPosition (blueprintBasename, position, bluetype);
           ushort wasType;
-          if (World.TryGetTypeAt (realPos, out wasType) && wasType == airtype) {
+          if (World.TryGetTypeAt (realPos, out wasType) && wasType == BuiltinBlocks.Air) {
             ServerManager.TryChangeBlock (realPos, scaffoldType);
           }
         }
@@ -94,7 +94,6 @@ namespace ScarabolMods
         if (blocks.Count > ScaffoldsModEntries.MAX_PREVIEW_BLOCKS_THRESHOLD) {
           return;
         }
-        ushort airtype = BlockTypes.Builtin.BuiltinBlocks.Air;
         ushort scaffoldType = ItemTypes.IndexLookup.GetIndex (ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
         foreach (BlueprintTodoBlock block in blocks) {
           if (block.typename.Equals ("air")) {
@@ -103,7 +102,7 @@ namespace ScarabolMods
           Vector3Int realPos = block.GetWorldPosition (blueprintBasename, position, bluetype);
           ushort wasType;
           if (World.TryGetTypeAt (realPos, out wasType) && wasType == scaffoldType) {
-            ServerManager.TryChangeBlock (realPos, airtype);
+            ServerManager.TryChangeBlock (realPos, BuiltinBlocks.Air);
           }
         }
       }

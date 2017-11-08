@@ -22,7 +22,7 @@ namespace ScarabolMods
           foreach (string filepath in files) {
             try {
               JSONNode jsonFromMod;
-              if (Pipliz.JSON.JSON.Deserialize (filepath, out jsonFromMod, false)) {
+              if (JSON.Deserialize (filepath, out jsonFromMod, false)) {
                 string locName = Directory.GetParent (filepath).Name;
                 log (string.Format ("Found mod localization file for '{0}' localization", locName), verbose);
                 localize (locName, locFilename, jsonFromMod, keyprefix, verbose);
@@ -42,7 +42,7 @@ namespace ScarabolMods
       try {
         string patchPath = MultiPath.Combine ("gamedata", "localization", locName, locFilename);
         JSONNode jsonToPatch;
-        if (Pipliz.JSON.JSON.Deserialize (patchPath, out jsonToPatch, false)) {
+        if (JSON.Deserialize (patchPath, out jsonToPatch, false)) {
           bool changed = false;
           foreach (KeyValuePair<string, JSONNode> entry in jsonFromMod.LoopObject()) {
             string realkey = entry.Key;
@@ -60,7 +60,7 @@ namespace ScarabolMods
             jsonToPatch.SetAs (realkey, val);
           }
           if (changed) {
-            Pipliz.JSON.JSON.Serialize (patchPath, jsonToPatch);
+            JSON.Serialize (patchPath, jsonToPatch);
             log (string.Format ("Patched mod localization file '{0}/{1}' into '{2}'", locName, locFilename, patchPath), verbose);
           }
         } else {
@@ -75,41 +75,6 @@ namespace ScarabolMods
     {
       if (verbose) {
         Pipliz.Log.Write (msg);
-      }
-    }
-  }
-
-  public static class ModAudioHelper
-  {
-    public static void IntegrateAudio (string audioFilesPath, string namesPrefix, string relativeAudioPath)
-    {
-      try {
-        string[] jsonfiles = Directory.GetFiles (audioFilesPath, "*.json", SearchOption.TopDirectoryOnly);
-        foreach (string jsonfilepath in jsonfiles) {
-          JSONNode jsonAudio;
-          Pipliz.JSON.JSON.Deserialize (jsonfilepath, out jsonAudio, true);
-          string colName;
-          if (jsonAudio.TryGetAs ("clipCollectionName", out colName)) {
-            string realColName = namesPrefix + colName;
-            Pipliz.Log.Write (string.Format ("Rewriting audio collection name from '{0}' to '{1}'", colName, realColName));
-            jsonAudio.SetAs ("clipCollectionName", realColName);
-          }
-          JSONNode jsonFileList;
-          if (jsonAudio.TryGetAs ("fileList", out jsonFileList) && jsonFileList.NodeType == NodeType.Array) {
-            foreach (JSONNode fileNode in jsonFileList.LoopArray()) {
-              string audioPath;
-              if (fileNode.TryGetAs ("path", out audioPath)) {
-                string realAudioPath = Path.Combine (relativeAudioPath, audioPath);
-                Pipliz.Log.Write (string.Format ("Rewriting audio file path from '{0}' to '{1}'", audioPath, realAudioPath));
-                fileNode.SetAs ("path", realAudioPath);
-              }
-            }
-          }
-          string jsontargetfilepath = MultiPath.Combine (Path.GetFullPath ("gamedata"), "audio", namesPrefix + Path.GetFileName (jsonfilepath));
-          Pipliz.JSON.JSON.Serialize (jsontargetfilepath, jsonAudio);
-        }
-      } catch (DirectoryNotFoundException) {
-//        Pipliz.Log.Write(string.Format("No audio directory found at {0}", audioFilesPath));
       }
     }
   }

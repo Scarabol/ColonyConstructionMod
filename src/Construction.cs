@@ -65,7 +65,7 @@ namespace ScarabolMods
         new InventoryItem (BuiltinBlocks.Planks, 1)
       }, new InventoryItem (JOB_ITEM_KEY, 1));
       RecipeStorage.AddRecipe (buildtoolRecipe);
-      RecipeStorage.AddBlockToRecipeMapping ("workbench", JOB_ITEM_KEY + ".recipe");
+      RecipeStorage.AddBlockToRecipeMapping ("workbench", buildtoolRecipe.Name);
     }
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.construction.addplayercrafts")]

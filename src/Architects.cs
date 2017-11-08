@@ -42,11 +42,12 @@ namespace ScarabolMods
       ));
     }
 
-    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.architects.addplayercrafts")]
-    public static void AfterWorldLoad ()
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.architects.loadrecipes")]
+    [ModLoader.ModCallbackDependsOn ("pipliz.server.loadresearchables")]
+    [ModLoader.ModCallbackProvidesFor ("pipliz.server.loadsortorder")]
+    public static void LoadRecipes ()
     {
-      // add recipes here, otherwise they're inserted before vanilla recipes in player crafts
-      RecipePlayer.AddDefaultRecipe (new Recipe (JOB_ITEM_KEY + ".recipe", new InventoryItem (BuiltinBlocks.Planks, 1), new InventoryItem (JOB_ITEM_KEY, 1)));
+      RecipePlayer.AddDefaultRecipe (new Recipe (JOB_ITEM_KEY + ".recipe", new InventoryItem (BuiltinBlocks.Planks, 1), new InventoryItem (JOB_ITEM_KEY, 1), 0));
     }
   }
 

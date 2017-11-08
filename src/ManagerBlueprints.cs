@@ -23,7 +23,7 @@ namespace ScarabolMods
       foreach (string filepath in prefixFiles) {
         try {
           JSONNode jsonPrefixes;
-          if (Pipliz.JSON.JSON.Deserialize (filepath, out jsonPrefixes, false)) {
+          if (JSON.Deserialize (filepath, out jsonPrefixes, false)) {
             string locName = Directory.GetParent (filepath).Name;
             Pipliz.Log.Write (string.Format ("Found prefixes localization file for '{0}' localization", locName));
             string blueprintsPrefix;
@@ -45,7 +45,7 @@ namespace ScarabolMods
       foreach (string filepath in files) {
         try {
           JSONNode json;
-          if (Pipliz.JSON.JSON.Deserialize (filepath, out json, false)) {
+          if (JSON.Deserialize (filepath, out json, false)) {
             string filename = Path.GetFileName (filepath);
             string blueprintName = Path.GetFileNameWithoutExtension (filepath).Replace (" ", "_").ToLower ();
             int offx = 0;
