@@ -17,12 +17,18 @@ namespace ScarabolMods
     public static string SCAFFOLD_ITEM_TYPE = ConstructionModEntries.MOD_PREFIX + "scaffold";
     public static int MAX_PREVIEW_BLOCKS_THRESHOLD = 1000;
 
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterSelectedWorld, "scarabol.scaffolds.registertexturemappings")]
+    [ModLoader.ModCallbackProvidesFor ("pipliz.server.registertexturemappingtextures")]
+    public static void AfterSelectedWorld ()
+    {
+      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
+      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "scaffold.png");
+      ItemTypesServer.SetTextureMapping (SCAFFOLD_ITEM_TYPE, textureMapping);
+    }
+
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.scaffolds.addrawtypes")]
     public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
-      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
-      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "scaffold");
-      ItemTypesServer.SetTextureMapping (SCAFFOLD_ITEM_TYPE, textureMapping);
       itemTypes.Add (SCAFFOLD_ITEM_TYPE, new ItemTypesServer.ItemTypeRaw (SCAFFOLD_ITEM_TYPE, new JSONNode ()
         .SetAs ("sideall", SCAFFOLD_ITEM_TYPE)
         .SetAs ("onRemove", new JSONNode (NodeType.Array))

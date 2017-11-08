@@ -16,13 +16,19 @@ namespace ScarabolMods
     public static string CAPSULE_PERMISSION = ConstructionModEntries.MOD_PREFIX + "usecapsules";
     public static string CAPSULE_SUFFIX = ".capsule";
 
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterSelectedWorld, "scarabol.capsules.registertexturemappings")]
+    [ModLoader.ModCallbackProvidesFor ("pipliz.server.registertexturemappingtextures")]
+    public static void AfterSelectedWorld ()
+    {
+      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
+      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "capsulesTop.png");
+      ItemTypesServer.SetTextureMapping (ConstructionModEntries.MOD_PREFIX + "capsuletop", textureMapping);
+    }
+
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.capsules.addrawtypes")]
     [ModLoader.ModCallbackDependsOn ("scarabol.blueprints.addrawtypes")]
     public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
-      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
-      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "capsulesTop");
-      ItemTypesServer.SetTextureMapping (ConstructionModEntries.MOD_PREFIX + "capsuletop", textureMapping);
       string iconFilepath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "icons", "capsule.png");
       foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
         itemTypes.Add (blueprintTypename + CAPSULE_SUFFIX, new ItemTypesServer.ItemTypeRaw (blueprintTypename + CAPSULE_SUFFIX,

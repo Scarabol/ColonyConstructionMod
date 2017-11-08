@@ -11,12 +11,18 @@ namespace ScarabolMods
   [ModLoader.ModManager]
   public static class BlueprintsModEntries
   {
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterSelectedWorld, "scarabol.blueprints.registertexturemappings")]
+    [ModLoader.ModCallbackProvidesFor ("pipliz.server.registertexturemappingtextures")]
+    public static void AfterSelectedWorld ()
+    {
+      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
+      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "blueprintsTop.png");
+      ItemTypesServer.SetTextureMapping (ConstructionModEntries.MOD_PREFIX + "blueprinttop", textureMapping);
+    }
+
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.blueprints.addrawtypes")]
     public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
-      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
-      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "blueprintsTop");
-      ItemTypesServer.SetTextureMapping (ConstructionModEntries.MOD_PREFIX + "blueprinttop", textureMapping);
       string iconFilepath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "icons", "blueprint.png");
       foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
         itemTypes.Add (blueprintTypename, new ItemTypesServer.ItemTypeRaw (blueprintTypename,

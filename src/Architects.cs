@@ -25,13 +25,19 @@ namespace ScarabolMods
       BlockJobManagerTracker.Register<ArchitectJob> (JOB_ITEM_KEY);
     }
 
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterSelectedWorld, "scarabol.architects.registertexturemappings")]
+    [ModLoader.ModCallbackProvidesFor ("pipliz.server.registertexturemappingtextures")]
+    public static void AfterSelectedWorld ()
+    {
+      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
+      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "architectTop.png");
+      ItemTypesServer.SetTextureMapping (ConstructionModEntries.MOD_PREFIX + "architecttop", textureMapping);
+    }
+
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.architects.addrawtypes")]
     [ModLoader.ModCallbackDependsOn ("scarabol.blueprints.addrawtypes")]
     public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
-      var textureMapping = new ItemTypesServer.TextureMapping (new JSONNode ());
-      textureMapping.AlbedoPath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "textures", "albedo", "architectTop");
-      ItemTypesServer.SetTextureMapping (ConstructionModEntries.MOD_PREFIX + "architecttop", textureMapping);
       itemTypes.Add (JOB_ITEM_KEY, new ItemTypesServer.ItemTypeRaw (JOB_ITEM_KEY, new JSONNode ()
         .SetAs ("icon", MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "icons", "architect.png"))
         .SetAs ("onPlaceAudio", "woodPlace")
