@@ -57,21 +57,15 @@ namespace ScarabolMods
     }
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.construction.loadrecipes")]
-    [ModLoader.ModCallbackProvidesFor ("pipliz.apiprovider.registerrecipes")]
+    [ModLoader.ModCallbackDependsOn ("pipliz.server.loadresearchables")]
+    [ModLoader.ModCallbackProvidesFor ("pipliz.server.loadsortorder")]
     public static void LoadRecipes ()
     {
       buildtoolRecipe = new Recipe (JOB_ITEM_KEY + ".recipe", new List<InventoryItem> () {
         new InventoryItem (BuiltinBlocks.IronIngot, 1),
         new InventoryItem (BuiltinBlocks.Planks, 1)
-      }, new InventoryItem (JOB_ITEM_KEY, 1));
-      RecipeStorage.AddRecipe (buildtoolRecipe);
-      RecipeStorage.AddBlockToRecipeMapping ("workbench", buildtoolRecipe.Name);
-    }
-
-    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.construction.addplayercrafts")]
-    public static void AfterWorldLoad ()
-    {
-      // add recipes here, otherwise they're inserted before vanilla recipes in player crafts
+      }, new InventoryItem (JOB_ITEM_KEY, 1), 0);
+      RecipeStorage.AddDefaultLimitTypeRecipe ("pipliz.crafter", buildtoolRecipe);
       RecipePlayer.AddDefaultRecipe (buildtoolRecipe);
     }
   }
