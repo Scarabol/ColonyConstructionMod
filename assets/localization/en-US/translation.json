@@ -1,0 +1,13 @@
+{
+  "sentences" : {
+    "popup" : {
+      "limits" : {
+        "scarabol.architect" : "Architect"
+      }
+    }
+  },
+  "types" : {
+    "buildtool" : "Build Tools",
+    "architects.table" : "Architects Table"
+  }
+}

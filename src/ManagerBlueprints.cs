@@ -13,6 +13,7 @@ namespace ScarabolMods
   {
     public static string BLUEPRINTS_PREFIX = ConstructionModEntries.MOD_PREFIX + "blueprints.";
     public static Dictionary<string, List<BlueprintTodoBlock>> blueprints = new Dictionary<string, List<BlueprintTodoBlock>> ();
+    public static Dictionary<string, JSONNode> blueprintsLocalizations = new Dictionary<string, JSONNode> ();
 
     public static void LoadBlueprints (string blueprintsPath)
     {
@@ -40,7 +41,6 @@ namespace ScarabolMods
         }
       }
       Pipliz.Log.Write (string.Format ("Loading blueprints from {0}", blueprintsPath));
-      Dictionary<string, JSONNode> blueprintsLocalizations = new Dictionary<string, JSONNode> ();
       string[] files = Directory.GetFiles (blueprintsPath, "**.json", SearchOption.AllDirectories);
       foreach (string filepath in files) {
         try {
@@ -82,11 +82,11 @@ namespace ScarabolMods
                   string label = ((string)locEntry.Value.BareObject).Trim ();
                   JSONNode locNode;
                   if (!blueprintsLocalizations.TryGetValue (locEntry.Key, out locNode)) {
-                    locNode = new JSONNode ();
+                    locNode = new JSONNode ().SetAs<JSONNode> ("types", new JSONNode ());
                     blueprintsLocalizations.Add (locEntry.Key, locNode);
                   }
-                  locNode.SetAs (blueprintName, labelPrefix + " " + label);
-                  locNode.SetAs (blueprintName + CapsulesModEntries.CAPSULE_SUFFIX, capsulePrefix + " " + label);
+                  locNode.GetAs<JSONNode> ("types").SetAs (blueprintName, labelPrefix + " " + label);
+                  locNode.GetAs<JSONNode> ("types").SetAs (blueprintName + CapsulesModEntries.CAPSULE_SUFFIX, capsulePrefix + " " + label);
                 }
               }
             } else {
@@ -175,13 +175,6 @@ namespace ScarabolMods
           }
         } catch (Exception exception) {
           Pipliz.Log.WriteError (string.Format ("Exception while loading from {0}; {1}", filepath, exception.Message));
-        }
-      }
-      foreach (KeyValuePair<string, JSONNode> locEntry in blueprintsLocalizations) {
-        try {
-          ModLocalizationHelper.localize (locEntry.Key, "types.json", locEntry.Value, BLUEPRINTS_PREFIX, false);
-        } catch (Exception exception) {
-          Pipliz.Log.WriteError (string.Format ("Exception while localization of {0}; {1}", locEntry.Key, exception.Message));
         }
       }
       Pipliz.Log.Write (string.Format ("Loaded blueprints in {0} ms", DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - StartLoadingBlueprints));

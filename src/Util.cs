@@ -4,77 +4,77 @@ using System.Text;
 using System.Collections.Generic;
 using Pipliz;
 using Pipliz.JSON;
+using Server.Localization;
 
 namespace ScarabolMods
 {
   public static class ModLocalizationHelper
   {
-    public static void localize (string localePath, string prefix)
-    {
-      localize (localePath, prefix, true);
-    }
-
-    public static void localize (string localePath, string keyprefix, bool verbose)
+    public static void localize (string localePath, string typesprefix)
     {
       try {
-        foreach (string locFilename in new string[] { "types.json", "typeuses.json", "localization.json" }) {
-          string[] files = Directory.GetFiles (localePath, locFilename, SearchOption.AllDirectories);
-          foreach (string filepath in files) {
-            try {
-              JSONNode jsonFromMod;
-              if (JSON.Deserialize (filepath, out jsonFromMod, false)) {
-                string locName = Directory.GetParent (filepath).Name;
-                log (string.Format ("Found mod localization file for '{0}' localization", locName), verbose);
-                localize (locName, locFilename, jsonFromMod, keyprefix, verbose);
-              }
-            } catch (Exception exception) {
-              log (string.Format ("Exception reading localization from {0}; {1}", filepath, exception.Message), verbose);
+        string[] files = Directory.GetFiles (localePath, "translation.json", SearchOption.AllDirectories);
+        foreach (string filepath in files) {
+          try {
+            JSONNode jsonFromMod;
+            if (JSON.Deserialize (filepath, out jsonFromMod, false)) {
+              string locName = Directory.GetParent (filepath).Name;
+              localize (locName, jsonFromMod, typesprefix);
             }
+          } catch (Exception exception) {
+            Pipliz.Log.WriteError (string.Format ("Exception reading localization from {0}; {1}", filepath, exception.Message));
           }
         }
       } catch (DirectoryNotFoundException) {
-        log (string.Format ("Localization directory not found at {0}", localePath), verbose);
+        Pipliz.Log.WriteError (string.Format ("Localization directory not found at {0}", localePath));
       }
     }
 
-    public static void localize (string locName, string locFilename, JSONNode jsonFromMod, string keyprefix, bool verbose)
+    public static void localize (string locName, JSONNode jsonFromMod, string typesprefix)
     {
       try {
-        string patchPath = MultiPath.Combine ("gamedata", "localization", locName, locFilename);
-        JSONNode jsonToPatch;
-        if (JSON.Deserialize (patchPath, out jsonToPatch, false)) {
-          bool changed = false;
-          foreach (KeyValuePair<string, JSONNode> entry in jsonFromMod.LoopObject()) {
-            string realkey = entry.Key;
-            if (!locFilename.Equals ("localization.json")) {
-              realkey = keyprefix + entry.Key;
+        JSONNode locNode;
+        if (Localization.LoadedTranslation.TryGetValue (locName, out locNode)) {
+          var toCheck = new Queue<NodePair> ();
+          toCheck.Enqueue (new NodePair ("", jsonFromMod, locNode));
+          while (toCheck.Count > 0) {
+            var current = toCheck.Dequeue ();
+            foreach (KeyValuePair<string, JSONNode> cNode in current.First.LoopObject()) {
+              string realkey;
+              if (current.Parent.Equals ("types") || current.Parent.Equals ("typeuses")) {
+                realkey = typesprefix + cNode.Key;
+              } else {
+                realkey = cNode.Key;
+              }
+              JSONNode gameNode;
+              if (current.Second.TryGetChild (realkey, out gameNode)) {
+                toCheck.Enqueue (new NodePair (realkey, cNode.Value, gameNode));
+              } else {
+                current.Second.SetAs (realkey, cNode.Value);
+              }
             }
-            string val = jsonFromMod.GetAs<string> (entry.Key);
-            if (!jsonToPatch.HasChild (realkey)) {
-              Pipliz.Log.Write (string.Format ("localization '{0}' => '{1}' added to '{2}'. This will apply AFTER next restart!!!", realkey, val, Path.Combine (locName, locFilename)));
-              changed = true;
-            } else if (!jsonToPatch.GetAs<string> (realkey).Equals (val)) {
-              Pipliz.Log.Write (string.Format ("localization '{0}' => '{1}' changed in '{2}'. This will apply AFTER next restart!!!", realkey, val, Path.Combine (locName, locFilename)));
-              changed = true;
-            }
-            jsonToPatch.SetAs (realkey, val);
-          }
-          if (changed) {
-            JSON.Serialize (patchPath, jsonToPatch);
-            log (string.Format ("Patched mod localization file '{0}/{1}' into '{2}'", locName, locFilename, patchPath), verbose);
           }
         } else {
-          log (string.Format ("Could not deserialize json from '{0}'", patchPath), verbose);
+          Localization.LoadedTranslation.Add (locName, jsonFromMod);
         }
       } catch (Exception) {
-        log (string.Format ("Exception while localizing {0}", Path.Combine (locName, locFilename)), verbose);
+        Pipliz.Log.WriteError (string.Format ("Exception while localizing {0}", locName));
       }
     }
 
-    private static void log (string msg, bool verbose)
+    class NodePair
     {
-      if (verbose) {
-        Pipliz.Log.Write (msg);
+      public string Parent { get; private set; }
+
+      public JSONNode First { get; private set; }
+
+      public JSONNode Second { get; private set; }
+
+      public NodePair (string parent, JSONNode first, JSONNode second)
+      {
+        this.Parent = parent;
+        this.First = first;
+        this.Second = second;
       }
     }
   }

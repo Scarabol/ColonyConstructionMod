@@ -1,0 +1,13 @@
+{
+  "sentences" : {
+    "popup" : {
+      "limits" : {
+        "scarabol.architect" : "Architektenaufträge"
+      }
+    }
+  },
+  "types" : {
+    "buildtool" : "Bauwerkzeuge",
+    "architects.table" : "Architektentisch"
+  }
+}

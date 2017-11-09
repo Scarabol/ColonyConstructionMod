@@ -27,7 +27,6 @@ namespace ScarabolMods
     {
       ModDirectory = Path.GetDirectoryName (path);
       AssetsDirectory = Path.Combine (ModDirectory, "assets");
-      ModLocalizationHelper.localize (Path.Combine (AssetsDirectory, "localization"), MOD_PREFIX, false);
     }
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterStartup, "scarabol.construction.registercallbacks")]
@@ -67,6 +66,21 @@ namespace ScarabolMods
       }, new InventoryItem (JOB_ITEM_KEY, 1), 0);
       RecipeStorage.AddDefaultLimitTypeRecipe ("pipliz.crafter", buildtoolRecipe);
       RecipePlayer.AddDefaultRecipe (buildtoolRecipe);
+    }
+
+    [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.construction.afterworldload")]
+    [ModLoader.ModCallbackDependsOn ("pipliz.server.localization.waitforloading")]
+    [ModLoader.ModCallbackProvidesFor ("pipliz.server.localization.convert")]
+    public static void AfterWorldLoad ()
+    {
+      ModLocalizationHelper.localize (Path.Combine (AssetsDirectory, "localization"), ConstructionModEntries.MOD_PREFIX);
+      foreach (KeyValuePair<string, JSONNode> locEntry in ManagerBlueprints.blueprintsLocalizations) {
+        try {
+          ModLocalizationHelper.localize (locEntry.Key, locEntry.Value, ManagerBlueprints.BLUEPRINTS_PREFIX);
+        } catch (Exception exception) {
+          Pipliz.Log.WriteError (string.Format ("Exception while localization of {0}; {1}", locEntry.Key, exception.Message));
+        }
+      }
     }
   }
 
