@@ -93,8 +93,6 @@ namespace ScarabolMods
 
     public override string NPCTypeKey { get { return "scarabol.constructor"; } }
 
-    public override float TimeBetweenJobs { get { return 0.5f; } }
-
     public override bool NeedsItems { get { return shouldTakeItems; } }
 
     public override InventoryItem RecruitementItem { get { return new InventoryItem (ItemTypes.IndexLookup.GetIndex (ConstructionModEntries.JOB_ITEM_KEY), 1); } }
@@ -140,7 +138,7 @@ namespace ScarabolMods
       return this;
     }
 
-    public override void OnNPCDoJob (ref NPCBase.NPCState state)
+    public override void OnNPCAtJob (ref NPCBase.NPCState state)
     {
       state.JobIsDone = true;
       usedNPC.LookAt (position.Vector);
@@ -179,10 +177,10 @@ namespace ScarabolMods
               if (ServerManager.TryChangeBlock (realPosition, newType, ServerManager.SetBlockFlags.DefaultAudio)) {
                 state.JobIsDone = true;
                 if (newType == BuiltinBlocks.Air) {
-                  OverrideCooldown (ConstructionModEntries.EXCAVATION_DELAY);
+                  state.SetCooldown (ConstructionModEntries.EXCAVATION_DELAY);
                   state.SetIndicator (NPCIndicatorType.Crafted, ConstructionModEntries.EXCAVATION_DELAY, actualType);
                 } else if (!blockInventory.IsEmpty && i > 0) {
-                  state.SetIndicator (NPCIndicatorType.Crafted, TimeBetweenJobs, ItemTypes.IndexLookup.GetIndex (rotatedTypename));
+                  state.SetIndicator (NPCIndicatorType.Crafted, 0.5f, ItemTypes.IndexLookup.GetIndex (rotatedTypename));
                 }
                 if (actualType != BuiltinBlocks.Air && actualType != scaffoldType) {
                   usedNPC.Inventory.Add (ItemTypes.GetType (actualType).OnRemoveItems);
@@ -202,7 +200,7 @@ namespace ScarabolMods
       }
     }
 
-    public override void OnNPCDoStockpile (ref NPCBase.NPCState state)
+    public override void OnNPCAtStockpile (ref NPCBase.NPCState state)
     {
       state.Inventory.TryDump (usedNPC.Colony.UsedStockpile);
       if (todoblocks.Count < 1) {

@@ -61,7 +61,7 @@ namespace ScarabolMods
   {
     public override string NPCTypeKey { get { return ArchitectsModEntries.JOB_NAME; } }
 
-    public override float TimeBetweenJobs { get { return 10.0f; } }
+    public override float CraftingCooldown { get { return 10.0f; } }
 
     public override int MaxRecipeCraftsPerHaul { get { return 1; } }
 
@@ -73,7 +73,7 @@ namespace ScarabolMods
     protected override void OnRecipeCrafted ()
     {
       var recipeStorage = RecipeStorage.GetPlayerStorage (owner);
-      recipeStorage.SetLimit (selectedRecipe.Name, recipeStorage.GetLimit (selectedRecipe.Name) - 1);
+      recipeStorage.SetLimit (selectedRecipe.Name, recipeStorage.GetRecipeSetting (selectedRecipe.Name).Limit - 1);
     }
 
     NPCTypeStandardSettings INPCTypeDefiner.GetNPCTypeDefinition ()
@@ -103,9 +103,9 @@ namespace ScarabolMods
     {
     }
 
-    public override int ShouldBeMade (Stockpile stockpile)
+    public override int ShouldBeMade (Stockpile stockpile, RecipeStorage.PlayerRecipeStorage playerStorage = null)
     {
-      return RecipeStorage.GetPlayerStorage (stockpile.Owner).GetLimit (this.Name);
+      return RecipeStorage.GetPlayerStorage (stockpile.Owner).GetRecipeSetting (this.Name).Limit;
     }
   }
 }
