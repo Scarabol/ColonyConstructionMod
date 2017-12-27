@@ -5,7 +5,7 @@ using Pipliz;
 using Pipliz.Chatting;
 using Pipliz.JSON;
 using Pipliz.Threading;
-using Pipliz.APIProvider.Jobs;
+using Pipliz.Mods.APIProvider.Jobs;
 using NPC;
 using Server.NPCs;
 using BlockTypes.Builtin;

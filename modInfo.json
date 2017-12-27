@@ -1,26 +1,11 @@
-{
-  "assemblies" : [
-    {
-      "name" : "scarabol.construction",
-      "path" : "Construction.dll",
-      "enabled" : true,
-      "compatibleversions" : [
-        {
-          "Major" : 0,
-          "Minor" : 4,
-          "Build" : 1
-        },
-        {
-          "Major" : 0,
-          "Minor" : 4,
-          "Build" : 2
-        },
-        {
-          "Major" : 0,
-          "Minor" : 4,
-          "Build" : 3
-        }
-      ]
-    }
-  ]
-}
+[
+  {
+    "name" : "scarabol.construction",
+    "version" : "4.0.0",
+    "dllpath" : "Construction.dll",
+    "enabled" : true,
+    "compatibleversions" : [
+      "0.5.0"
+    ]
+  }
+]
