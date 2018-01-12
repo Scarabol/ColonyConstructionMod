@@ -30,9 +30,10 @@ namespace ScarabolMods
     public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
       itemTypes.Add (SCAFFOLD_ITEM_TYPE, new ItemTypesServer.ItemTypeRaw (SCAFFOLD_ITEM_TYPE, new JSONNode ()
-        .SetAs ("sideall", SCAFFOLD_ITEM_TYPE)
         .SetAs ("onRemove", new JSONNode (NodeType.Array))
         .SetAs ("isSolid", false)
+        .SetAs ("mesh", MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "meshes", "scaffold.obj"))
+        .SetAs ("sideall", "planks")
         .SetAs ("destructionTime", 100)
       ));
     }
