@@ -5,7 +5,8 @@
     "dllpath" : "Construction.dll",
     "enabled" : true,
     "compatibleversions" : [
-      "0.5.0"
+      "0.5.0",
+      "0.5.1"
     ]
   }
 ]

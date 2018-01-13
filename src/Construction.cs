@@ -170,7 +170,9 @@ namespace ScarabolMods
           }
           ushort newType = ItemTypes.IndexLookup.GetIndex (rotatedTypename);
           ushort actualType;
-          if (World.TryGetTypeAt (realPosition, out actualType) && actualType != newType) {
+          if (!World.TryGetTypeAt (realPosition, out actualType) || actualType == newType) {
+            todoblocks.RemoveAt (i);
+          } else {
             ushort baseType = ItemTypes.IndexLookup.GetIndex (baseTypename);
             if (newType == BuiltinBlocks.Air || blockInventory.TryGetOneItem (baseType)) {
               todoblocks.RemoveAt (i);
@@ -189,8 +191,6 @@ namespace ScarabolMods
                 break;
               }
             }
-          } else {
-            todoblocks.RemoveAt (i);
           }
         }
         if (!placed) {
