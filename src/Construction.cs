@@ -184,7 +184,7 @@ namespace ScarabolMods
                 } else if (!blockInventory.IsEmpty && i > 0) {
                   state.SetIndicator (NPCIndicatorType.Crafted, 0.5f, ItemTypes.IndexLookup.GetIndex (rotatedTypename));
                 }
-                if (actualType != BuiltinBlocks.Air && actualType != scaffoldType) {
+                if (actualType != BuiltinBlocks.Air && actualType != BuiltinBlocks.Water && actualType != scaffoldType) {
                   usedNPC.Inventory.Add (ItemTypes.GetType (actualType).OnRemoveItems);
                 }
                 placed = true;
