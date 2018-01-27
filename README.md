@@ -2,7 +2,7 @@
 
 ## Installation
 
-**This mod must be installed on both server and client side!**
+**This mod must be installed on server side!**
 
 * download a (compatible) [release](https://github.com/Scarabol/ColonyConstructionMod/releases) or build from source code (see below)
 * place the unzipped *Scarabol* folder inside your *ColonySurvival/gamedata/mods/* directory, like *ColonySurvival/gamedata/mods/Scarabol/*
