@@ -39,9 +39,9 @@ namespace ScarabolMods
     public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
       itemTypes.Add (JOB_ITEM_KEY, new ItemTypesServer.ItemTypeRaw (JOB_ITEM_KEY, new JSONNode ()
-        .SetAs ("icon", MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "icons", "architect.png"))
         .SetAs ("onPlaceAudio", "woodPlace")
         .SetAs ("onRemoveAudio", "woodDeleteLight")
+        .SetAs ("icon", MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "icons", "architect.png"))
         .SetAs ("sideall", "planks")
         .SetAs ("sidey+", ConstructionModEntries.MOD_PREFIX + "architecttop")
         .SetAs ("npcLimit", 0)

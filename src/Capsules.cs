@@ -34,10 +34,10 @@ namespace ScarabolMods
         itemTypes.Add (blueprintTypename + CAPSULE_SUFFIX, new ItemTypesServer.ItemTypeRaw (blueprintTypename + CAPSULE_SUFFIX,
           new JSONNode ()
             .SetAs ("onPlaceAudio", "woodPlace")
+            .SetAs ("onRemoveAudio", "woodDeleteLight")
             .SetAs ("icon", iconFilepath)
             .SetAs ("sideall", "planks")
             .SetAs ("sidey+", ConstructionModEntries.MOD_PREFIX + "capsuletop")
-            .SetAs ("isSolid", "false")
             .SetAs ("isRotatable", "true")
             .SetAs ("rotatablex+", blueprintTypename + CAPSULE_SUFFIX + "x+")
             .SetAs ("rotatablex-", blueprintTypename + CAPSULE_SUFFIX + "x-")

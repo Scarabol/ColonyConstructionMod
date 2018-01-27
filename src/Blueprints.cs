@@ -27,8 +27,8 @@ namespace ScarabolMods
       foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
         itemTypes.Add (blueprintTypename, new ItemTypesServer.ItemTypeRaw (blueprintTypename,
           new JSONNode ()
-            .SetAs ("onRemoveAudio", "woodDeleteLight")
             .SetAs ("onPlaceAudio", "woodPlace")
+            .SetAs ("onRemoveAudio", "woodDeleteLight")
             .SetAs ("icon", iconFilepath)
             .SetAs ("sideall", "planks")
             .SetAs ("sidey+", ConstructionModEntries.MOD_PREFIX + "blueprinttop")
