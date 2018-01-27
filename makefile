@@ -1,7 +1,7 @@
 # important variables
 modname = Construction
 versionmajor = 5.0
-versionminor = 0
+versionminor = 1
 compatible_cs = "0.5.3"
 zip_files_extra = "$(moddir)/assets/" "$(moddir)/blueprints/"
 
