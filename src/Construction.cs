@@ -180,9 +180,9 @@ namespace ScarabolMods
                 state.JobIsDone = true;
                 if (newType == BuiltinBlocks.Air) {
                   state.SetCooldown (ConstructionModEntries.EXCAVATION_DELAY);
-                  state.SetIndicator (NPCIndicatorType.Crafted, ConstructionModEntries.EXCAVATION_DELAY, actualType);
+                  state.SetIndicator (new Shared.IndicatorState (ConstructionModEntries.EXCAVATION_DELAY, actualType));
                 } else if (!blockInventory.IsEmpty && i > 0) {
-                  state.SetIndicator (NPCIndicatorType.Crafted, 0.5f, ItemTypes.IndexLookup.GetIndex (rotatedTypename));
+                  state.SetIndicator (new Shared.IndicatorState (0.5f, ItemTypes.IndexLookup.GetIndex (rotatedTypename)));
                 }
                 if (actualType != BuiltinBlocks.Air && actualType != BuiltinBlocks.Water && actualType != scaffoldType) {
                   usedNPC.Inventory.Add (ItemTypes.GetType (actualType).OnRemoveItems);
@@ -239,7 +239,7 @@ namespace ScarabolMods
         return;
       } else if (shouldTakeItems) {
         state.JobIsDone = false;
-        state.SetIndicator (NPCIndicatorType.MissingItem, 6f, ItemTypes.IndexLookup.GetIndex (todoblocks [todoblocks.Count - 1].typename));
+        state.SetIndicator (new Shared.IndicatorState (6f, ItemTypes.IndexLookup.GetIndex (todoblocks [todoblocks.Count - 1].typename), true, false));
       }
     }
 
