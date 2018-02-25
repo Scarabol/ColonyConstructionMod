@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Forge",
     "de-DE" : "Schmiede",
-    "fr-FR" : "Forge"
+    "fr-FR" : "Forge",
+    "es-ES" : "Forja"
   },
   "blocks" : [
     { "x" : 0, "y" : -1, "z" : 0, "typename" : "stonebricks", "width" : 11, "depth" : 6 },

@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Trench (10, right)",
     "de-DE" : "Graben (10, rechts)",
-    "fr-FR" : "Tranchée (10, droite)"
+    "fr-FR" : "Tranchée (10, droite)",
+    "es-ES" : "Trinchera (10, derecha)"
   },
   "blocks" : [
     { "x" : 3, "y" : -1, "z" : -1, "typename" : "air", "height" : -3, "depth" : 10 },

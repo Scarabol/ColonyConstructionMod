@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Wall (10, right)",
     "de-DE" : "Mauer (10, rechts)",
-    "fr-FR" : "Mur (10, droit)"
+    "fr-FR" : "Mur (10, droit)",
+    "es-ES" : "Muralla (10, derecha)"
   },
   "offset" : { "x" : 0, "y" : 0, "z" : -1 },
   "blocks" : [

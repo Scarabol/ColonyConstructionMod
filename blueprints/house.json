@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "House",
     "de-DE" : "Haus",
-    "fr-FR" : "Maison"
+    "fr-FR" : "Maison",
+    "es-ES" : "Casa (grande)"
   },
   "blocks" : [
     { "x" : 0, "y" : -1, "z" : 0, "typename" : "stonebricks", "width" : 8, "depth" : 6 },

@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Hedge (10)",
     "de-DE" : "Hecke (10)",
-    "fr-FR" : "Haies (10)"
+    "fr-FR" : "Haies (10)",
+    "es-ES" : "Setos (10)"
   },
   "offset" : { "x" : 0, "y" : 0, "z" : -1 },
   "blocks" : [
