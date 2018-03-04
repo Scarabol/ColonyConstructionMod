@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Flatten (5 x 10)",
     "de-DE" : "Planieren (5 x 10)",
-    "fr-FR" : "Aplanir (5 x 10)"
+    "fr-FR" : "Aplanir (5 x 10)",
+    "es-ES" : "Aplanar (5 x 10)"
   },
   "blocks" : [
     { "x" : -2, "y" : 14, "z" : 0, "typename" : "air", "width" : 5, "height" : -15, "depth" : 10 },

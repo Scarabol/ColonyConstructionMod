@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Tower",
     "de-DE" : "Turm",
-    "fr-FR" : "Tours"
+    "fr-FR" : "Tours",
+    "es-ES" : "Torre"
   },
   "blocks" : [
     { "x" : 0, "y" : -1, "z" : 0, "typename" : "stonebricks", "width" : 5, "depth" : 5 },

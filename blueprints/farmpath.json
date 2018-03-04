@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Farm Path (3 x 8)",
     "de-DE" : "Feldweg (3 x 8)",
-    "fr-FR" : "Chemin (3 x 8)"
+    "fr-FR" : "Chemin (3 x 8)",
+    "es-ES" : "Camino de tierra (3 x 8)"
   },
   "blocks" : [
     { "x" : -1, "y" : -1, "z" : -1, "typename" : "dirt", "width" : 3, "depth" : 8 }

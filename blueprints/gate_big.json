@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Big Gate",
     "de-DE" : "Großes Torhaus",
-    "fr-FR" : "Grande Porte"
+    "fr-FR" : "Grande Porte",
+    "es-ES" : "Puerta (grande)"
   },
   "blocks" : [
     { "x" : 0, "y" : -1, "z" : 0, "typename" : "stonebricks", "width" : 9, "depth" : 9 },

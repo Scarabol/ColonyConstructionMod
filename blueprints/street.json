@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Street (3 x 8)",
     "de-DE" : "Straße (3 x 8)",
-    "fr-FR" : "Rue (3 x 8)"
+    "fr-FR" : "Rue (3 x 8)",
+    "es-ES" : "Calle (3 x 8)"
   },
   "blocks" : [
     { "x" : -1, "y" : -1, "z" : -1, "typename" : "stonebricks", "width" : 3, "depth" : 8 }

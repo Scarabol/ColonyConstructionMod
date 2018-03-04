@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Palisade Gate",
     "de-DE" : "Palisadentor",
-    "fr-FR" : "Porte de palissade"
+    "fr-FR" : "Porte de palissade",
+    "es-ES" : "Puerta de empalizada"
   },
   "blocks" : [
     { "x" : 0, "y" : 0, "z" : 0, "typename" : "planks", "depth" : 2, "height" : 3 },

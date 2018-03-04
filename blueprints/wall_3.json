@@ -1,0 +1,31 @@
+{
+	"localization" :
+		  {
+			"en-US" : "Wall Type 3 (10, right)",
+			"de-DE" : "Mauer Typ 3 (10, rechts)",
+			"fr-FR" : "Mur de type 3 (10, droit)",
+			"es-ES" : "Muralla de tipo 3 (10, derecha)"
+		  },
+	"blocks" :
+		[
+			{ "x" : 0, "y" : -1, "z" : 0, "typename" : "grasstemperate", "width" : 10, "height" : 1, "depth" : 1 },
+			{ "x" : 0, "y" : -1, "z" : 1, "typename" : "planks", "width" : 10, "height" : 1, "depth" : 3 },
+			{ "x" : 0, "y" : -1, "z" : 4, "typename" : "grasstemperate", "width" : 10, "height" : 1, "depth" : 1 },
+
+			{ "x" : 0, "y" : 0, "z" : 0, "typename" : "stonebricks", "width" : 10, "height" : 4, "depth" : 1 },
+			{ "x" : 0, "y" : 3, "z" : 1, "typename" : "planks", "width" : 10, "height" : 1, "depth" : 3 },
+			{ "x" : 0, "y" : 0, "z" : 4, "typename" : "stonebricks", "width" : 10, "height" : 4, "depth" : 1 },
+
+			{ "x" : 1, "y" : 4, "z" : 0, "typename" : "stonebricks", "width" : 1, "height" : 1, "depth" : 1 },
+			{ "x" : 3, "y" : 4, "z" : 0, "typename" : "stonebricks", "width" : 1, "height" : 1, "depth" : 1 },
+			{ "x" : 5, "y" : 4, "z" : 0, "typename" : "stonebricks", "width" : 1, "height" : 1, "depth" : 1 },
+			{ "x" : 7, "y" : 4, "z" : 0, "typename" : "stonebricks", "width" : 1, "height" : 1, "depth" : 1 },
+			{ "x" : 9, "y" : 4, "z" : 0, "typename" : "stonebricks", "width" : 1, "height" : 1, "depth" : 1 },
+
+			{ "x" : 1, "y" : 4, "z" : 4, "typename" : "stonebricks", "width" : 1, "height" : 1, "depth" : 1 },
+			{ "x" : 3, "y" : 4, "z" : 4, "typename" : "stonebricks", "width" : 1, "height" : 1, "depth" : 1 },
+			{ "x" : 5, "y" : 4, "z" : 4, "typename" : "stonebricks", "width" : 1, "height" : 1, "depth" : 1 },
+			{ "x" : 7, "y" : 4, "z" : 4, "typename" : "stonebricks", "width" : 1, "height" : 1, "depth" : 1 },
+			{ "x" : 9, "y" : 4, "z" : 4, "typename" : "stonebricks", "width" : 1, "height" : 1, "depth" : 1 },
+		]
+}

@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Mine Tunnel",
     "de-DE" : "Minenstollen",
-    "fr-FR" : "Tunnel de mine"
+    "fr-FR" : "Tunnel de mine",
+    "es-ES" : "Tunel de mina"
   },
   "blocks" : [
     { "x" : 0, "y" : 0, "z" : 0, "typename" : "air", "height" : 3, "depth" : 10 },

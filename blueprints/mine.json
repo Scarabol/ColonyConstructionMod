@@ -2,7 +2,8 @@
   "localization" : {
     "en-US" : "Mine",
     "de-DE" : "Mine",
-    "fr-FR" : "Mine"
+    "fr-FR" : "Mine",
+    "es-ES" : "Mina"
   },
   "blocks" : [
     { "x" : -1, "y" : 0, "z" : -1, "typename" : "leavestemperate", "depth" : 4 },
