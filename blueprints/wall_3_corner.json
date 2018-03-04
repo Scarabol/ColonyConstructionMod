@@ -2,8 +2,8 @@
 	"localization" :
 		  {
 			"en-US" : "Wall Corner Type 3 (5, right)",
-			"de-DE" : "Mauer ¿Ecke? Typ 3 (5, rechts)",
-			"fr-FR" : "Mur ¿Coin? de type 3 (5, droit)",
+			"de-DE" : "Mauer Ecke Typ 3 (5, rechts)",
+			"fr-FR" : "Mur Coin de type 3 (5, droit)",
 			"es-ES" : "Esquina de muralla tipo 3 (5, derecha)"
 		  },
 	"blocks" :
