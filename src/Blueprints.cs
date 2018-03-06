@@ -75,17 +75,29 @@ namespace ScarabolMods
     }
 
     public BlueprintTodoBlock (JSONNode node)
-      : this (node.GetAs<int> ("offsetx"), node.GetAs<int> ("offsety"), node.GetAs<int> ("offsetz"), node.GetAs<string> ("typename"))
     {
+      this.offsetx = getAsOrElse<int> (node, "x", "offsetx");
+      this.offsety = getAsOrElse<int> (node, "y", "offsety");
+      this.offsetz = getAsOrElse<int> (node, "z", "offsetz");
+      this.typename = getAsOrElse<string> (node, "t", "typename");
+    }
+
+    private static T getAsOrElse<T> (JSONNode node, string identifier, string otherIdentifier)
+    {
+      T result;
+      if (!node.TryGetAs<T> (identifier, out result)) {
+        result = node.GetAs<T> (otherIdentifier);
+      }
+      return result;
     }
 
     public JSONNode GetJSON ()
     {
       return new JSONNode ()
-        .SetAs ("offsetx", offsetx)
-        .SetAs ("offsety", offsety)
-        .SetAs ("offsetz", offsetz)
-        .SetAs ("typename", typename);
+        .SetAs ("x", offsetx)
+        .SetAs ("y", offsety)
+        .SetAs ("z", offsetz)
+        .SetAs ("t", typename);
     }
 
     public Vector3Int GetWorldPosition (string typeBasename, Vector3Int position, ushort bluetype)
