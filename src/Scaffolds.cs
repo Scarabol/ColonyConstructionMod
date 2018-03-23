@@ -66,7 +66,7 @@ namespace ScarabolMods
           Vector3Int realPos = block.GetWorldPosition (blueprintBasename, position, bluetype);
           ushort wasType;
           if (World.TryGetTypeAt (realPos, out wasType) && wasType == BuiltinBlocks.Air) {
-            ServerManager.TryChangeBlock (realPos, scaffoldType);
+            ServerManager.TryChangeBlock (realPos, scaffoldType, causedBy);
           }
         }
         ThreadManager.InvokeOnMainThread (delegate () {
@@ -100,7 +100,7 @@ namespace ScarabolMods
           Vector3Int realPos = block.GetWorldPosition (blueprintBasename, position, bluetype);
           ushort wasType;
           if (World.TryGetTypeAt (realPos, out wasType) && wasType == scaffoldType) {
-            ServerManager.TryChangeBlock (realPos, BuiltinBlocks.Air);
+            ServerManager.TryChangeBlock (realPos, BuiltinBlocks.Air, causedBy);
           }
         }
       }

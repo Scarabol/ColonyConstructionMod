@@ -176,7 +176,7 @@ namespace ScarabolMods
             ushort baseType = ItemTypes.IndexLookup.GetIndex (baseTypename);
             if (newType == BuiltinBlocks.Air || blockInventory.TryGetOneItem (baseType)) {
               todoblocks.RemoveAt (i);
-              if (ServerManager.TryChangeBlock (realPosition, newType)) {
+              if (ServerManager.TryChangeBlock (realPosition, newType, owner)) {
                 state.JobIsDone = true;
                 if (newType == BuiltinBlocks.Air) {
                   state.SetCooldown (ConstructionModEntries.EXCAVATION_DELAY);
@@ -204,7 +204,7 @@ namespace ScarabolMods
     {
       state.Inventory.Dump (usedNPC.Colony.UsedStockpile);
       if (todoblocks.Count < 1) {
-        ServerManager.TryChangeBlock (position, BuiltinBlocks.Air);
+        ServerManager.TryChangeBlock (position, BuiltinBlocks.Air, owner);
         return;
       }
       state.JobIsDone = true;
@@ -235,7 +235,7 @@ namespace ScarabolMods
         }
       }
       if (todoblocks.Count < 1) {
-        ServerManager.TryChangeBlock (position, BuiltinBlocks.Air);
+        ServerManager.TryChangeBlock (position, BuiltinBlocks.Air, owner);
         return;
       } else if (shouldTakeItems) {
         state.JobIsDone = false;

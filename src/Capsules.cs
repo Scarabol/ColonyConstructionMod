@@ -45,7 +45,7 @@ namespace ScarabolMods
             .SetAs ("rotatablez-", blueprintTypename + CAPSULE_SUFFIX + "z-")
             .SetAs ("npcLimit", "0")
         ));
-        foreach (string xz in new string[] { "x+", "x-", "z+", "z-" }) {
+        foreach (string xz in new string [] { "x+", "x-", "z+", "z-" }) {
           itemTypes.Add (blueprintTypename + CAPSULE_SUFFIX + xz, new ItemTypesServer.ItemTypeRaw (blueprintTypename + CAPSULE_SUFFIX + xz,
             new JSONNode ()
               .SetAs ("parentType", blueprintTypename + CAPSULE_SUFFIX)
@@ -69,7 +69,7 @@ namespace ScarabolMods
     public static void OnPlaceCapsule (Vector3Int position, ushort capsuleType, Players.Player causedBy)
     {
       if (!PermissionsManager.CheckAndWarnPermission (causedBy, CapsulesModEntries.CAPSULE_PERMISSION)) {
-        ServerManager.TryChangeBlock (position, BlockTypes.Builtin.BuiltinBlocks.Air);
+        ServerManager.TryChangeBlock (position, BlockTypes.Builtin.BuiltinBlocks.Air, Players.GetPlayer (NetworkID.Server));
         return;
       }
       ThreadManager.InvokeOnMainThread (delegate () {
@@ -77,7 +77,7 @@ namespace ScarabolMods
         if (World.TryGetTypeAt (position, out realType) && realType != capsuleType) {
           return;
         }
-        ServerManager.TryChangeBlock (position, BlockTypes.Builtin.BuiltinBlocks.Air);
+        ServerManager.TryChangeBlock (position, BlockTypes.Builtin.BuiltinBlocks.Air, Players.GetPlayer (NetworkID.Server));
         string capsuleName = ItemTypes.IndexLookup.GetName (capsuleType);
         string blueprintName = capsuleName.Substring (0, capsuleName.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length - 2);
         Chat.Send (causedBy, string.Format ("Starting to build '{0}' at {1}", blueprintName, position));
@@ -97,7 +97,7 @@ namespace ScarabolMods
                 rotatedTypename = baseTypename + TypeHelper.VectorToXZ (combinedVec);
               }
               ushort rotatedType;
-              if (realPosition.y > 0 && ItemTypes.IndexLookup.TryGetIndex (rotatedTypename, out rotatedType) && ServerManager.TryChangeBlock (realPosition, rotatedType)) {
+              if (realPosition.y > 0 && ItemTypes.IndexLookup.TryGetIndex (rotatedTypename, out rotatedType) && ServerManager.TryChangeBlock (realPosition, rotatedType, Players.GetPlayer (NetworkID.Server))) {
                 if (block.typename.Equals ("air")) {
                   removed++;
                 } else {
