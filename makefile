@@ -1,8 +1,8 @@
 # important variables
 modname = Construction
-versionmajor = 5.0
-versionminor = 3
-compatible_cs = "0.5.3"
+versionmajor = 6.0
+versionminor = 1
+compatible_cs = "0.6.0"
 zip_files_extra = "$(moddir)/assets/" "$(moddir)/blueprints/"
 
 fullname = Colony$(modname)Mod

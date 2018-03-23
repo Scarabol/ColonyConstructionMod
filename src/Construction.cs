@@ -32,7 +32,7 @@ namespace ScarabolMods
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterStartup, "scarabol.construction.registercallbacks")]
     public static void AfterStartup ()
     {
-      Pipliz.Log.Write ("Loaded Construction Mod 5.0.3 by Scarabol");
+      Pipliz.Log.Write ("Loaded Construction Mod 6.0.1 by Scarabol");
       ManagerBlueprints.LoadBlueprints (Path.Combine (ModDirectory, "blueprints"));
     }
 
@@ -125,13 +125,13 @@ namespace ScarabolMods
 
     public override ITrackableBlock InitializeFromJSON (Players.Player player, JSONNode node)
     {
-      blockInventory = new NPCInventory (node ["inventory"]);
+      blockInventory = new NPCInventory (10000000f, node ["inventory"]);
       shouldTakeItems = false;
       node.TryGetAs ("shouldTakeItems", out shouldTakeItems);
       fullname = node.GetAs<string> ("fullname");
       JSONNode jsonTodos = node ["todoblocks"];
       todoblocks = new List<BlueprintTodoBlock> ();
-      foreach (JSONNode jsonBlock in jsonTodos.LoopArray()) {
+      foreach (JSONNode jsonBlock in jsonTodos.LoopArray ()) {
         todoblocks.Add (new BlueprintTodoBlock (jsonBlock));
       }
       InitializeJob (player, (Vector3Int)node ["position"], node.GetAs<int> ("npcID"));
@@ -176,7 +176,7 @@ namespace ScarabolMods
             ushort baseType = ItemTypes.IndexLookup.GetIndex (baseTypename);
             if (newType == BuiltinBlocks.Air || blockInventory.TryGetOneItem (baseType)) {
               todoblocks.RemoveAt (i);
-              if (ServerManager.TryChangeBlock (realPosition, newType, ServerManager.SetBlockFlags.DefaultAudio)) {
+              if (ServerManager.TryChangeBlock (realPosition, newType)) {
                 state.JobIsDone = true;
                 if (newType == BuiltinBlocks.Air) {
                   state.SetCooldown (ConstructionModEntries.EXCAVATION_DELAY);
@@ -202,7 +202,7 @@ namespace ScarabolMods
 
     public override void OnNPCAtStockpile (ref NPCBase.NPCState state)
     {
-      state.Inventory.TryDump (usedNPC.Colony.UsedStockpile);
+      state.Inventory.Dump (usedNPC.Colony.UsedStockpile);
       if (todoblocks.Count < 1) {
         ServerManager.TryChangeBlock (position, BuiltinBlocks.Air);
         return;
@@ -245,7 +245,7 @@ namespace ScarabolMods
 
     public override void OnRemove ()
     {
-      blockInventory.TryDump (Stockpile.GetStockPile (owner));
+      blockInventory.Dump (Stockpile.GetStockPile (owner));
       base.OnRemove ();
     }
 
