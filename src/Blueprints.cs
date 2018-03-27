@@ -1,10 +1,6 @@
-using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Pipliz;
 using Pipliz.JSON;
-using Pipliz.Chatting;
 
 namespace ScarabolMods
 {
@@ -24,7 +20,7 @@ namespace ScarabolMods
     public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
       string iconFilepath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "icons", "blueprint.png");
-      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
+      foreach (string blueprintTypename in ManagerBlueprints.Blueprints.Keys) {
         itemTypes.Add (blueprintTypename, new ItemTypesServer.ItemTypeRaw (blueprintTypename,
           new JSONNode ()
             .SetAs ("onPlaceAudio", "woodPlace")
@@ -61,43 +57,34 @@ namespace ScarabolMods
 
   public class BlueprintTodoBlock
   {
-    public int offsetx;
-    public int offsety;
-    public int offsetz;
-    public string typename;
+    public int OffsetX;
+    public int OffsetY;
+    public int OffsetZ;
+    public string Typename;
 
     public BlueprintTodoBlock (int offsetx, int offsety, int offsetz, string typename)
     {
-      this.offsetx = offsetx;
-      this.offsety = offsety;
-      this.offsetz = offsetz;
-      this.typename = typename;
+      OffsetX = offsetx;
+      OffsetY = offsety;
+      OffsetZ = offsetz;
+      Typename = typename;
     }
 
     public BlueprintTodoBlock (JSONNode node)
     {
-      this.offsetx = getAsOrElse<int> (node, "x", "offsetx");
-      this.offsety = getAsOrElse<int> (node, "y", "offsety");
-      this.offsetz = getAsOrElse<int> (node, "z", "offsetz");
-      this.typename = getAsOrElse<string> (node, "t", "typename");
-    }
-
-    private static T getAsOrElse<T> (JSONNode node, string identifier, string otherIdentifier)
-    {
-      T result;
-      if (!node.TryGetAs<T> (identifier, out result)) {
-        result = node.GetAs<T> (otherIdentifier);
-      }
-      return result;
+      OffsetX = node.getAsOrElse<int> ("x", "offsetx");
+      OffsetY = node.getAsOrElse<int> ("y", "offsety");
+      OffsetZ = node.getAsOrElse<int> ("z", "offsetz");
+      Typename = node.getAsOrElse<string> ("t", "typename");
     }
 
     public JSONNode GetJSON ()
     {
       return new JSONNode ()
-        .SetAs ("x", offsetx)
-        .SetAs ("y", offsety)
-        .SetAs ("z", offsetz)
-        .SetAs ("t", typename);
+        .SetAs ("x", OffsetX)
+        .SetAs ("y", OffsetY)
+        .SetAs ("z", OffsetZ)
+        .SetAs ("t", Typename);
     }
 
     public Vector3Int GetWorldPosition (string typeBasename, Vector3Int position, ushort bluetype)
@@ -105,19 +92,19 @@ namespace ScarabolMods
       ushort hxm = ItemTypes.IndexLookup.GetIndex (typeBasename + "x-");
       ushort hzp = ItemTypes.IndexLookup.GetIndex (typeBasename + "z+");
       ushort hzm = ItemTypes.IndexLookup.GetIndex (typeBasename + "z-");
-      int realx = this.offsetz + 1;
-      int realz = -this.offsetx;
+      int realx = OffsetZ + 1;
+      int realz = -OffsetX;
       if (bluetype == hxm) {
-        realx = -this.offsetz - 1;
-        realz = this.offsetx;
+        realx = -OffsetZ - 1;
+        realz = OffsetX;
       } else if (bluetype == hzp) {
-        realx = this.offsetx;
-        realz = this.offsetz + 1;
+        realx = OffsetX;
+        realz = OffsetZ + 1;
       } else if (bluetype == hzm) {
-        realx = -this.offsetx;
-        realz = -this.offsetz - 1;
+        realx = -OffsetX;
+        realz = -OffsetZ - 1;
       }
-      return position.Add (realx, this.offsety, realz);
+      return position.Add (realx, OffsetY, realz);
     }
   }
 }

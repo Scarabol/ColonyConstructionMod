@@ -1,12 +1,6 @@
-using System;
-using System.IO;
 using System.Collections.Generic;
-using Pipliz;
-using Pipliz.Chatting;
 using Pipliz.JSON;
-using Pipliz.Threading;
 using Pipliz.Mods.APIProvider.Jobs;
-using NPC;
 using Server.NPCs;
 using BlockTypes.Builtin;
 
@@ -50,7 +44,6 @@ namespace ScarabolMods
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.architects.loadrecipes")]
     [ModLoader.ModCallbackDependsOn ("pipliz.server.loadresearchables")]
-    [ModLoader.ModCallbackProvidesFor ("pipliz.server.loadsortorder")]
     public static void LoadRecipes ()
     {
       RecipePlayer.AddDefaultRecipe (new Recipe (JOB_ITEM_KEY + ".recipe", new InventoryItem (BuiltinBlocks.Planks, 1), new InventoryItem (JOB_ITEM_KEY, 1), 0));
@@ -67,7 +60,7 @@ namespace ScarabolMods
 
     public override List<string> GetCraftingLimitsTriggers ()
     {
-      return new List<string> () { ArchitectsModEntries.JOB_ITEM_KEY };
+      return new List<string> { ArchitectsModEntries.JOB_ITEM_KEY };
     }
 
     protected override void OnRecipeCrafted ()
@@ -78,7 +71,7 @@ namespace ScarabolMods
 
     NPCTypeStandardSettings INPCTypeDefiner.GetNPCTypeDefinition ()
     {
-      return new NPCTypeStandardSettings () {
+      return new NPCTypeStandardSettings {
         keyName = NPCTypeKey,
         printName = "Architect",
         maskColor1 = new UnityEngine.Color32 (220, 220, 220, 255),
@@ -89,7 +82,7 @@ namespace ScarabolMods
     public override IList<Recipe> GetCraftingLimitsRecipes ()
     {
       List<Recipe> result = new List<Recipe> ();
-      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
+      foreach (string blueprintTypename in ManagerBlueprints.Blueprints.Keys) {
         result.Add (new ArchitectRecipe (blueprintTypename));
       }
       return result;

@@ -1,32 +1,29 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Linq;
-using Pipliz;
 using Pipliz.JSON;
-using Pipliz.Chatting;
 
 namespace ScarabolMods
 {
   public static class ManagerBlueprints
   {
     public static string BLUEPRINTS_PREFIX = ConstructionModEntries.MOD_PREFIX + "blueprints.";
-    public static Dictionary<string, List<BlueprintTodoBlock>> blueprints = new Dictionary<string, List<BlueprintTodoBlock>> ();
-    public static Dictionary<string, JSONNode> blueprintsLocalizations = new Dictionary<string, JSONNode> ();
+    public static Dictionary<string, List<BlueprintTodoBlock>> Blueprints = new Dictionary<string, List<BlueprintTodoBlock>> ();
+    public static Dictionary<string, JSONNode> BlueprintsLocalizations = new Dictionary<string, JSONNode> ();
 
     public static void LoadBlueprints (string blueprintsPath)
     {
-      long StartLoadingBlueprints = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+      long startLoadingBlueprints = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
       Dictionary<string, string> prefixesBlueprints = new Dictionary<string, string> ();
       Dictionary<string, string> prefixesCapsules = new Dictionary<string, string> ();
-      string[] prefixFiles = Directory.GetFiles (Path.Combine (ConstructionModEntries.AssetsDirectory, "localization"), "prefixes.json", SearchOption.AllDirectories);
+      string [] prefixFiles = Directory.GetFiles (Path.Combine (ConstructionModEntries.AssetsDirectory, "localization"), "prefixes.json", SearchOption.AllDirectories);
       foreach (string filepath in prefixFiles) {
         try {
           JSONNode jsonPrefixes;
           if (JSON.Deserialize (filepath, out jsonPrefixes, false)) {
             string locName = Directory.GetParent (filepath).Name;
-            Pipliz.Log.Write (string.Format ("Found prefixes localization file for '{0}' localization", locName));
+            Pipliz.Log.Write ($"Found prefixes localization file for '{locName}' localization");
             string blueprintsPrefix;
             if (jsonPrefixes.TryGetAs ("blueprints", out blueprintsPrefix)) {
               prefixesBlueprints [locName] = blueprintsPrefix;
@@ -37,11 +34,11 @@ namespace ScarabolMods
             }
           }
         } catch (Exception exception) {
-          Pipliz.Log.WriteError (string.Format ("Exception reading localization from {0}; {1}", filepath, exception.Message));
+          Pipliz.Log.WriteError ($"Exception reading localization from {filepath}; {exception.Message}");
         }
       }
-      Pipliz.Log.Write (string.Format ("Loading blueprints from {0}", blueprintsPath));
-      string[] files = Directory.GetFiles (blueprintsPath, "**.json", SearchOption.AllDirectories);
+      Pipliz.Log.Write ($"Loading blueprints from {blueprintsPath}");
+      string [] files = Directory.GetFiles (blueprintsPath, "**.json", SearchOption.AllDirectories);
       foreach (string filepath in files) {
         try {
           JSONNode json;
@@ -55,7 +52,7 @@ namespace ScarabolMods
             JSONNode jsonBlocks;
             if (json.NodeType == NodeType.Object) {
               if (!json.TryGetAs ("blocks", out jsonBlocks)) {
-                Pipliz.Log.WriteError (string.Format ("Expected 'blocks' key in json {0}", filename));
+                Pipliz.Log.WriteError ($"Expected 'blocks' key in json {filename}");
                 continue;
               }
               JSONNode jsonOffset;
@@ -66,7 +63,7 @@ namespace ScarabolMods
               }
               JSONNode jsonLocalization;
               if (json.TryGetAs ("localization", out jsonLocalization)) {
-                foreach (KeyValuePair<string, JSONNode> locEntry in jsonLocalization.LoopObject()) {
+                foreach (KeyValuePair<string, JSONNode> locEntry in jsonLocalization.LoopObject ()) {
                   string labelPrefix;
                   string capsulePrefix;
                   if (prefixesBlueprints.TryGetValue (locEntry.Key, out labelPrefix)) {
@@ -81,9 +78,9 @@ namespace ScarabolMods
                   }
                   string label = ((string)locEntry.Value.BareObject).Trim ();
                   JSONNode locNode;
-                  if (!blueprintsLocalizations.TryGetValue (locEntry.Key, out locNode)) {
+                  if (!BlueprintsLocalizations.TryGetValue (locEntry.Key, out locNode)) {
                     locNode = new JSONNode ().SetAs<JSONNode> ("types", new JSONNode ());
-                    blueprintsLocalizations.Add (locEntry.Key, locNode);
+                    BlueprintsLocalizations.Add (locEntry.Key, locNode);
                   }
                   locNode.GetAs<JSONNode> ("types").SetAs (blueprintName, labelPrefix + " " + label);
                   locNode.GetAs<JSONNode> ("types").SetAs (blueprintName + CapsulesModEntries.CAPSULE_SUFFIX, capsulePrefix + " " + label);
@@ -91,9 +88,9 @@ namespace ScarabolMods
               }
             } else {
               jsonBlocks = json; // fallback everything is an array
-              Pipliz.Log.Write (string.Format ("No json object defined in '{0}', using full content as blocks array", filename));
+              Pipliz.Log.Write ($"No json object defined in '{filename}', using full content as blocks array");
               int maxx = 0, maxy = 0, maxz = 0;
-              foreach (JSONNode node in jsonBlocks.LoopArray()) {
+              foreach (JSONNode node in jsonBlocks.LoopArray ()) {
                 int x = getJSONInt (node, "startx", "x", 0, false);
                 if (x < offx) {
                   offx = x;
@@ -119,20 +116,20 @@ namespace ScarabolMods
               for (int x = 0; x <= -offx + maxx; x++) { // add auto-clear area
                 for (int y = 0; y <= -offz + maxy; y++) {
                   for (int z = 0; z <= -offz + maxz; z++) {
-                    blocks [string.Format ("{0}?{1}?{2}", x, y, z)] = new BlueprintTodoBlock (x, y, z, "air");
+                    blocks [$"{x}?{y}?{z}"] = new BlueprintTodoBlock (x, y, z, "air");
                   }
                 }
               }
             }
             BlueprintTodoBlock originBlock = null;
-            foreach (JSONNode node in jsonBlocks.LoopArray()) {
+            foreach (JSONNode node in jsonBlocks.LoopArray ()) {
               int startx = getJSONInt (node, "startx", "x", 0, false);
               int starty = getJSONInt (node, "starty", "y", 0, false);
               int startz = getJSONInt (node, "startz", "z", 0, false);
               string typename;
               if (!node.TryGetAs ("typename", out typename)) {
                 if (!node.TryGetAs ("t", out typename)) {
-                  throw new Exception (string.Format ("typename not defined or not a string"));
+                  throw new Exception ($"typename not defined or not a string");
                 }
               }
               if (typename.EndsWith ("x+")) {
@@ -161,26 +158,26 @@ namespace ScarabolMods
                     if (absX == 0 && absY == 0 && absZ == -1) { // do not replace the blueprint box itself (yet)
                       originBlock = b;
                     } else {
-                      blocks [string.Format ("{0}?{1}?{2}", absX, absY, absZ)] = b;
+                      blocks [$"{absX}?{absY}?{absZ}"] = b;
                     }
                   }
                 }
               }
             }
             if (originBlock != null) {
-              blocks [string.Format ("{0}?{1}?{2}", 0, 0, -1)] = originBlock;
+              blocks [$"{0}?{0}?{-1}"] = originBlock;
             }
-            blueprints.Add (BLUEPRINTS_PREFIX + blueprintName, blocks.Values.ToList ());
-            Pipliz.Log.Write (string.Format ("Added blueprint '{0}' with {1} blocks from {2}", BLUEPRINTS_PREFIX + blueprintName, blocks.Count, filename));
+            Blueprints.Add (BLUEPRINTS_PREFIX + blueprintName, blocks.Values.ToList ());
+            Pipliz.Log.Write ($"Added blueprint '{BLUEPRINTS_PREFIX + blueprintName}' with {blocks.Count} blocks from {filename}");
           }
         } catch (Exception exception) {
-          Pipliz.Log.WriteError (string.Format ("Exception while loading from {0}; {1}", filepath, exception.Message));
+          Pipliz.Log.WriteError ($"Exception while loading from {filepath}; {exception.Message}");
         }
       }
-      Pipliz.Log.Write (string.Format ("Loaded blueprints in {0} ms", DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - StartLoadingBlueprints));
+      Pipliz.Log.Write ($"Loaded blueprints in {DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - startLoadingBlueprints} ms");
     }
 
-    private static int getJSONInt (JSONNode node, string name, string alternativeName, int defaultValue, bool optional)
+    static int getJSONInt (JSONNode node, string name, string alternativeName, int defaultValue, bool optional)
     {
       try {
         return node [name].GetAs<int> ();
@@ -190,9 +187,8 @@ namespace ScarabolMods
         } catch (Exception) {
           if (optional) {
             return defaultValue;
-          } else {
-            throw new Exception (string.Format ("Neither {0} nor {1} defined or not an integer", name, alternativeName));
           }
+          throw new Exception ($"Neither {name} nor {alternativeName} defined or not an integer");
         }
       }
     }

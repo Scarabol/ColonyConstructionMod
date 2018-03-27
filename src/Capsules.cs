@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Pipliz;
@@ -30,7 +29,7 @@ namespace ScarabolMods
     public static void AfterAddingBaseTypes (Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
     {
       string iconFilepath = MultiPath.Combine (ConstructionModEntries.AssetsDirectory, "icons", "capsule.png");
-      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
+      foreach (string blueprintTypename in ManagerBlueprints.Blueprints.Keys) {
         itemTypes.Add (blueprintTypename + CAPSULE_SUFFIX, new ItemTypesServer.ItemTypeRaw (blueprintTypename + CAPSULE_SUFFIX,
           new JSONNode ()
             .SetAs ("onPlaceAudio", "woodPlace")
@@ -57,7 +56,7 @@ namespace ScarabolMods
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.capsules.registertypes")]
     public static void AfterItemTypesDefined ()
     {
-      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
+      foreach (string blueprintTypename in ManagerBlueprints.Blueprints.Keys) {
         ItemTypesServer.RegisterOnAdd (blueprintTypename + CAPSULE_SUFFIX, CapsuleBlockCode.OnPlaceCapsule);
       }
       ChatCommands.CommandManager.RegisterCommand (new CapsuleChatCommand ());
@@ -80,25 +79,25 @@ namespace ScarabolMods
         ServerManager.TryChangeBlock (position, BlockTypes.Builtin.BuiltinBlocks.Air, Players.GetPlayer (NetworkID.Server));
         string capsuleName = ItemTypes.IndexLookup.GetName (capsuleType);
         string blueprintName = capsuleName.Substring (0, capsuleName.Length - CapsulesModEntries.CAPSULE_SUFFIX.Length - 2);
-        Chat.Send (causedBy, string.Format ("Starting to build '{0}' at {1}", blueprintName, position));
+        Chat.Send (causedBy, $"Starting to build '{blueprintName}' at {position}");
         List<BlueprintTodoBlock> blocks;
-        if (ManagerBlueprints.blueprints.TryGetValue (blueprintName, out blocks)) {
+        if (ManagerBlueprints.Blueprints.TryGetValue (blueprintName, out blocks)) {
           int placed = 0, removed = 0, failed = 0;
           ushort bluetype;
           if (ItemTypes.IndexLookup.TryGetIndex (blueprintName + capsuleName.Substring (capsuleName.Length - 2), out bluetype)) {
             foreach (BlueprintTodoBlock block in blocks) {
               Vector3Int realPosition = block.GetWorldPosition (blueprintName, position, bluetype);
-              string baseTypename = TypeHelper.RotatableToBasetype (block.typename);
-              string rotatedTypename = block.typename;
-              if (!baseTypename.Equals (block.typename)) {
+              string baseTypename = TypeHelper.RotatableToBasetype (block.Typename);
+              string rotatedTypename = block.Typename;
+              if (!baseTypename.Equals (block.Typename)) {
                 Vector3Int jobVec = TypeHelper.RotatableToVector (capsuleName);
-                Vector3Int blockVec = TypeHelper.RotatableToVector (block.typename);
+                Vector3Int blockVec = TypeHelper.RotatableToVector (block.Typename);
                 Vector3Int combinedVec = new Vector3Int (-jobVec.z * blockVec.x + jobVec.x * blockVec.z, 0, jobVec.x * blockVec.x + jobVec.z * blockVec.z);
                 rotatedTypename = baseTypename + TypeHelper.VectorToXZ (combinedVec);
               }
               ushort rotatedType;
               if (realPosition.y > 0 && ItemTypes.IndexLookup.TryGetIndex (rotatedTypename, out rotatedType) && ServerManager.TryChangeBlock (realPosition, rotatedType, Players.GetPlayer (NetworkID.Server))) {
-                if (block.typename.Equals ("air")) {
+                if (block.Typename.Equals ("air")) {
                   removed++;
                 } else {
                   placed++;
@@ -108,9 +107,9 @@ namespace ScarabolMods
               }
             }
           }
-          Chat.Send (causedBy, string.Format ("Completed '{0}' at {1} with {2} placed, {3} removed and {4} failed blocks", blueprintName, position, placed, removed, failed));
+          Chat.Send (causedBy, $"Completed '{blueprintName}' at {position} with {placed} placed, {removed} removed and {failed} failed blocks");
         } else {
-          Chat.Send (causedBy, string.Format ("Blueprint '{0}' not found", blueprintName));
+          Chat.Send (causedBy, $"Blueprint '{blueprintName}' not found");
         }
       }, 2.0);
     }
@@ -143,12 +142,12 @@ namespace ScarabolMods
       }
       string blueprintName = matched.Groups ["name"].Value;
       string blueprintFullname = ManagerBlueprints.BLUEPRINTS_PREFIX + blueprintName;
-      if (!ManagerBlueprints.blueprints.ContainsKey (blueprintFullname)) {
-        Chat.Send (causedBy, string.Format ("Blueprint '{0}' not known", blueprintName));
+      if (!ManagerBlueprints.Blueprints.ContainsKey (blueprintFullname)) {
+        Chat.Send (causedBy, $"Blueprint '{blueprintName}' not known");
         return true;
       }
       Stockpile.GetStockPile (causedBy).Add (ItemTypes.IndexLookup.GetIndex (blueprintFullname + CapsulesModEntries.CAPSULE_SUFFIX), amount);
-      Chat.Send (causedBy, string.Format ("Added {0} emperor capsule '{1}' to your stockpile", amount, blueprintName));
+      Chat.Send (causedBy, $"Added {amount} emperor capsule '{blueprintName}' to your stockpile");
       return true;
     }
   }

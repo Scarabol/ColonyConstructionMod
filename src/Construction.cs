@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Pipliz;
 using Pipliz.Chatting;
 using Pipliz.JSON;
-using Pipliz.Threading;
 using Pipliz.Mods.APIProvider.Jobs;
 using NPC;
 using Server.NPCs;
@@ -20,7 +19,7 @@ namespace ScarabolMods
     public static float EXCAVATION_DELAY = 2.0f;
     public static string ModDirectory;
     public static string AssetsDirectory;
-    private static Recipe buildtoolRecipe;
+    static Recipe buildtoolRecipe;
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.construction.assemblyload")]
     public static void OnAssemblyLoaded (string path)
@@ -32,7 +31,7 @@ namespace ScarabolMods
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterStartup, "scarabol.construction.registercallbacks")]
     public static void AfterStartup ()
     {
-      Pipliz.Log.Write ("Loaded Construction Mod 6.0.3 by Scarabol");
+      Log.Write ("Loaded Construction Mod 6.0.3 by Scarabol");
       ManagerBlueprints.LoadBlueprints (Path.Combine (ModDirectory, "blueprints"));
     }
 
@@ -40,7 +39,7 @@ namespace ScarabolMods
     [ModLoader.ModCallbackProvidesFor ("pipliz.apiprovider.jobs.resolvetypes")]
     public static void RegisterJobs ()
     {
-      foreach (string blueprintTypename in ManagerBlueprints.blueprints.Keys) {
+      foreach (string blueprintTypename in ManagerBlueprints.Blueprints.Keys) {
         BlockJobManagerTracker.Register<ConstructionJob> (blueprintTypename);
       }
     }
@@ -57,7 +56,6 @@ namespace ScarabolMods
 
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.construction.loadrecipes")]
     [ModLoader.ModCallbackDependsOn ("pipliz.server.loadresearchables")]
-    [ModLoader.ModCallbackProvidesFor ("pipliz.server.loadsortorder")]
     public static void LoadRecipes ()
     {
       buildtoolRecipe = new Recipe (JOB_ITEM_KEY + ".recipe", new List<InventoryItem> () {
@@ -73,12 +71,12 @@ namespace ScarabolMods
     [ModLoader.ModCallbackProvidesFor ("pipliz.server.localization.convert")]
     public static void AfterWorldLoad ()
     {
-      ModLocalizationHelper.localize (Path.Combine (AssetsDirectory, "localization"), ConstructionModEntries.MOD_PREFIX);
-      foreach (KeyValuePair<string, JSONNode> locEntry in ManagerBlueprints.blueprintsLocalizations) {
+      ModLocalizationHelper.Localize (Path.Combine (AssetsDirectory, "localization"), MOD_PREFIX);
+      foreach (KeyValuePair<string, JSONNode> locEntry in ManagerBlueprints.BlueprintsLocalizations) {
         try {
-          ModLocalizationHelper.localize (locEntry.Key, locEntry.Value, ManagerBlueprints.BLUEPRINTS_PREFIX);
+          ModLocalizationHelper.Localize (locEntry.Key, locEntry.Value, ManagerBlueprints.BLUEPRINTS_PREFIX);
         } catch (Exception exception) {
-          Pipliz.Log.WriteError (string.Format ("Exception while localization of {0}; {1}", locEntry.Key, exception.Message));
+          Log.WriteError ($"Exception while localization of {locEntry.Key}; {exception.Message}");
         }
       }
     }
@@ -86,53 +84,52 @@ namespace ScarabolMods
 
   public class ConstructionJob : BlockJobBase, IBlockJobBase, INPCTypeDefiner
   {
-    NPCInventory blockInventory;
-    bool shouldTakeItems;
-    string fullname;
-    List<BlueprintTodoBlock> todoblocks;
+    NPCInventory BlockInventory;
+    bool ShouldTakeItems;
+    string Fullname;
+    List<BlueprintTodoBlock> Todoblocks;
 
     public override string NPCTypeKey { get { return "scarabol.constructor"; } }
 
-    public override bool NeedsItems { get { return shouldTakeItems; } }
+    public override bool NeedsItems { get { return ShouldTakeItems; } }
 
-    public override InventoryItem RecruitementItem { get { return new InventoryItem (ItemTypes.IndexLookup.GetIndex (ConstructionModEntries.JOB_ITEM_KEY), 1); } }
+    public override InventoryItem RecruitementItem { get { return new InventoryItem (ConstructionModEntries.JOB_ITEM_KEY, 1); } }
 
     public override JSONNode GetJSON ()
     {
       JSONNode jsonTodos = new JSONNode (NodeType.Array);
-      foreach (BlueprintTodoBlock block in todoblocks) {
+      foreach (BlueprintTodoBlock block in Todoblocks) {
         jsonTodos.AddToArray (block.GetJSON ());
       }
       return base.GetJSON ()
-        .SetAs ("inventory", blockInventory.GetJSON ())
-        .SetAs ("shouldTakeItems", shouldTakeItems)
-        .SetAs ("fullname", fullname)
+        .SetAs ("inventory", BlockInventory.GetJSON ())
+        .SetAs ("shouldTakeItems", ShouldTakeItems)
+        .SetAs ("fullname", Fullname)
         .SetAs ("todoblocks", jsonTodos);
     }
 
     public ITrackableBlock InitializeOnAdd (Vector3Int position, ushort type, Players.Player player)
     {
-      blockInventory = new NPCInventory (10000000f);
+      BlockInventory = new NPCInventory (10000000f);
       InitializeJob (player, position, 0);
-      fullname = ItemTypes.IndexLookup.GetName (type);
-      string blueprintTypename = fullname.Substring (0, fullname.Length - 2);
-      List<BlueprintTodoBlock> blocks;
-      ManagerBlueprints.blueprints.TryGetValue (blueprintTypename, out blocks);
-      todoblocks = new List<BlueprintTodoBlock> (blocks);
-      todoblocks.Reverse ();
+      Fullname = ItemTypes.IndexLookup.GetName (type);
+      string blueprintTypename = Fullname.Substring (0, Fullname.Length - 2);
+      ManagerBlueprints.Blueprints.TryGetValue (blueprintTypename, out List<BlueprintTodoBlock> blocks);
+      Todoblocks = new List<BlueprintTodoBlock> (blocks);
+      Todoblocks.Reverse ();
       return this;
     }
 
     public override ITrackableBlock InitializeFromJSON (Players.Player player, JSONNode node)
     {
-      blockInventory = new NPCInventory (10000000f, node ["inventory"]);
-      shouldTakeItems = false;
-      node.TryGetAs ("shouldTakeItems", out shouldTakeItems);
-      fullname = node.GetAs<string> ("fullname");
+      BlockInventory = new NPCInventory (10000000f, node ["inventory"]);
+      ShouldTakeItems = false;
+      node.TryGetAs ("shouldTakeItems", out ShouldTakeItems);
+      Fullname = node.GetAs<string> ("fullname");
       JSONNode jsonTodos = node ["todoblocks"];
-      todoblocks = new List<BlueprintTodoBlock> ();
+      Todoblocks = new List<BlueprintTodoBlock> ();
       foreach (JSONNode jsonBlock in jsonTodos.LoopArray ()) {
-        todoblocks.Add (new BlueprintTodoBlock (jsonBlock));
+        Todoblocks.Add (new BlueprintTodoBlock (jsonBlock));
       }
       InitializeJob (player, (Vector3Int)node ["position"], node.GetAs<int> ("npcID"));
       return this;
@@ -143,46 +140,53 @@ namespace ScarabolMods
       state.JobIsDone = true;
       usedNPC.LookAt (position.Vector);
       if (!state.Inventory.IsEmpty) {
-        state.Inventory.Dump (blockInventory);
+        state.Inventory.Dump (BlockInventory);
       }
-      if (todoblocks.Count < 1) {
-        blockInventory.Dump (usedNPC.Inventory);
-        shouldTakeItems = true;
+      if (Todoblocks.Count < 1) {
+        BlockInventory.Dump (usedNPC.Inventory);
+        ShouldTakeItems = true;
       } else {
         bool placed = false;
-        ushort bluetype = ItemTypes.IndexLookup.GetIndex (fullname);
+        if (!ItemTypes.IndexLookup.TryGetIndex (Fullname, out ushort bluetype)) {
+          string msg = $"Bob here from site at {position}, the blueprint '{Fullname}' does not exist, stopped work here";
+          Log.WriteError (msg);
+          Chat.Send (usedNPC.Colony.Owner, msg);
+          Todoblocks.Clear ();
+          return;
+        }
         ushort scaffoldType = ItemTypes.IndexLookup.GetIndex (ScaffoldsModEntries.SCAFFOLD_ITEM_TYPE);
-        string jobname = TypeHelper.RotatableToBasetype (fullname);
-        for (int i = todoblocks.Count - 1; i >= 0; i--) {
-          BlueprintTodoBlock todoblock = todoblocks [i];
+        string jobname = TypeHelper.RotatableToBasetype (Fullname);
+        for (int i = Todoblocks.Count - 1; i >= 0; i--) {
+          BlueprintTodoBlock todoblock = Todoblocks [i];
           Vector3Int realPosition = todoblock.GetWorldPosition (jobname, position, bluetype);
           if (realPosition.y <= 0) {
-            todoblocks.RemoveAt (i);
+            Todoblocks.RemoveAt (i);
             continue;
           }
-          string baseTypename = TypeHelper.RotatableToBasetype (todoblock.typename);
-          string rotatedTypename = todoblock.typename;
-          if (!baseTypename.Equals (todoblock.typename)) {
-            Vector3Int jobVec = TypeHelper.RotatableToVector (fullname);
-            Vector3Int blockVec = TypeHelper.RotatableToVector (todoblock.typename);
+          string todoblockBaseTypename = TypeHelper.RotatableToBasetype (todoblock.Typename);
+          string todoblockRotatedTypename = todoblock.Typename;
+          if (!todoblockBaseTypename.Equals (todoblock.Typename)) {
+            Vector3Int jobVec = TypeHelper.RotatableToVector (Fullname);
+            Vector3Int blockVec = TypeHelper.RotatableToVector (todoblock.Typename);
             Vector3Int combinedVec = new Vector3Int (-jobVec.z * blockVec.x + jobVec.x * blockVec.z, 0, jobVec.x * blockVec.x + jobVec.z * blockVec.z);
-            rotatedTypename = baseTypename + TypeHelper.VectorToXZ (combinedVec);
+            todoblockRotatedTypename = todoblockBaseTypename + TypeHelper.VectorToXZ (combinedVec);
           }
-          ushort newType = ItemTypes.IndexLookup.GetIndex (rotatedTypename);
-          ushort actualType;
-          if (!World.TryGetTypeAt (realPosition, out actualType) || actualType == newType) {
-            todoblocks.RemoveAt (i);
+          if (!LookupAndWarnItemIndex (todoblockRotatedTypename, out ushort todoblockRotatedType)) {
+            Todoblocks.RemoveAt (i);
+          } else if (!World.TryGetTypeAt (realPosition, out ushort actualType) || actualType == todoblockRotatedType) {
+            Todoblocks.RemoveAt (i);
           } else {
-            ushort baseType = ItemTypes.IndexLookup.GetIndex (baseTypename);
-            if (newType == BuiltinBlocks.Air || blockInventory.TryGetOneItem (baseType)) {
-              todoblocks.RemoveAt (i);
-              if (ServerManager.TryChangeBlock (realPosition, newType, owner)) {
+            if (!LookupAndWarnItemIndex (todoblockBaseTypename, out ushort todoblockBaseType)) {
+              Todoblocks.RemoveAt (i);
+            } else if (todoblockRotatedType == BuiltinBlocks.Air || BlockInventory.TryGetOneItem (todoblockBaseType)) {
+              Todoblocks.RemoveAt (i);
+              if (ServerManager.TryChangeBlock (realPosition, todoblockRotatedType, owner)) {
                 state.JobIsDone = true;
-                if (newType == BuiltinBlocks.Air) {
+                if (todoblockRotatedType == BuiltinBlocks.Air) {
                   state.SetCooldown (ConstructionModEntries.EXCAVATION_DELAY);
                   state.SetIndicator (new Shared.IndicatorState (ConstructionModEntries.EXCAVATION_DELAY, actualType));
-                } else if (!blockInventory.IsEmpty && i > 0) {
-                  state.SetIndicator (new Shared.IndicatorState (0.5f, ItemTypes.IndexLookup.GetIndex (rotatedTypename)));
+                } else if (!BlockInventory.IsEmpty && i > 0) {
+                  state.SetIndicator (new Shared.IndicatorState (0.5f, todoblockRotatedType));
                 }
                 if (actualType != BuiltinBlocks.Air && actualType != BuiltinBlocks.Water && actualType != scaffoldType) {
                   usedNPC.Inventory.Add (ItemTypes.GetType (actualType).OnRemoveItems);
@@ -194,29 +198,36 @@ namespace ScarabolMods
           }
         }
         if (!placed) {
-          blockInventory.Dump (usedNPC.Inventory);
-          shouldTakeItems = true;
+          BlockInventory.Dump (usedNPC.Inventory);
+          ShouldTakeItems = true;
         }
       }
+    }
+
+    bool LookupAndWarnItemIndex (string typename, out ushort type)
+    {
+      string msg = $"Bob here from site at {position}, the item type '{typename}' does not exist. Ignoring it...";
+      Log.WriteError (msg);
+      Chat.Send (usedNPC.Colony.Owner, msg);
+      return ItemTypes.IndexLookup.TryGetIndex (typename, out type);
     }
 
     public override void OnNPCAtStockpile (ref NPCBase.NPCState state)
     {
       state.Inventory.Dump (usedNPC.Colony.UsedStockpile);
-      if (todoblocks.Count < 1) {
+      if (Todoblocks.Count < 1) {
         ServerManager.TryChangeBlock (position, BuiltinBlocks.Air, owner);
         return;
       }
       state.JobIsDone = true;
       if (!ToSleep) {
-        shouldTakeItems = true;
-        for (int i = todoblocks.Count - 1; i >= 0; i--) {
-          BlueprintTodoBlock block = todoblocks [i];
-          if (!block.typename.Equals ("air")) {
-            ushort typeindex;
-            if (ItemTypes.IndexLookup.TryGetIndex (TypeHelper.RotatableToBasetype (block.typename), out typeindex)) {
+        ShouldTakeItems = true;
+        for (int i = Todoblocks.Count - 1; i >= 0; i--) {
+          BlueprintTodoBlock block = Todoblocks [i];
+          if (!block.Typename.Equals ("air")) {
+            if (ItemTypes.IndexLookup.TryGetIndex (TypeHelper.RotatableToBasetype (block.Typename), out ushort typeindex)) {
               if (usedNPC.Colony.UsedStockpile.TryRemove (typeindex, 1)) {
-                shouldTakeItems = false;
+                ShouldTakeItems = false;
                 state.Inventory.Add (typeindex, 1);
                 if (state.Inventory.UsedCapacity >= state.Inventory.Capacity) { // workaround for capacity issue
                   if (state.Inventory.TryGetOneItem (typeindex)) {
@@ -226,32 +237,33 @@ namespace ScarabolMods
                 }
               }
             } else {
-              Chat.Send (usedNPC.Colony.Owner, string.Format ("Bob here from site at {0}, the item type '{1}' does not exist. Ignoring it...", position, block.typename));
-              todoblocks.RemoveAt (i);
+              Chat.Send (usedNPC.Colony.Owner, $"Bob here from site at {position}, the item type '{block.Typename}' does not exist. Ignoring it...");
+              Todoblocks.RemoveAt (i);
             }
           } else {
-            shouldTakeItems = false;
+            ShouldTakeItems = false;
           }
         }
       }
-      if (todoblocks.Count < 1) {
+      if (Todoblocks.Count < 1) {
         ServerManager.TryChangeBlock (position, BuiltinBlocks.Air, owner);
         return;
-      } else if (shouldTakeItems) {
+      }
+      if (ShouldTakeItems) {
         state.JobIsDone = false;
-        state.SetIndicator (new Shared.IndicatorState (6f, ItemTypes.IndexLookup.GetIndex (todoblocks [todoblocks.Count - 1].typename), true, false));
+        state.SetIndicator (new Shared.IndicatorState (6f, ItemTypes.IndexLookup.GetIndex (Todoblocks [Todoblocks.Count - 1].Typename), true, false));
       }
     }
 
     public override void OnRemove ()
     {
-      blockInventory.Dump (Stockpile.GetStockPile (owner));
+      BlockInventory.Dump (Stockpile.GetStockPile (owner));
       base.OnRemove ();
     }
 
     NPCTypeStandardSettings INPCTypeDefiner.GetNPCTypeDefinition ()
     {
-      return new NPCTypeStandardSettings () {
+      return new NPCTypeStandardSettings {
         keyName = NPCTypeKey,
         printName = "Constructor",
         maskColor1 = new UnityEngine.Color32 (75, 100, 140, 255),
