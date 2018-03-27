@@ -31,7 +31,7 @@ namespace ScarabolMods
     [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterStartup, "scarabol.construction.registercallbacks")]
     public static void AfterStartup ()
     {
-      Log.Write ("Loaded Construction Mod 6.0.3 by Scarabol");
+      Log.Write ("Loaded Construction Mod 6.0.4 by Scarabol");
       ManagerBlueprints.LoadBlueprints (Path.Combine (ModDirectory, "blueprints"));
     }
 
