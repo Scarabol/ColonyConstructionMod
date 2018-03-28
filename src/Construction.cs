@@ -206,10 +206,13 @@ namespace ScarabolMods
 
     bool LookupAndWarnItemIndex (string typename, out ushort type)
     {
-      string msg = $"Bob here from site at {position}, the item type '{typename}' does not exist. Ignoring it...";
-      Log.WriteError (msg);
-      Chat.Send (usedNPC.Colony.Owner, msg);
-      return ItemTypes.IndexLookup.TryGetIndex (typename, out type);
+      if (!ItemTypes.IndexLookup.TryGetIndex (typename, out type)) {
+        string msg = $"Bob here from site at {position}, the item type '{typename}' does not exist. Ignoring it...";
+        Log.WriteError (msg);
+        Chat.Send (usedNPC.Colony.Owner, msg);
+        return false;
+      }
+      return true;
     }
 
     public override void OnNPCAtStockpile (ref NPCBase.NPCState state)
@@ -225,7 +228,7 @@ namespace ScarabolMods
         for (int i = Todoblocks.Count - 1; i >= 0; i--) {
           BlueprintTodoBlock block = Todoblocks [i];
           if (!block.Typename.Equals ("air")) {
-            if (ItemTypes.IndexLookup.TryGetIndex (TypeHelper.RotatableToBasetype (block.Typename), out ushort typeindex)) {
+            if (LookupAndWarnItemIndex (TypeHelper.RotatableToBasetype (block.Typename), out ushort typeindex)) {
               if (usedNPC.Colony.UsedStockpile.TryRemove (typeindex, 1)) {
                 ShouldTakeItems = false;
                 state.Inventory.Add (typeindex, 1);
@@ -237,7 +240,6 @@ namespace ScarabolMods
                 }
               }
             } else {
-              Chat.Send (usedNPC.Colony.Owner, $"Bob here from site at {position}, the item type '{block.Typename}' does not exist. Ignoring it...");
               Todoblocks.RemoveAt (i);
             }
           } else {
