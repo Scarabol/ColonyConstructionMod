@@ -8,78 +8,79 @@ using Server.Localization;
 
 namespace ScarabolMods
 {
-  public static class ModLocalizationHelper
-  {
-    public static void Localize (string localePath, string typesprefix)
-    {
-      try {
-        string [] files = Directory.GetFiles (localePath, "translation.json", SearchOption.AllDirectories);
-        foreach (string filepath in files) {
-          try {
-            JSONNode jsonFromMod;
-            if (JSON.Deserialize (filepath, out jsonFromMod, false)) {
-              string locName = Directory.GetParent (filepath).Name;
-              Localize (locName, jsonFromMod, typesprefix);
-            }
-          } catch (Exception exception) {
-            Log.WriteError ($"Exception reading localization from {filepath}; {exception.Message}");
-          }
-        }
-      } catch (DirectoryNotFoundException) {
-        Log.WriteError ($"Localization directory not found at {localePath}");
-      }
-    }
-
-    public static void Localize (string locName, JSONNode jsonFromMod, string typesprefix)
-    {
-      try {
-        JSONNode locNode;
-        if (Localization.LoadedTranslation.TryGetValue (locName, out locNode)) {
-          var toCheck = new Queue<NodePair> ();
-          toCheck.Enqueue (new NodePair ("", jsonFromMod, locNode));
-          while (toCheck.Count > 0) {
-            var current = toCheck.Dequeue ();
-            foreach (KeyValuePair<string, JSONNode> cNode in current.First.LoopObject ()) {
-              string realkey;
-              if (current.Parent.Equals ("types") || current.Parent.Equals ("typeuses")) {
-                realkey = typesprefix + cNode.Key;
-              } else {
-                realkey = cNode.Key;
-              }
-              JSONNode gameNode;
-              if (current.Second.TryGetChild (realkey, out gameNode)) {
-                toCheck.Enqueue (new NodePair (realkey, cNode.Value, gameNode));
-              } else {
-                current.Second.SetAs (realkey, cNode.Value);
-              }
-            }
-          }
-        } else {
-          Localization.LoadedTranslation.Add (locName, jsonFromMod);
-        }
-      } catch (Exception) {
-        Log.WriteError ($"Exception while localizing {locName}");
-      }
-    }
-
-    class NodePair
-    {
-      public string Parent { get; private set; }
-
-      public JSONNode First { get; private set; }
-
-      public JSONNode Second { get; private set; }
-
-      public NodePair (string parent, JSONNode first, JSONNode second)
+    /*
+      public static class ModLocalizationHelper
       {
-        Parent = parent;
-        First = first;
-        Second = second;
-      }
-    }
-  }
+        public static void Localize (string localePath, string typesprefix)
+        {
+          try {
+            string [] files = Directory.GetFiles (localePath, "translation.json", SearchOption.AllDirectories);
+            foreach (string filepath in files) {
+              try {
+                JSONNode jsonFromMod;
+                if (JSON.Deserialize (filepath, out jsonFromMod, false)) {
+                  string locName = Directory.GetParent (filepath).Name;
+                  Localize (locName, jsonFromMod, typesprefix);
+                }
+              } catch (Exception exception) {
+                Log.WriteError ($"Exception reading localization from {filepath}; {exception.Message}");
+              }
+            }
+          } catch (DirectoryNotFoundException) {
+            Log.WriteError ($"Localization directory not found at {localePath}");
+          }
+        }
 
-  public static class MultiPath
+        public static void Localize (string locName, JSONNode jsonFromMod, string typesprefix)
+        {
+          try {
+            JSONNode locNode;
+            if (Localization.LoadedTranslation.TryGetValue (locName, out locNode)) {
+              var toCheck = new Queue<NodePair> ();
+              toCheck.Enqueue (new NodePair ("", jsonFromMod, locNode));
+              while (toCheck.Count > 0) {
+                var current = toCheck.Dequeue ();
+                foreach (KeyValuePair<string, JSONNode> cNode in current.First.LoopObject ()) {
+                  string realkey;
+                  if (current.Parent.Equals ("types") || current.Parent.Equals ("typeuses")) {
+                    realkey = typesprefix + cNode.Key;
+                  } else {
+                    realkey = cNode.Key;
+                  }
+                  JSONNode gameNode;
+                  if (current.Second.TryGetChild (realkey, out gameNode)) {
+                    toCheck.Enqueue (new NodePair (realkey, cNode.Value, gameNode));
+                  } else {
+                    current.Second.SetAs (realkey, cNode.Value);
+                  }
+                }
+              }
+            } else {
+              Localization.LoadedTranslation.Add (locName, jsonFromMod);
+            }
+          } catch (Exception) {
+            Log.WriteError ($"Exception while localizing {locName}");
+          }
+        }
+
+        class NodePair
+        {
+          public string Parent { get; private set; }
+
+          public JSONNode First { get; private set; }
+
+          public JSONNode Second { get; private set; }
+
+          public NodePair (string parent, JSONNode first, JSONNode second)
+          {
+            Parent = parent;
+            First = first;
+            Second = second;
+          }
+        }
+      }
+    */
+public static class MultiPath
   {
     public static string Combine (params string [] pathParts)
     {
