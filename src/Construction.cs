@@ -67,9 +67,9 @@ namespace ScarabolMods
             RecipePlayer.AddDefaultRecipe(buildtoolRecipe);
             }
 
-        /*
+        
             [ModLoader.ModCallback (ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.construction.afterworldload")]
-            [ModLoader.ModCallbackDependsOn ("pipliz.server.localization.waitforloading")]
+            //[ModLoader.ModCallbackDependsOn ("pipliz.server.localization.waitforloading")]
             [ModLoader.ModCallbackProvidesFor ("pipliz.server.localization.convert")]
             public static void AfterWorldLoad ()
             {
@@ -81,7 +81,7 @@ namespace ScarabolMods
                   Log.WriteError ($"Exception while localization of {locEntry.Key}; {exception.Message}");
                 }
               }
-            }*/
+            }
         }
 
 

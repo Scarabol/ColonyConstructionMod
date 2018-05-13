@@ -8,7 +8,7 @@ using Server.Localization;
 
 namespace ScarabolMods
 {
-    /*
+    
       public static class ModLocalizationHelper
       {
         public static void Localize (string localePath, string typesprefix)
@@ -31,37 +31,38 @@ namespace ScarabolMods
           }
         }
 
-        public static void Localize (string locName, JSONNode jsonFromMod, string typesprefix)
-        {
-          try {
-            JSONNode locNode;
-            if (Localization.LoadedTranslation.TryGetValue (locName, out locNode)) {
-              var toCheck = new Queue<NodePair> ();
-              toCheck.Enqueue (new NodePair ("", jsonFromMod, locNode));
-              while (toCheck.Count > 0) {
-                var current = toCheck.Dequeue ();
-                foreach (KeyValuePair<string, JSONNode> cNode in current.First.LoopObject ()) {
-                  string realkey;
-                  if (current.Parent.Equals ("types") || current.Parent.Equals ("typeuses")) {
-                    realkey = typesprefix + cNode.Key;
-                  } else {
-                    realkey = cNode.Key;
-                  }
-                  JSONNode gameNode;
-                  if (current.Second.TryGetChild (realkey, out gameNode)) {
-                    toCheck.Enqueue (new NodePair (realkey, cNode.Value, gameNode));
-                  } else {
-                    current.Second.SetAs (realkey, cNode.Value);
-                  }
+        // Thanks to ZUN for the help with the localization
+        public static void Localize(string locName, JSONNode jsonFromMod, string typesprefix)
+            {
+            try
+                {
+                if(jsonFromMod.HasChild("types"))
+                    {
+                    JSONNode arr = jsonFromMod["types"];
+                    JSONNode result = new JSONNode();
+                    foreach(var pair in arr.LoopObject())
+                        {
+                        result[typesprefix + pair.Key] = pair.Value;
+                        }
+                    jsonFromMod["types"] = result;
+                    }
+                if(jsonFromMod.HasChild("typeuses"))
+                    {
+                    JSONNode arr = jsonFromMod["typeuses"];
+                    JSONNode result = new JSONNode();
+                    foreach(var pair in arr.LoopObject())
+                        {
+                        result[typesprefix + pair.Key] = pair.Value;
+                        }
+                    jsonFromMod["typeuses"] = result;
+                    }
+                Localization.QueueLocalePatch(new Localization.LocalePatch(0, jsonFromMod, locName));
                 }
-              }
-            } else {
-              Localization.LoadedTranslation.Add (locName, jsonFromMod);
+            catch(Exception exception)
+                {
+                    Log.WriteError($"Exception while localization of {locName}; {exception.Message}");
+                }
             }
-          } catch (Exception) {
-            Log.WriteError ($"Exception while localizing {locName}");
-          }
-        }
 
         class NodePair
         {
@@ -79,7 +80,7 @@ namespace ScarabolMods
           }
         }
       }
-    */
+    
 public static class MultiPath
   {
     public static string Combine (params string [] pathParts)
