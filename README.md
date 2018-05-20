@@ -1,5 +1,7 @@
 # Colony Survival Construction Mod by Scarabol
 
+Original Creator: Scarabol Existence Github: https://github.com/Scarabol/ColonyConstructionMod
+
 
 ## Blueprints
 
