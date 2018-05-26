@@ -11,7 +11,31 @@ namespace ScarabolMods
     public static class ScaffoldsModEntries
     {
         public static string SCAFFOLD_ITEM_TYPE = ConstructionModEntries.MOD_PREFIX + "scaffold";
-        public static int MAX_PREVIEW_BLOCKS_THRESHOLD = 1000;
+        public static int PREVIEW_BLOCKS = 1000;
+        public const int MAX_PREVIEW = 10000;
+        public const int MIN_PREVIEW = 0;
+        public const int DEFAULT_PREVIEW = 1000;
+
+        [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.scaffolds.LoadConfig")]
+        public static void LoadConfig(Dictionary<string, ItemTypesServer.ItemTypeRaw> a)
+        {
+            try
+            {
+                JSONNode config = JSON.Deserialize(ConstructionModEntries.ModDirectory + "/config.json");
+
+                if(!config.TryGetAs<int>("previewBlocks", out PREVIEW_BLOCKS))
+                    PREVIEW_BLOCKS = DEFAULT_PREVIEW;
+                else if(PREVIEW_BLOCKS > MAX_PREVIEW || PREVIEW_BLOCKS < MIN_PREVIEW)
+                {
+                    Log.Write(string.Format("<color=red>Warning: previewBlocks must be between {0} and {1} included</color>", MIN_PREVIEW, MAX_PREVIEW));
+                    PREVIEW_BLOCKS = DEFAULT_PREVIEW;
+                }
+            }
+            catch(System.Exception)
+            {
+                PREVIEW_BLOCKS = DEFAULT_PREVIEW;
+            }
+        }
 
         [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.scaffolds.addrawtypes")]
         public static void AfterAddingBaseTypes(Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
@@ -53,7 +77,7 @@ namespace ScarabolMods
             List<BlueprintTodoBlock> blocks;
             if(ManagerBlueprints.Blueprints.TryGetValue(blueprintBasename, out blocks))
             {
-                if(blocks.Count > ScaffoldsModEntries.MAX_PREVIEW_BLOCKS_THRESHOLD)
+                if(blocks.Count > ScaffoldsModEntries.PREVIEW_BLOCKS)
                 {
                     Chat.Send(causedBy, "Blueprint contains too many blocks for preview");
                     return;
@@ -94,7 +118,7 @@ namespace ScarabolMods
             List<BlueprintTodoBlock> blocks;
             if(ManagerBlueprints.Blueprints.TryGetValue(blueprintBasename, out blocks))
             {
-                if(blocks.Count > ScaffoldsModEntries.MAX_PREVIEW_BLOCKS_THRESHOLD)
+                if(blocks.Count > ScaffoldsModEntries.PREVIEW_BLOCKS)
                 {
                     return;
                 }
