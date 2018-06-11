@@ -48,8 +48,6 @@ namespace ScarabolMods
         [ModLoader.ModCallbackDependsOn("pipliz.server.loadresearchables")]
         public static void LoadRecipes()
         {
-            RecipePlayer.AddDefaultRecipe(new Recipe(JOB_ITEM_KEY + ".recipe", new InventoryItem(BuiltinBlocks.Planks, 1), new InventoryItem(JOB_ITEM_KEY, 1), 0));
-
             //Add blueprints as recipes
             foreach(string blueprintTypename in ManagerBlueprints.Blueprints.Keys)
             {

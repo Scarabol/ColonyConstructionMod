@@ -55,19 +55,6 @@ namespace ScarabolMods
             ));
         }
 
-        [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.construction.loadrecipes")]
-        [ModLoader.ModCallbackDependsOn("pipliz.server.loadresearchables")]
-        public static void LoadRecipes()
-        {
-            buildtoolRecipe = new Recipe(JOB_ITEM_KEY + ".recipe", new List<InventoryItem>() {
-        new InventoryItem (BuiltinBlocks.IronIngot, 1),
-        new InventoryItem (BuiltinBlocks.Planks, 1)
-      }, new InventoryItem(JOB_ITEM_KEY, 1), 0);
-            RecipeStorage.AddDefaultLimitTypeRecipe("pipliz.crafter", buildtoolRecipe);
-            RecipePlayer.AddDefaultRecipe(buildtoolRecipe);
-        }
-
-
         [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.construction.afterworldload")]
         //[ModLoader.ModCallbackDependsOn ("pipliz.server.localization.waitforloading")]
         [ModLoader.ModCallbackProvidesFor("pipliz.server.localization.convert")]
