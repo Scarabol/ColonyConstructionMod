@@ -25,10 +25,16 @@ namespace ScarabolMods
 
                 if(!config.TryGetAs<int>("previewBlocks", out PREVIEW_BLOCKS))
                     PREVIEW_BLOCKS = DEFAULT_PREVIEW;
-                else if(PREVIEW_BLOCKS > MAX_PREVIEW || PREVIEW_BLOCKS < MIN_PREVIEW)
+
+                if(PREVIEW_BLOCKS > MAX_PREVIEW)
                 {
                     Log.Write(string.Format("<color=red>Warning: previewBlocks must be between {0} and {1} included</color>", MIN_PREVIEW, MAX_PREVIEW));
-                    PREVIEW_BLOCKS = DEFAULT_PREVIEW;
+                    PREVIEW_BLOCKS = MAX_PREVIEW;
+                }
+                else if(PREVIEW_BLOCKS < MIN_PREVIEW)
+                {
+                    Log.Write(string.Format("<color=red>Warning: previewBlocks must be between {0} and {1} included</color>", MIN_PREVIEW, MAX_PREVIEW));
+                    PREVIEW_BLOCKS = MIN_PREVIEW;
                 }
             }
             catch(System.Exception)
