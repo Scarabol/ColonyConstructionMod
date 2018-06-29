@@ -11,10 +11,10 @@ namespace ScarabolMods
     public static class ScaffoldsModEntries
     {
         public static string SCAFFOLD_ITEM_TYPE = ConstructionModEntries.MOD_PREFIX + "scaffold";
-        public static int PREVIEW_BLOCKS = 1000;
-        public const int MAX_PREVIEW = 10000;
+        public static int PREVIEW_BLOCKS = 5000;
+        public const int MAX_PREVIEW = 25000;
         public const int MIN_PREVIEW = 0;
-        public const int DEFAULT_PREVIEW = 1000;
+        public const int DEFAULT_PREVIEW = 5000;
 
         [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.scaffolds.LoadConfig")]
         public static void LoadConfig(Dictionary<string, ItemTypesServer.ItemTypeRaw> a)
