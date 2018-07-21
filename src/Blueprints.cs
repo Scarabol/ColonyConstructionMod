@@ -7,15 +7,6 @@ namespace ScarabolMods
     [ModLoader.ModManager]
     public static class BlueprintsModEntries
     {
-        [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterSelectedWorld, "scarabol.blueprints.registertexturemappings")]
-        [ModLoader.ModCallbackProvidesFor("pipliz.server.registertexturemappingtextures")]
-        public static void AfterSelectedWorld()
-        {
-            var textureMapping = new ItemTypesServer.TextureMapping(new JSONNode());
-            textureMapping.AlbedoPath = MultiPath.Combine(ConstructionModEntries.AssetsDirectory, "textures", "albedo", "blueprintsTop.png");
-            ItemTypesServer.SetTextureMapping(ConstructionModEntries.MOD_PREFIX + "blueprinttop", textureMapping);
-        }
-
         [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.blueprints.addrawtypes")]
         public static void AfterAddingBaseTypes(Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
         {
@@ -28,7 +19,7 @@ namespace ScarabolMods
                     .SetAs("onRemoveAudio", "woodDeleteLight")
                     .SetAs("icon", iconFilepath)
                     .SetAs("sideall", "planks")
-                    .SetAs("sidey+", ConstructionModEntries.MOD_PREFIX + "blueprinttop")
+                    .SetAs("sidey+", "mods.scarabol.construction.blueprintTop")
                     .SetAs("npcLimit", "0")
                     .SetAs("isRotatable", "true")
                     .SetAs("rotatablex+", blueprintTypename + "x+")

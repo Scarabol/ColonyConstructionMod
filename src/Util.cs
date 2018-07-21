@@ -8,7 +8,6 @@ using Server.Localization;
 
 namespace ScarabolMods
 {
-
     public static class ModLocalizationHelper
     {
         public static void Localize(string localePath, string typesprefix)

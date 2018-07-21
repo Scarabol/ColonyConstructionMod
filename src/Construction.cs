@@ -19,7 +19,6 @@ namespace ScarabolMods
         public static float EXCAVATION_DELAY = 2.0f;
         public static string ModDirectory;
         public static string AssetsDirectory;
-        static Recipe buildtoolRecipe;
 
         [ModLoader.ModCallback(ModLoader.EModCallbackType.OnAssemblyLoaded, "scarabol.construction.assemblyload")]
         public static void OnAssemblyLoaded(string path)
@@ -45,18 +44,7 @@ namespace ScarabolMods
             }
         }
 
-        [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.construction.addrawtypes")]
-        public static void AfterAddingBaseTypes(Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
-        {
-            itemTypes.Add(JOB_ITEM_KEY, new ItemTypesServer.ItemTypeRaw(JOB_ITEM_KEY, new JSONNode()
-              .SetAs("npcLimit", 1)
-              .SetAs("icon", MultiPath.Combine(AssetsDirectory, "icons", "buildtool.png"))
-              .SetAs("isPlaceable", false)
-            ));
-        }
-
         [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterWorldLoad, "scarabol.construction.afterworldload")]
-        //[ModLoader.ModCallbackDependsOn ("pipliz.server.localization.waitforloading")]
         [ModLoader.ModCallbackProvidesFor("pipliz.server.localization.convert")]
         public static void AfterWorldLoad()
         {

@@ -21,29 +21,6 @@ namespace ScarabolMods
             RecipeStorage.AddBlockToRecipeMapping(JOB_ITEM_KEY, JOB_NAME);
         }
 
-        [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterSelectedWorld, "scarabol.architects.registertexturemappings")]
-        [ModLoader.ModCallbackProvidesFor("pipliz.server.registertexturemappingtextures")]
-        public static void AfterSelectedWorld()
-        {
-            var textureMapping = new ItemTypesServer.TextureMapping(new JSONNode());
-            textureMapping.AlbedoPath = MultiPath.Combine(ConstructionModEntries.AssetsDirectory, "textures", "albedo", "architectTop.png");
-            ItemTypesServer.SetTextureMapping(ConstructionModEntries.MOD_PREFIX + "architecttop", textureMapping);
-        }
-
-        [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.architects.addrawtypes")]
-        [ModLoader.ModCallbackDependsOn("scarabol.blueprints.addrawtypes")]
-        public static void AfterAddingBaseTypes(Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
-        {
-            itemTypes.Add(JOB_ITEM_KEY, new ItemTypesServer.ItemTypeRaw(JOB_ITEM_KEY, new JSONNode()
-              .SetAs("onPlaceAudio", "woodPlace")
-              .SetAs("onRemoveAudio", "woodDeleteLight")
-              .SetAs("icon", MultiPath.Combine(ConstructionModEntries.AssetsDirectory, "icons", "architect.png"))
-              .SetAs("sideall", "planks")
-              .SetAs("sidey+", ConstructionModEntries.MOD_PREFIX + "architecttop")
-              .SetAs("npcLimit", 0)
-            ));
-        }
-
         [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.architects.loadrecipes")]
         [ModLoader.ModCallbackDependsOn("pipliz.server.loadresearchables")]
         public static void LoadRecipes()
@@ -64,6 +41,7 @@ namespace ScarabolMods
 
         public override int MaxRecipeCraftsPerHaul { get { return 1; } }
 
+        //Decrease the amount of blueprints to build each time that one is crafted
         protected override void OnRecipeCrafted()
         {
             var recipeStorage = RecipeStorage.GetPlayerStorage(owner);
@@ -92,7 +70,7 @@ namespace ScarabolMods
 
         public override int ShouldBeMade(Stockpile stockpile, RecipeStorage.PlayerRecipeStorage playerStorage = null)
         {
-            return RecipeStorage.GetPlayerStorage(stockpile.Owner).GetRecipeSetting(this.Name).Limit;
+            return RecipeStorage.GetPlayerStorage(stockpile.Owner).GetRecipeSetting(Name).Limit;
         }
     }
 }

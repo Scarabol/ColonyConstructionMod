@@ -43,18 +43,6 @@ namespace ScarabolMods
             }
         }
 
-        [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterAddingBaseTypes, "scarabol.scaffolds.addrawtypes")]
-        public static void AfterAddingBaseTypes(Dictionary<string, ItemTypesServer.ItemTypeRaw> itemTypes)
-        {
-            itemTypes.Add(SCAFFOLD_ITEM_TYPE, new ItemTypesServer.ItemTypeRaw(SCAFFOLD_ITEM_TYPE, new JSONNode()
-              .SetAs("onRemove", new JSONNode(NodeType.Array))
-              .SetAs("isSolid", false)
-              .SetAs("mesh", MultiPath.Combine(ConstructionModEntries.AssetsDirectory, "meshes", "scaffold.obj"))
-              .SetAs("sideall", "planks")
-              .SetAs("destructionTime", 100)
-            ));
-        }
-
         [ModLoader.ModCallback(ModLoader.EModCallbackType.AfterItemTypesDefined, "scarabol.scaffolds.registertypes")]
         public static void AfterItemTypesDefined()
         {
